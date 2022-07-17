@@ -58,7 +58,13 @@ class TetaUserUtils {
       await TetaCMS.instance.analytics.init(userId: user.uid);
       return user;
     }
-    return null;
+    return TetaUser(
+      uid: null,
+      name: null,
+      email: null,
+      provider: null,
+      createdAt: null,
+    );
   }
 
   /// Check if users is logged in
