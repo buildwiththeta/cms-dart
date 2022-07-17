@@ -38,7 +38,16 @@ class TetaUserUtils {
       TetaCMS.printWarning('insertUser body: ${res.body}');
 
       if (res.statusCode != 200) {
-        throw Exception('insertUser resulted in ${res.statusCode} ${res.body}');
+        TetaCMS.printWarning(
+          'insertUser resulted in ${res.statusCode} ${res.body}',
+        );
+        return TetaUser(
+          uid: null,
+          name: null,
+          email: null,
+          provider: null,
+          createdAt: null,
+        );
       }
 
       unawaited(

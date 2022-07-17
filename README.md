@@ -179,8 +179,8 @@ The `isFirstTime` flag tells us whether the user is a first-time login, which is
 
 ```dart
 // Get the current user
-final user = await TetaCMS.instance.auth.user.get;
-if (user?.isLogged) {
+final TetaUser user = await TetaCMS.instance.auth.user.get;
+if (user.isLogged) {
   // The user is logged 🎉
 } else {
   // There is no current user
