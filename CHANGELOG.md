@@ -1,3 +1,11 @@
+# 0.1.7+3
+
+* Improved auth.user.get. Now always returns a TetaUser, with isLogged = false in case there is no user.
+
+# 0.1.7+2
+
+* New Docs
+
 # 0.1.7+1
 
 * Improve UI/UX dashboard within Teta 0.4 
