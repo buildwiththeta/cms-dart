@@ -26,7 +26,7 @@ class TetaAnalytics {
 
   /// Initialize the logged user id
   Future init({final String? userId}) async {
-    _currentUserId = userId ?? (await TetaCMS.instance.auth.user.get)?.uid;
+    _currentUserId = userId ?? (await TetaCMS.instance.auth.user.get).uid;
   }
 
   /// Creates a new event

@@ -1,5 +1,9 @@
 # 0.1.7+3
 
+* Improve Pub points
+
+# 0.1.7+3
+
 * Improved auth.user.get. Now always returns a TetaUser, with isLogged = false in case there is no user.
 
 # 0.1.7+2

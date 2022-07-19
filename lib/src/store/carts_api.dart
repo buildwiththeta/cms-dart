@@ -21,7 +21,7 @@ class TetaStoreCartsApi {
 
   /// Gets a cart by userId
   Future<TetaCartResponse> get() async {
-    final cmsUserId = (await TetaCMS.instance.auth.user.get)?.uid ?? '';
+    final cmsUserId = (await TetaCMS.instance.auth.user.get).uid ?? '';
     final uri = Uri.parse(
       '${Constants.storeCartUrl}$cmsUserId',
     );
@@ -51,7 +51,7 @@ class TetaStoreCartsApi {
   Future<TetaResponse> insert(
     final String productId,
   ) async {
-    final userId = (await TetaCMS.instance.auth.user.get)?.uid;
+    final userId = (await TetaCMS.instance.auth.user.get).uid;
 
     final uri = Uri.parse(
       '${Constants.storeCartUrl}$userId/$productId',
@@ -82,7 +82,7 @@ class TetaStoreCartsApi {
 
   /// Deletes a product by id
   Future<TetaResponse> delete(final String prodId) async {
-    final userId = (await TetaCMS.instance.auth.user.get)?.uid;
+    final userId = (await TetaCMS.instance.auth.user.get).uid;
 
     final uri = Uri.parse(
       '${Constants.storeProductUrl}$userId/$prodId',
@@ -110,7 +110,7 @@ class TetaStoreCartsApi {
   }
 
   Future<TetaPaymentIntentResponse> getPaymentIntent() async {
-    final userId = (await TetaCMS.instance.auth.user.get)?.uid;
+    final userId = (await TetaCMS.instance.auth.user.get).uid;
 
     try {
       final res = await dio.post<String>(
