@@ -1,4 +1,5 @@
-<img src="https://teta.so/wp-content/uploads/2021/03/cropped-favicon-1.png" style="width:80px;margin-bottom:40px"/>
+<br>
+<img src="https://teta.so/wp-content/uploads/2021/03/cropped-favicon-1.png" style="width:100px;margin-bottom:0px"/>
 
 ### Build an app in a weekend
 <br><br>
