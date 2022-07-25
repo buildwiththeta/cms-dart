@@ -1,3 +1,11 @@
+# 0.1.7+5
+
+* Update Readme
+
+# 0.1.7+4
+
+* Update docs and count function
+
 # 0.1.7+3
 
 * Improve Pub points
