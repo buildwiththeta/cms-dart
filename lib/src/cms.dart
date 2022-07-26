@@ -172,34 +172,39 @@ class TetaCMS {
     final accessToken =
         ((json.decode(box.get('SUPABASE_PERSIST_SESSION_KEY') as String)
                 as Map<String, dynamic>)['currentSession']
-            as Map<String, dynamic>)['access_token'] as String;
+            as Map<String, dynamic>?)?['access_token'] as String?;
     final refreshToken =
         ((json.decode(box.get('SUPABASE_PERSIST_SESSION_KEY') as String)
                 as Map<String, dynamic>)['currentSession']
-            as Map<String, dynamic>)['refresh_token'] as String;
+            as Map<String, dynamic>?)?['refresh_token'] as String?;
     //SUPABASE_PERSIST_SESSION_KEY
-    const url = 'https://auth.teta.so/auth';
-    final response = await http.post(
-      Uri.parse(url),
-      headers: {'content-type': 'application/json'},
-      body: json.encode(
-        <String, dynamic>{
-          'access_token': accessToken,
-          'refresh_token': refreshToken,
-        },
-      ),
-    );
-    if (response.statusCode == 200) {
-      final list = json.decode(response.body) as List<dynamic>;
-      final result = list.first as bool;
-      final token = list.last as String;
-      if (result) {
-        return token;
+    if (accessToken != null && refreshToken != null) {
+      const url = 'https://auth.teta.so/auth';
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'content-type': 'application/json'},
+        body: json.encode(
+          <String, dynamic>{
+            'access_token': accessToken,
+            'refresh_token': refreshToken,
+          },
+        ),
+      );
+      if (response.statusCode == 200) {
+        final list = json.decode(response.body) as List<dynamic>;
+        final result = list.first as bool;
+        final token = list.last as String;
+        if (result) {
+          return token;
+        } else {
+          throw Exception('Error putDoc $token');
+        }
       } else {
-        throw Exception('Error putDoc $token');
+        throw Exception(
+          'Error putDoc ${response.statusCode}: ${response.body}',
+        );
       }
-    } else {
-      throw Exception('Error putDoc ${response.statusCode}: ${response.body}');
     }
+    throw Exception('Access token and/or refresh token are null');
   }
 }
