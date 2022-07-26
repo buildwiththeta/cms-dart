@@ -1,10 +1,5 @@
-<br>
-<img src="https://teta.so/wp-content/uploads/2021/03/cropped-favicon-1.png" style="width:100px;margin-bottom:0px"/>
-
-### Build an app in a weekend
-<br><br>
-
-# Hey! Ciao! ¡Hola! !أهلا नमस्ते!<br> Welcome to Teta CMS! ⚡️
+### Hey! Ciao! ¡Hola! !أهلا नमस्ते!<br> 
+# Welcome to Teta CMS! ⚡️
 
 [![pub package](https://img.shields.io/pub/v/teta_cms.svg)](https://pub.dev/packages/teta_cms)
 
