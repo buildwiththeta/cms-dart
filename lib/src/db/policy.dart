@@ -45,14 +45,16 @@ class TetaPolicies {
       );
     }
 
-    await TetaCMS.instance.analytics.insertEvent(
-      TetaAnalyticsType.getPolicies,
-      'Teta CMS: get policies',
-      <String, dynamic>{
-        'weight': res.bodyBytes.lengthInBytes,
-      },
-      isUserIdPreferableIfExists: false,
-    );
+    try {
+      await TetaCMS.instance.analytics.insertEvent(
+        TetaAnalyticsType.getPolicies,
+        'Teta CMS: get policies',
+        <String, dynamic>{
+          'weight': res.bodyBytes.lengthInBytes,
+        },
+        isUserIdPreferableIfExists: false,
+      );
+    } catch (_) {}
 
     final map = json.decode(res.body) as Map<String, dynamic>;
     final backups = <String, dynamic>{};
@@ -104,12 +106,14 @@ class TetaPolicies {
       );
     }
 
-    await TetaCMS.instance.analytics.insertEvent(
-      TetaAnalyticsType.insertPolicy,
-      'Teta CMS: insert new policy',
-      <String, dynamic>{},
-      isUserIdPreferableIfExists: false,
-    );
+    try {
+      await TetaCMS.instance.analytics.insertEvent(
+        TetaAnalyticsType.insertPolicy,
+        'Teta CMS: insert new policy',
+        <String, dynamic>{},
+        isUserIdPreferableIfExists: false,
+      );
+    } catch (_) {}
 
     return TetaResponse<Uint8List, TetaErrorResponse?>(
       data: res.bodyBytes,
@@ -143,12 +147,14 @@ class TetaPolicies {
       );
     }
 
-    await TetaCMS.instance.analytics.insertEvent(
-      TetaAnalyticsType.deletePolicy,
-      'Teta CMS: delete policy',
-      <String, dynamic>{},
-      isUserIdPreferableIfExists: false,
-    );
+    try {
+      await TetaCMS.instance.analytics.insertEvent(
+        TetaAnalyticsType.deletePolicy,
+        'Teta CMS: delete policy',
+        <String, dynamic>{},
+        isUserIdPreferableIfExists: false,
+      );
+    } catch (_) {}
 
     return TetaResponse<void, TetaErrorResponse?>(
       data: null,

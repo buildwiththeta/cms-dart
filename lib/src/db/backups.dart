@@ -42,14 +42,16 @@ class TetaBackups {
       );
     }
 
-    await TetaCMS.instance.analytics.insertEvent(
-      TetaAnalyticsType.getBackups,
-      'Teta CMS: get backups',
-      <String, dynamic>{
-        'weight': res.bodyBytes.lengthInBytes,
-      },
-      isUserIdPreferableIfExists: false,
-    );
+    try {
+      await TetaCMS.instance.analytics.insertEvent(
+        TetaAnalyticsType.getBackups,
+        'Teta CMS: get backups',
+        <String, dynamic>{
+          'weight': res.bodyBytes.lengthInBytes,
+        },
+        isUserIdPreferableIfExists: false,
+      );
+    } catch (_) {}
 
     final map = json.decode(res.body) as List<dynamic>;
     final backups =
@@ -88,12 +90,14 @@ class TetaBackups {
         );
       }
 
-      await TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.downloadBackup,
-        'Teta CMS: download backup request',
-        <String, dynamic>{},
-        isUserIdPreferableIfExists: false,
-      );
+      try {
+        await TetaCMS.instance.analytics.insertEvent(
+          TetaAnalyticsType.downloadBackup,
+          'Teta CMS: download backup request',
+          <String, dynamic>{},
+          isUserIdPreferableIfExists: false,
+        );
+      } catch (_) {}
 
       return TetaResponse<Uint8List, TetaErrorResponse?>(
         data: res.bodyBytes,
@@ -133,12 +137,14 @@ class TetaBackups {
         );
       }
 
-      await TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.restoreBackup,
-        'Teta CMS: restore backup request',
-        <String, dynamic>{},
-        isUserIdPreferableIfExists: false,
-      );
+      try {
+        await TetaCMS.instance.analytics.insertEvent(
+          TetaAnalyticsType.restoreBackup,
+          'Teta CMS: restore backup request',
+          <String, dynamic>{},
+          isUserIdPreferableIfExists: false,
+        );
+      } catch (_) {}
 
       return TetaResponse<void, TetaErrorResponse?>(
         data: null,
