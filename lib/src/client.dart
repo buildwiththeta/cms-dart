@@ -295,7 +295,8 @@ class TetaClient {
     TetaCMS.log('getCollections: ${res.body}');
 
     if (res.statusCode != 200) {
-      throw Exception('getCollections returned status ${res.statusCode}');
+      TetaCMS.log('getCollections returned status ${res.statusCode}');
+      return [];
     }
 
     final data = json.decode(res.body) as List<dynamic>;
