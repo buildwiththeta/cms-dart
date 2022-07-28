@@ -6,6 +6,7 @@ import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:teta_cms/src/constants.dart';
 import 'package:teta_cms/src/platform/index.dart';
+import 'package:teta_cms/src/users/email.dart';
 import 'package:teta_cms/src/users/settings.dart';
 import 'package:teta_cms/src/users/user.dart';
 import 'package:teta_cms/teta_cms.dart';
@@ -22,6 +23,7 @@ class TetaAuth {
   ) {
     project = TetaProjectSettings(token, prjId);
     user = TetaUserUtils(token, prjId);
+    email = TetaEmail(token, prjId);
   }
 
   /// Token of the current prj
@@ -35,6 +37,9 @@ class TetaAuth {
 
   /// User utils
   late TetaUserUtils user;
+
+  /// Teta email
+  late TetaEmail email;
 
   /// Insert a new user inside the prj
   Future<bool> insertUser(final String userToken) async {

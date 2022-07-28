@@ -29,4 +29,9 @@ enum TetaAnalyticsType {
   db,
   store,
   usage,
+  emailInfo,
+  emailInsertTemplate,
+  emailDeleteTemplate,
+  emailUpdateTemplate,
+  emailSend,
 }
