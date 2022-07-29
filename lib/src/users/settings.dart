@@ -2,7 +2,32 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:teta_cms/src/constants.dart';
 import 'package:teta_cms/teta_cms.dart';
+
+enum TetaPlan {
+  free,
+  dev,
+  pro,
+}
+
+class TetaPlanResponse {
+  TetaPlanResponse({
+    required this.isPremium,
+    required this.plan,
+  });
+
+  TetaPlanResponse.fromJson(final Map<String, dynamic> json)
+      : isPremium = json['isPremium'] as bool,
+        plan = (json['premiumPlan'] as int) == 0
+            ? TetaPlan.free
+            : (json['premiumPlan'] as int) == 1
+                ? TetaPlan.dev
+                : TetaPlan.pro;
+
+  final bool isPremium;
+  final TetaPlan plan;
+}
 
 /// Project settings
 class TetaProjectSettings {
@@ -18,13 +43,45 @@ class TetaProjectSettings {
   /// Id of the current prj
   final int prjId;
 
+  Future<TetaResponse<TetaPlanResponse?, TetaErrorResponse?>>
+      retrievePlanInfo() async {
+    final uri = Uri.parse(
+      '${Constants.tetaUrl}auth/credentials/$prjId',
+    );
+
+    final res = await http.post(
+      uri,
+      headers: {
+        'authorization': 'Bearer $token',
+      },
+    );
+
+    if (res.statusCode != 200) {
+      return TetaResponse(
+        data: null,
+        error: TetaErrorResponse(
+          code: res.statusCode,
+          message: res.body,
+        ),
+      );
+    }
+
+    final data = TetaPlanResponse.fromJson(
+      json.decode(res.body) as Map<String, dynamic>,
+    );
+
+    return TetaResponse(
+      data: data,
+      error: null,
+    );
+  }
+
   /// Save OAuth providers credentials
   Future<void> saveCredentials({
-    required final int prjId,
     required final TetaAuthCredentials credentials,
   }) async {
     final uri = Uri.parse(
-      'https://public.teta.so:9840/auth/credentials/$prjId',
+      '${Constants.tetaUrl}auth/credentials/$prjId',
     );
 
     final res = await http.post(
@@ -57,11 +114,9 @@ class TetaProjectSettings {
   }
 
   /// Retrieve project credentials
-  Future<TetaAuthCredentials> retrieveCredentials({
-    required final int prjId,
-  }) async {
+  Future<TetaAuthCredentials> retrieveCredentials() async {
     final uri = Uri.parse(
-      'https://public.teta.so:9840/auth/credentials/services/$prjId',
+      '${Constants.tetaUrl}auth/credentials/services/$prjId',
     );
 
     final res = await http.get(
