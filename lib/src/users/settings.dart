@@ -19,6 +19,34 @@ class TetaProjectSettings {
   /// Id of the current prj
   final int prjId;
 
+  Future<TetaResponse<List<dynamic>, TetaErrorResponse?>> invoices() async {
+    final uri = Uri.parse(
+      '${Constants.tetaUrl}auth/invoices/$prjId',
+    );
+
+    final res = await http.get(
+      uri,
+      headers: {
+        'authorization': 'Bearer $token',
+      },
+    );
+
+    if (res.statusCode != 200) {
+      return TetaResponse(
+        data: <dynamic>[],
+        error: TetaErrorResponse(
+          code: res.statusCode,
+          message: res.body,
+        ),
+      );
+    }
+
+    return TetaResponse(
+      data: <dynamic>[],
+      error: null,
+    );
+  }
+
   Future<TetaResponse<double, TetaErrorResponse?>> retrieveSpaceUsed() async {
     final uri = Uri.parse(
       '${Constants.tetaUrl}cms/space/$prjId',

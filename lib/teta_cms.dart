@@ -7,6 +7,7 @@ export 'src/index.dart';
 export 'src/models/collection.dart';
 export 'src/models/credentials.dart';
 export 'src/models/email_info.dart';
+export 'src/models/email_response.dart';
 export 'src/models/email_template.dart';
 export 'src/models/filter.dart';
 export 'src/models/plan.dart';

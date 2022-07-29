@@ -90,7 +90,7 @@ class TetaAnalytics {
     );
 
     if (res.statusCode != 200) {
-      return TetaResponse<List<dynamic>, TetaErrorResponse>(
+      return TetaResponse<dynamic, TetaErrorResponse>(
         data: <dynamic>[],
         error: TetaErrorResponse(
           code: res.statusCode,
