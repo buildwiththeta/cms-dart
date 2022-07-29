@@ -41,8 +41,12 @@ class TetaProjectSettings {
       );
     }
 
+    final invoices = (json.decode(res.body) as Map<String, dynamic>?)?['data']
+            as List<dynamic>? ??
+        <dynamic>[];
+
     return TetaResponse(
-      data: <dynamic>[],
+      data: invoices,
       error: null,
     );
   }
