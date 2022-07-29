@@ -5,30 +5,6 @@ import 'package:http/http.dart' as http;
 import 'package:teta_cms/src/constants.dart';
 import 'package:teta_cms/teta_cms.dart';
 
-enum TetaPlan {
-  free,
-  dev,
-  pro,
-}
-
-class TetaPlanResponse {
-  TetaPlanResponse({
-    required this.isPremium,
-    required this.plan,
-  });
-
-  TetaPlanResponse.fromJson(final Map<String, dynamic> json)
-      : isPremium = json['isPremium'] as bool,
-        plan = (json['premiumPlan'] as int) == 0
-            ? TetaPlan.free
-            : (json['premiumPlan'] as int) == 1
-                ? TetaPlan.dev
-                : TetaPlan.pro;
-
-  final bool isPremium;
-  final TetaPlan plan;
-}
-
 /// Project settings
 class TetaProjectSettings {
   /// Project settings
