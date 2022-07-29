@@ -19,6 +19,38 @@ class TetaProjectSettings {
   /// Id of the current prj
   final int prjId;
 
+  Future<TetaResponse<double, TetaErrorResponse?>> retrieveSpaceUsed() async {
+    final uri = Uri.parse(
+      '${Constants.tetaUrl}cms/space/$prjId',
+    );
+
+    final res = await http.get(
+      uri,
+      headers: {
+        'authorization': 'Bearer $token',
+      },
+    );
+
+    if (res.statusCode != 200) {
+      return TetaResponse(
+        data: 0,
+        error: TetaErrorResponse(
+          code: res.statusCode,
+          message: res.body,
+        ),
+      );
+    }
+
+    final spaceUsed =
+        (json.decode(res.body) as Map<String, dynamic>)['spaceUsed'] as double;
+    final mb = spaceUsed / 1000 / 1000;
+
+    return TetaResponse(
+      data: mb,
+      error: null,
+    );
+  }
+
   Future<TetaResponse<TetaPlanResponse?, TetaErrorResponse?>>
       retrievePlanInfo() async {
     final uri = Uri.parse(
