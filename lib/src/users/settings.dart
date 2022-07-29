@@ -22,10 +22,10 @@ class TetaProjectSettings {
   Future<TetaResponse<TetaPlanResponse?, TetaErrorResponse?>>
       retrievePlanInfo() async {
     final uri = Uri.parse(
-      '${Constants.tetaUrl}auth/credentials/$prjId',
+      '${Constants.tetaUrl}auth/premium/$prjId',
     );
 
-    final res = await http.post(
+    final res = await http.get(
       uri,
       headers: {
         'authorization': 'Bearer $token',
