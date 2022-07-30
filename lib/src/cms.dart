@@ -55,7 +55,7 @@ class TetaCMS {
   /// [AssertionError] is thrown
   static TetaCMS initialize({
     required final int prjId,
-    final String? token,
+    required final String token,
     final bool? debug,
   }) {
     /*assert(
@@ -63,7 +63,7 @@ class TetaCMS {
       'This instance is already initialized',
     );*/
     _instance._init(
-      token ?? _getToken(),
+      token,
       prjId,
     );
     TetaCMS.log('***** TetaCMS init completed $_instance');
