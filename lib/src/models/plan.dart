@@ -11,10 +11,10 @@ class TetaPlanResponse {
   });
 
   TetaPlanResponse.fromJson(final Map<String, dynamic> json)
-      : isPremium = json['isPremium'] as bool,
-        plan = (json['premiumPlan'] as int) == 0
+      : isPremium = json['isPremium'] as bool? ?? false,
+        plan = (json['premiumPlan'] as int?) == 0
             ? TetaPlan.free
-            : (json['premiumPlan'] as int) == 1
+            : (json['premiumPlan'] as int?) == 1
                 ? TetaPlan.dev
                 : TetaPlan.pro;
 
