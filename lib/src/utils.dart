@@ -21,13 +21,14 @@ class TetaCMSUtils {
     final dynamic amount,
   ) async {
     const url =
-        'https://us-central1-flutter-editor.cloudfunctions.net/paypalPayments';
+        'https://us-central1-flutter-editor.cloudfunctions.net/braintreePay';
     final uri = Uri.parse(
       '$url?payment_method_nonce=$nounce&device_data=$deviceData&amount=$amount',
     );
 
     final res = await http.post(
       uri,
+      headers: {'authorization': 'Bearer $token'},
     );
 
     TetaCMS.log('custom query: ${res.body}');
