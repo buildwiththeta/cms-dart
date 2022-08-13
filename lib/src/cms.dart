@@ -14,6 +14,7 @@ import 'package:teta_cms/src/client.dart';
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/src/di/injection_container.dart';
 import 'package:teta_cms/src/store.dart';
+import 'package:teta_cms/src/utils.dart';
 import 'package:teta_cms/teta_cms.dart';
 import 'package:universal_platform/universal_platform.dart';
 
@@ -91,6 +92,9 @@ class TetaCMS {
   /// The TetaStore instance
   late TetaAnalytics analytics;
 
+  /// Utils
+  late TetaCMSUtils utils;
+
   /// Dispose the instance to free up resources.
   void dispose() {
     _initialized = false;
@@ -137,6 +141,10 @@ class TetaCMS {
       prjId,
     );
     store = sl.get<TetaStore>();
+    utils = TetaCMSUtils(
+      token,
+      prjId,
+    );
 
     if (!UniversalPlatform.isWeb && !Hive.isBoxOpen('Teta Auth')) {
       Hive.init((await getApplicationDocumentsDirectory()).path);
