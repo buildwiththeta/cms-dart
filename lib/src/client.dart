@@ -473,4 +473,26 @@ class TetaClient {
       error: null,
     );
   }
+
+  Future<String> proxy(
+      final String url, final Map<String, String> headers) async {
+    final enc = Uri.encodeComponent(url);
+    final uri = Uri.parse('${Constants.reverseProxyUrl}/$enc');
+    print('Gmaps url: $uri');
+    final res = await http.get(
+      uri,
+      headers: {
+        'authorization': 'Bearer $token',
+        ...headers,
+      },
+    );
+
+    TetaCMS.log('Proxy: ${res.body}');
+
+    if (res.statusCode != 200) {
+      return res.body;
+    } else {
+      throw Exception('Request failed.: ${res.body}');
+    }
+  }
 }

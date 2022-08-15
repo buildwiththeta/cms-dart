@@ -30,4 +30,6 @@ class Constants {
 
   /// Analytics url
   static const String analyticsUrl = 'https://analytics.teta.so:8001/';
+
+  static const String reverseProxyUrl = 'https://cms.teta.so:9720/proxy';
 }
