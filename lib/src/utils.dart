@@ -20,8 +20,7 @@ class TetaCMSUtils {
     final dynamic deviceData,
     final dynamic amount,
   ) async {
-    const url =
-        'https://us-central1-flutter-editor.cloudfunctions.net/braintreePay';
+    final url = 'http://cms.teta.so:9183/pay/$prjId';
     final uri = Uri.parse(
       '$url?payment_method_nonce=$nounce&device_data=$deviceData&amount=$amount',
     );
