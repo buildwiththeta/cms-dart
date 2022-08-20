@@ -475,10 +475,12 @@ class TetaClient {
   }
 
   Future<String> proxy(
-      final String url, final Map<String, String> headers) async {
+    final String url,
+    final Map<String, String> headers,
+  ) async {
     final enc = Uri.encodeComponent(url);
     final uri = Uri.parse('${Constants.reverseProxyUrl}/$enc');
-    print('Gmaps url: $uri');
+    TetaCMS.log('Gmaps url: $uri');
     final res = await http.get(
       uri,
       headers: {

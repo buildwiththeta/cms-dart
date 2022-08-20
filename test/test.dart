@@ -2,7 +2,7 @@ import 'package:teta_cms/teta_cms.dart';
 
 Future<void> insert(final List<String> args) async {
   const collectionId = '0';
-  final res = await TetaCMS.instance.client.insertDocument(
+  await TetaCMS.instance.client.insertDocument(
     collectionId,
     <String, dynamic>{'name': 'Giulia', 'city': 'Roma'},
   );
@@ -11,7 +11,7 @@ Future<void> insert(final List<String> args) async {
 Future<void> update(final List<String> args) async {
   const collectionId = '0';
   const documentId = '0';
-  final res = await TetaCMS.instance.client.updateDocument(
+  await TetaCMS.instance.client.updateDocument(
     collectionId,
     documentId,
     <String, dynamic>{'name': 'Alessia', 'city': 'Milano'},
@@ -21,7 +21,7 @@ Future<void> update(final List<String> args) async {
 Future<void> delete(final List<String> args) async {
   const collectionId = '0';
   const documentId = '0';
-  final res = await TetaCMS.instance.client.deleteDocument(
+  await TetaCMS.instance.client.deleteDocument(
     collectionId,
     documentId,
   );
@@ -29,7 +29,7 @@ Future<void> delete(final List<String> args) async {
 
 Future<void> createCollection(final List<String> args) async {
   const collectionName = '0';
-  final res = await TetaCMS.instance.client.createCollection(
+  await TetaCMS.instance.client.createCollection(
     collectionName,
   );
 }
@@ -37,16 +37,16 @@ Future<void> createCollection(final List<String> args) async {
 Future<void> updateCollection(final List<String> args) async {
   const collectionId = '0';
   const newName = '0';
-  final res = await TetaCMS.instance.client.updateCollection(
+  await TetaCMS.instance.client.updateCollection(
     collectionId,
     newName,
-    <String, dynamic>{'key': 'value', 'key': 'value'},
+    <String, dynamic>{'key': 'value', 'key1': 'value1'},
   );
 }
 
 Future<void> deleteCollection(final List<String> args) async {
   const collectionId = '0';
-  final res = await TetaCMS.instance.client.deleteCollection(
+  await TetaCMS.instance.client.deleteCollection(
     collectionId,
   );
 }
