@@ -489,9 +489,10 @@ class TetaClient {
       },
     );
 
+    TetaCMS.log('Status Code: ${res.statusCode}');
     TetaCMS.log('Proxy: ${res.body}');
 
-    if (res.statusCode != 200) {
+    if (res.statusCode == 200) {
       return res.body;
     } else {
       throw Exception('Request failed.: ${res.body}');
