@@ -194,11 +194,13 @@ class TetaRealtime {
       collectionId: collectionId,
       callback: (final e) async {
         try {
-          await TetaCMS.instance.analytics.insertEvent(
-            TetaAnalyticsType.streamCollection,
-            'Teta CMS: realtime request',
-            <String, dynamic>{},
-            isUserIdPreferableIfExists: true,
+          unawaited(
+            TetaCMS.instance.analytics.insertEvent(
+              TetaAnalyticsType.streamCollection,
+              'Teta CMS: realtime request',
+              <String, dynamic>{},
+              isUserIdPreferableIfExists: true,
+            ),
           );
         } catch (_) {}
         TetaCMS.printWarning('$filters, $limit, $page');

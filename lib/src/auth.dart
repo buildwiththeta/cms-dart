@@ -68,11 +68,13 @@ class TetaAuth {
 
     if (res.body != '{"warn":"User already registered"}') {
       try {
-        await TetaCMS.instance.analytics.insertEvent(
-          TetaAnalyticsType.tetaAuthSignUp,
-          'Teta Auth: signup request',
-          <String, dynamic>{},
-          isUserIdPreferableIfExists: false,
+        unawaited(
+          TetaCMS.instance.analytics.insertEvent(
+            TetaAnalyticsType.tetaAuthSignUp,
+            'Teta Auth: signup request',
+            <String, dynamic>{},
+            isUserIdPreferableIfExists: false,
+          ),
         );
         return false;
       } catch (_) {}
@@ -113,13 +115,15 @@ class TetaAuth {
     TetaCMS.log('retrieveUsers users: $users');
 
     try {
-      await TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.tetaAuthRetrieveUsers,
-        'Teta Auth: retrieve users request',
-        <String, dynamic>{
-          'weight': res.bodyBytes.lengthInBytes,
-        },
-        isUserIdPreferableIfExists: false,
+      unawaited(
+        TetaCMS.instance.analytics.insertEvent(
+          TetaAnalyticsType.tetaAuthRetrieveUsers,
+          'Teta Auth: retrieve users request',
+          <String, dynamic>{
+            'weight': res.bodyBytes.lengthInBytes,
+          },
+          isUserIdPreferableIfExists: false,
+        ),
       );
     } catch (_) {}
 

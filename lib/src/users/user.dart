@@ -64,7 +64,9 @@ class TetaUserUtils {
       final user = TetaUser.fromJson(
         json.decode(res.body) as Map<String, dynamic>? ?? <String, dynamic>{},
       );
-      await TetaCMS.instance.analytics.init(userId: user.uid);
+      unawaited(
+        TetaCMS.instance.analytics.init(userId: user.uid),
+      );
       return user;
     }
     return TetaUser(

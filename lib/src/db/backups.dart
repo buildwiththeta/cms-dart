@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -43,13 +44,15 @@ class TetaBackups {
     }
 
     try {
-      await TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.getBackups,
-        'Teta CMS: get backups',
-        <String, dynamic>{
-          'weight': res.bodyBytes.lengthInBytes,
-        },
-        isUserIdPreferableIfExists: false,
+      unawaited(
+        TetaCMS.instance.analytics.insertEvent(
+          TetaAnalyticsType.getBackups,
+          'Teta CMS: get backups',
+          <String, dynamic>{
+            'weight': res.bodyBytes.lengthInBytes,
+          },
+          isUserIdPreferableIfExists: false,
+        ),
       );
     } catch (_) {}
 
@@ -91,11 +94,13 @@ class TetaBackups {
       }
 
       try {
-        await TetaCMS.instance.analytics.insertEvent(
-          TetaAnalyticsType.downloadBackup,
-          'Teta CMS: download backup request',
-          <String, dynamic>{},
-          isUserIdPreferableIfExists: false,
+        unawaited(
+          TetaCMS.instance.analytics.insertEvent(
+            TetaAnalyticsType.downloadBackup,
+            'Teta CMS: download backup request',
+            <String, dynamic>{},
+            isUserIdPreferableIfExists: false,
+          ),
         );
       } catch (_) {}
 
@@ -138,11 +143,13 @@ class TetaBackups {
       }
 
       try {
-        await TetaCMS.instance.analytics.insertEvent(
-          TetaAnalyticsType.restoreBackup,
-          'Teta CMS: restore backup request',
-          <String, dynamic>{},
-          isUserIdPreferableIfExists: false,
+        unawaited(
+          TetaCMS.instance.analytics.insertEvent(
+            TetaAnalyticsType.restoreBackup,
+            'Teta CMS: restore backup request',
+            <String, dynamic>{},
+            isUserIdPreferableIfExists: false,
+          ),
         );
       } catch (_) {}
 

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -46,13 +47,15 @@ class TetaPolicies {
     }
 
     try {
-      await TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.getPolicies,
-        'Teta CMS: get policies',
-        <String, dynamic>{
-          'weight': res.bodyBytes.lengthInBytes,
-        },
-        isUserIdPreferableIfExists: false,
+      unawaited(
+        TetaCMS.instance.analytics.insertEvent(
+          TetaAnalyticsType.getPolicies,
+          'Teta CMS: get policies',
+          <String, dynamic>{
+            'weight': res.bodyBytes.lengthInBytes,
+          },
+          isUserIdPreferableIfExists: false,
+        ),
       );
     } catch (_) {}
 
@@ -107,11 +110,13 @@ class TetaPolicies {
     }
 
     try {
-      await TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.insertPolicy,
-        'Teta CMS: insert new policy',
-        <String, dynamic>{},
-        isUserIdPreferableIfExists: false,
+      unawaited(
+        TetaCMS.instance.analytics.insertEvent(
+          TetaAnalyticsType.insertPolicy,
+          'Teta CMS: insert new policy',
+          <String, dynamic>{},
+          isUserIdPreferableIfExists: false,
+        ),
       );
     } catch (_) {}
 
@@ -148,11 +153,13 @@ class TetaPolicies {
     }
 
     try {
-      await TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.deletePolicy,
-        'Teta CMS: delete policy',
-        <String, dynamic>{},
-        isUserIdPreferableIfExists: false,
+      unawaited(
+        TetaCMS.instance.analytics.insertEvent(
+          TetaAnalyticsType.deletePolicy,
+          'Teta CMS: delete policy',
+          <String, dynamic>{},
+          isUserIdPreferableIfExists: false,
+        ),
       );
     } catch (_) {}
 

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -56,11 +57,13 @@ class TetaClient {
     final data = json.decode(res.body) as Map<String, dynamic>;
 
     try {
-      await TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.createCollection,
-        'Teta CMS: create collection request',
-        <String, dynamic>{},
-        isUserIdPreferableIfExists: false,
+      unawaited(
+        TetaCMS.instance.analytics.insertEvent(
+          TetaAnalyticsType.createCollection,
+          'Teta CMS: create collection request',
+          <String, dynamic>{},
+          isUserIdPreferableIfExists: false,
+        ),
       );
     } catch (_) {}
 
@@ -93,11 +96,13 @@ class TetaClient {
     }
 
     try {
-      await TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.deleteCollection,
-        'Teta CMS: delete collection request',
-        <String, dynamic>{},
-        isUserIdPreferableIfExists: false,
+      unawaited(
+        TetaCMS.instance.analytics.insertEvent(
+          TetaAnalyticsType.deleteCollection,
+          'Teta CMS: delete collection request',
+          <String, dynamic>{},
+          isUserIdPreferableIfExists: false,
+        ),
       );
     } catch (_) {}
 
@@ -133,11 +138,15 @@ class TetaClient {
     }
 
     try {
-      await TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.insertDocument,
-        'Teta CMS: insert document request',
-        <String, dynamic>{'weight': utf8.encode(json.encode(document)).length},
-        isUserIdPreferableIfExists: true,
+      unawaited(
+        TetaCMS.instance.analytics.insertEvent(
+          TetaAnalyticsType.insertDocument,
+          'Teta CMS: insert document request',
+          <String, dynamic>{
+            'weight': utf8.encode(json.encode(document)).length
+          },
+          isUserIdPreferableIfExists: true,
+        ),
       );
     } catch (_) {}
 
@@ -171,11 +180,13 @@ class TetaClient {
     }
 
     try {
-      await TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.deleteDocument,
-        'Teta CMS: delete document request',
-        <String, dynamic>{},
-        isUserIdPreferableIfExists: true,
+      unawaited(
+        TetaCMS.instance.analytics.insertEvent(
+          TetaAnalyticsType.deleteDocument,
+          'Teta CMS: delete document request',
+          <String, dynamic>{},
+          isUserIdPreferableIfExists: true,
+        ),
       );
     } catch (_) {}
 
@@ -220,13 +231,15 @@ class TetaClient {
     }
 
     try {
-      await TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.getCollection,
-        'Teta CMS: cms request',
-        <String, dynamic>{
-          'weight': res.bodyBytes.lengthInBytes,
-        },
-        isUserIdPreferableIfExists: true,
+      unawaited(
+        TetaCMS.instance.analytics.insertEvent(
+          TetaAnalyticsType.getCollection,
+          'Teta CMS: cms request',
+          <String, dynamic>{
+            'weight': res.bodyBytes.lengthInBytes,
+          },
+          isUserIdPreferableIfExists: true,
+        ),
       );
     } catch (_) {}
 
@@ -278,11 +291,13 @@ class TetaClient {
     final count = data['count'] as int? ?? 0;
 
     try {
-      await TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.getCollectionCount,
-        'Teta CMS: count request',
-        <String, dynamic>{},
-        isUserIdPreferableIfExists: true,
+      unawaited(
+        TetaCMS.instance.analytics.insertEvent(
+          TetaAnalyticsType.getCollectionCount,
+          'Teta CMS: count request',
+          <String, dynamic>{},
+          isUserIdPreferableIfExists: true,
+        ),
       );
     } catch (_) {}
 
@@ -313,13 +328,15 @@ class TetaClient {
     final data = json.decode(res.body) as List<dynamic>;
 
     try {
-      await TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.getCollections,
-        'Teta CMS: get collections request',
-        <String, dynamic>{
-          'weight': res.bodyBytes.lengthInBytes,
-        },
-        isUserIdPreferableIfExists: false,
+      unawaited(
+        TetaCMS.instance.analytics.insertEvent(
+          TetaAnalyticsType.getCollections,
+          'Teta CMS: get collections request',
+          <String, dynamic>{
+            'weight': res.bodyBytes.lengthInBytes,
+          },
+          isUserIdPreferableIfExists: false,
+        ),
       );
     } catch (_) {}
 
@@ -366,13 +383,15 @@ class TetaClient {
     TetaCMS.log(res.body);
 
     try {
-      await TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.updateCollection,
-        'Teta CMS: update collection request',
-        <String, dynamic>{
-          'weight': res.bodyBytes.lengthInBytes,
-        },
-        isUserIdPreferableIfExists: true,
+      unawaited(
+        TetaCMS.instance.analytics.insertEvent(
+          TetaAnalyticsType.updateCollection,
+          'Teta CMS: update collection request',
+          <String, dynamic>{
+            'weight': res.bodyBytes.lengthInBytes,
+          },
+          isUserIdPreferableIfExists: true,
+        ),
       );
     } catch (_) {}
 
@@ -409,13 +428,15 @@ class TetaClient {
     TetaCMS.log(res.body);
 
     try {
-      await TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.updateDocument,
-        'Teta CMS: update document request',
-        <String, dynamic>{
-          'weight': res.bodyBytes.lengthInBytes,
-        },
-        isUserIdPreferableIfExists: true,
+      unawaited(
+        TetaCMS.instance.analytics.insertEvent(
+          TetaAnalyticsType.updateDocument,
+          'Teta CMS: update document request',
+          <String, dynamic>{
+            'weight': res.bodyBytes.lengthInBytes,
+          },
+          isUserIdPreferableIfExists: true,
+        ),
       );
     } catch (_) {}
 
@@ -456,13 +477,15 @@ class TetaClient {
     }
 
     try {
-      await TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.customQuery,
-        'Teta CMS: custom queries request',
-        <String, dynamic>{
-          'weight': res.bodyBytes.lengthInBytes + utf8.encode(query).length,
-        },
-        isUserIdPreferableIfExists: false,
+      unawaited(
+        TetaCMS.instance.analytics.insertEvent(
+          TetaAnalyticsType.customQuery,
+          'Teta CMS: custom queries request',
+          <String, dynamic>{
+            'weight': res.bodyBytes.lengthInBytes + utf8.encode(query).length,
+          },
+          isUserIdPreferableIfExists: false,
+        ),
       );
     } catch (_) {}
 

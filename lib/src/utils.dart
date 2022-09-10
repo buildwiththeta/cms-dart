@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -43,11 +44,13 @@ class TetaCMSUtils {
     }
 
     try {
-      await TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.customQuery,
-        'Braintree: purchase',
-        <String, dynamic>{},
-        isUserIdPreferableIfExists: false,
+      unawaited(
+        TetaCMS.instance.analytics.insertEvent(
+          TetaAnalyticsType.customQuery,
+          'Braintree: purchase',
+          <String, dynamic>{},
+          isUserIdPreferableIfExists: false,
+        ),
       );
     } catch (_) {}
 
