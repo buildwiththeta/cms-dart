@@ -503,7 +503,6 @@ class TetaClient {
   ) async {
     final enc = Uri.encodeComponent(url);
     final uri = Uri.parse('${Constants.reverseProxyUrl}/$enc');
-    TetaCMS.log('Gmaps url: $uri');
     final res = await http.get(
       uri,
       headers: {
@@ -511,9 +510,6 @@ class TetaClient {
         ...headers,
       },
     );
-
-    TetaCMS.log('Status Code: ${res.statusCode}');
-    TetaCMS.log('Proxy: ${res.body}');
 
     if (res.statusCode == 200) {
       return res.body;
