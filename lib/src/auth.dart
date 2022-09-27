@@ -4,8 +4,11 @@ import 'dart:convert';
 import 'package:enum_to_string/enum_to_string.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
+import 'package:injectable/injectable.dart';
 import 'package:teta_cms/src/constants.dart';
+import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/src/platform/index.dart';
+import 'package:teta_cms/src/use_cases/get_server_request_headers/get_server_request_headers.dart';
 import 'package:teta_cms/src/users/email.dart';
 import 'package:teta_cms/src/users/settings.dart';
 import 'package:teta_cms/src/users/user.dart';
@@ -15,44 +18,42 @@ import 'package:universal_platform/universal_platform.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Teta Auth - Control all the methods about authentication
+@lazySingleton
 class TetaAuth {
   /// Teta Auth - Control all the methods about authentication
   TetaAuth(
-    this.token,
-    this.prjId,
-  ) {
-    project = TetaProjectSettings(token, prjId);
-    user = TetaUserUtils(token, prjId);
-    email = TetaEmail(token, prjId);
-  }
-
-  /// Token of the current prj
-  final String token;
-
-  /// Id of the current prj
-  final int prjId;
+    this.project,
+    this.user,
+    this.email,
+    this.serverRequestMetadata,
+    this.getServerRequestHeaders,
+  );
 
   /// Project settings
-  late TetaProjectSettings project;
+  final TetaProjectSettings project;
 
   /// User utils
-  late TetaUserUtils user;
+  final TetaUserUtils user;
 
   /// Teta email
-  late TetaEmail email;
+  final TetaEmail email;
+
+  ///This stores the token and project id headers.
+  final ServerRequestMetadataStore serverRequestMetadata;
+
+  ///Get standard Teta heders
+  final GetServerRequestHeaders getServerRequestHeaders;
 
   /// Insert a new user inside the prj
   Future<bool> insertUser(final String userToken) async {
+    final requestMetadata = serverRequestMetadata.getMetadata();
     final uri = Uri.parse(
-      '${Constants.tetaUrl}auth/users/$prjId',
+      '${Constants.tetaUrl}auth/users/${requestMetadata.prjId}',
     );
 
     final res = await http.post(
       uri,
-      headers: {
-        'authorization': 'Bearer $token',
-        'content-type': 'application/json',
-      },
+      headers: getServerRequestHeaders.execute(),
       body: json.encode(
         <String, dynamic>{
           'token': userToken,
@@ -89,6 +90,8 @@ class TetaAuth {
     final int limit = 10,
     final int page = 0,
   }) async {
+    final requestMetadata = serverRequestMetadata.getMetadata();
+
     final uri = Uri.parse(
       '${Constants.tetaUrl}auth/users/$prjId',
     );
@@ -96,7 +99,7 @@ class TetaAuth {
     final res = await http.get(
       uri,
       headers: {
-        'authorization': 'Bearer $token',
+        'authorization': 'Bearer ${requestMetadata.token}',
         'page': '$page',
         'page-elems': '$limit',
       },
@@ -136,12 +139,14 @@ class TetaAuth {
     required final TetaProvider provider,
   }) async {
     TetaCMS.log('signIn');
+    final requestMetadata = serverRequestMetadata.getMetadata();
+
     final param = EnumToString.convertToString(provider);
     final device = UniversalPlatform.isWeb ? 'web' : 'mobile';
     final res = await http.post(
       Uri.parse('https://auth.teta.so/auth/$param/$prjId/$device'),
       headers: {
-        'authorization': 'Bearer $token',
+        'authorization': 'Bearer ${requestMetadata.token}',
         'content-type': 'application/json',
       },
     );
@@ -163,7 +168,9 @@ class TetaAuth {
     /// The external provider
     final TetaProvider provider = TetaProvider.google,
   }) async {
-    final url = await _signIn(prjId: prjId, provider: provider);
+    final requestMetadata = serverRequestMetadata.getMetadata();
+
+    final url = await _signIn(prjId: requestMetadata.prjId, provider: provider);
     await CMSPlatform.login(url, (final userToken) async {
       if (!UniversalPlatform.isWeb) {
         uriLinkStream.listen(
@@ -230,6 +237,8 @@ class TetaAuth {
   Future<TetaResponse<dynamic, TetaErrorResponse?>> get(
     final String ayayaQuery,
   ) async {
+    final requestMetadata = serverRequestMetadata.getMetadata();
+
     final uri = Uri.parse(
       '${Constants.tetaUrl}auth/aya',
     );
@@ -237,11 +246,11 @@ class TetaAuth {
     final res = await http.post(
       uri,
       headers: {
-        'authorization': 'Bearer $token',
-        'x-identifier': '$prjId',
+        'authorization': 'Bearer ${requestMetadata.token}',
+        'x-identifier': '${requestMetadata.prjId}',
       },
       body: '''
-      ON prj_id* $prjId;
+      ON prj_id* ${requestMetadata.prjId};
       $ayayaQuery
       ''',
     );

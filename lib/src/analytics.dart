@@ -2,24 +2,21 @@ import 'dart:convert';
 
 import 'package:enum_to_string/enum_to_string.dart';
 import 'package:http/http.dart' as http;
+import 'package:injectable/injectable.dart';
 import 'package:teta_cms/src/constants.dart';
+import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/teta_cms.dart';
 
 /// Teta Analytics is our service to track events in an OLAP DB
+@lazySingleton
 class TetaAnalytics {
   ///
-  TetaAnalytics(
-    this.token,
-    this.prjId,
-  ) {
+  TetaAnalytics(this.serverRequestMetadata) {
     init();
   }
 
-  /// Token of the current prj
-  final String token;
-
-  /// Id of the current prj
-  final int prjId;
+  ///This stores the token and project id headers.
+  final ServerRequestMetadataStore serverRequestMetadata;
 
   /// Detected id of the logged user
   String? _currentUserId;
@@ -39,17 +36,18 @@ class TetaAnalytics {
     final uri = Uri.parse(
       '${Constants.analyticsUrl}events/add/${EnumToString.convertToString(type)}',
     );
+    final serverMetadata = serverRequestMetadata.getMetadata();
 
     final res = await http.post(
       uri,
       headers: {
         'content-type': 'application/json',
-        'authorization': 'Bearer $token',
-        'x-identifier': '$prjId',
+        'authorization': 'Bearer ${serverMetadata.token}',
+        'x-identifier': '${serverMetadata.prjId}',
       },
       body: json.encode(<String, dynamic>{
         'description': description,
-        'prj_id': prjId,
+        'prj_id': {serverMetadata.prjId},
         if (isUserIdPreferableIfExists && _currentUserId != null)
           'user_id': _currentUserId,
         ...properties,
@@ -79,12 +77,13 @@ class TetaAnalytics {
     final uri = Uri.parse(
       '${Constants.analyticsUrl}events/aya',
     );
+    final serverMetadata = serverRequestMetadata.getMetadata();
 
     final res = await http.post(
       uri,
       headers: {
-        'authorization': 'Bearer $token',
-        'x-identifier': '$prjId',
+        'authorization': 'Bearer ${serverMetadata.token}',
+        'x-identifier': '${serverMetadata.prjId}',
       },
       body: ayayaQuery,
     );

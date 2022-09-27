@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
+import 'package:injectable/injectable.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path_provider_android/path_provider_android.dart';
 import 'package:path_provider_ios/path_provider_ios.dart';
@@ -12,7 +13,7 @@ import 'package:teta_cms/src/analytics.dart';
 import 'package:teta_cms/src/auth.dart';
 import 'package:teta_cms/src/client.dart';
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
-import 'package:teta_cms/src/di/injection_container.dart';
+import 'package:teta_cms/src/di/injector.dart';
 import 'package:teta_cms/src/shop.dart';
 import 'package:teta_cms/src/utils.dart';
 import 'package:teta_cms/teta_cms.dart';
@@ -121,41 +122,27 @@ class TetaCMS {
     }
 
     if (!diInitialized) {
-      initGetIt();
+      await configureDependencies(const Environment(Environment.prod));
       diInitialized = true;
     }
 
-    sl
+    getIt
         .get<ServerRequestMetadataStore>()
         .updateMetadata(token: token, prjId: prjId);
-    realtime = TetaRealtime(
-      token,
-      prjId,
-    );
-    auth = TetaAuth(
-      token,
-      prjId,
-    );
-    client = TetaClient(
-      token,
-      prjId,
-    );
-    store = sl.get<TetaShop>();
-    utils = TetaCMSUtils(
-      token,
-      prjId,
-    );
+    realtime = getIt.get<TetaRealtime>();
+    auth = getIt.get<TetaAuth>();
+    client = getIt.get<TetaClient>();
+    store = getIt.get<TetaStore>();
+    utils = getIt.get<TetaCMSUtils>();
 
     if (!UniversalPlatform.isWeb && !Hive.isBoxOpen('Teta Auth')) {
       Hive.init((await getApplicationDocumentsDirectory()).path);
     }
     _initialized = true;
-    analytics = TetaAnalytics(
-      token,
-      prjId,
-    );
+    analytics = getIt.get<TetaAnalytics>();
   }
 
+  /// Get CMS token
   static String _getToken() {
     final box = Hive.box<dynamic>('Teta_CMS');
     return box.get('tkn') as String;

@@ -11,3 +11,5 @@ linter:
     prefer_constructors_over_static_methods: false
     library_private_types_in_public_api: false
     prefer_final_parameters: true
+analyzer:
+  exclude: [lib/src/di/injector.config.dart]
