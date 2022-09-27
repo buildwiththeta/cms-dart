@@ -3,29 +3,30 @@ import 'dart:convert';
 
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
+import 'package:injectable/injectable.dart';
+import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/teta_cms.dart';
 
 /// User utils
+@lazySingleton
 class TetaUserUtils {
   /// User utils
   TetaUserUtils(
-    this.token,
-    this.prjId,
+    this.serverRequestMetadata,
   );
 
-  /// Token of the current prj
-  final String token;
-
-  /// Id of the current prj
-  final int prjId;
+  ///This stores the token and project id headers.
+  final ServerRequestMetadataStore serverRequestMetadata;
 
   /// Check if users is logged in
   Future<TetaUser> get get async {
+    final serverMetadata = serverRequestMetadata.getMetadata();
+
     final box = await Hive.openBox<dynamic>('Teta Auth');
     final accessToken = await box.get('access_tkn') as String?;
     if (accessToken != null) {
       final uri = Uri.parse(
-        'https://cms.teta.so:9840/auth/info/$prjId',
+        'https://cms.teta.so:9840/auth/info/${serverMetadata.prjId}',
       );
 
       final res = await http.get(
@@ -84,7 +85,7 @@ class TetaUserUtils {
     return await box.get('access_tkn') != null;
   }
 
-  /*Future verifyToken() async {
+/*Future verifyToken() async {
     try {
 
       // Verify a token

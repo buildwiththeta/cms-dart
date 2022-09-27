@@ -1,6 +1,8 @@
+import 'package:injectable/injectable.dart';
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 
 /// Teta Store Headers
+@lazySingleton
 class GetServerRequestHeaders {
   /// Teta Store Headers
   GetServerRequestHeaders(this.metadataStore);

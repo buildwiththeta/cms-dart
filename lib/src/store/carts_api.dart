@@ -3,20 +3,27 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
+import 'package:injectable/injectable.dart';
 import 'package:teta_cms/src/constants.dart';
 import 'package:teta_cms/src/mappers/cart_mapper.dart';
 import 'package:teta_cms/src/use_cases/get_server_request_headers/get_server_request_headers.dart';
 import 'package:teta_cms/teta_cms.dart';
 
+/// Carts api
+@lazySingleton
 class TetaStoreCartsApi {
+  /// Carts api
   TetaStoreCartsApi(
     this.cartMapper,
     this.getServerRequestHeaders,
     this.dio,
   );
 
+  ///Cart Mapper
   final CartMapper cartMapper;
+  /// Headers util
   final GetServerRequestHeaders getServerRequestHeaders;
+  ///Http client
   final Dio dio;
 
   /// Gets a cart by userId

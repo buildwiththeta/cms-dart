@@ -11,6 +11,7 @@ class Constants {
 
   /// Standard Teta url
   static const String tetaUrl = 'https://$_host:$_port/';
+  /// Standard email url
   static const String emailUrl = 'https://$_host:5001/';
 
   /// Default Http headers
@@ -31,5 +32,6 @@ class Constants {
   /// Analytics url
   static const String analyticsUrl = 'https://analytics.teta.so:8001/';
 
+  /// Reverse proxy url
   static const String reverseProxyUrl = 'https://cms.teta.so:9720/proxy';
 }

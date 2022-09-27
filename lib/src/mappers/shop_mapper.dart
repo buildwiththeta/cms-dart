@@ -1,15 +1,20 @@
+import 'package:injectable/injectable.dart';
 import 'package:teta_cms/src/mappers/cart_mapper.dart';
 import 'package:teta_cms/src/mappers/product_mapper.dart';
 import 'package:teta_cms/src/models/store/cart.dart';
 import 'package:teta_cms/src/models/store/product.dart';
 import 'package:teta_cms/src/models/store/shop.dart';
-
+///Transforms Api Data to knows object.
+@lazySingleton
 class ShopMapper {
+  ///Transforms Api Data to knows object.
   ShopMapper(this.productMapper, this.cartMapper);
 
+  ///Transforms Api Data to knows object.
   final ProductMapper productMapper;
+  ///Transforms Api Data to knows object.
   final CartMapper cartMapper;
-
+  ///Transforms Api Data to knows object.
   TetaShop mapShop(final Map<String, dynamic> json) => TetaShop(
         id: json['id'] as String,
         currency: json['currency'] as String,
@@ -24,7 +29,7 @@ class ShopMapper {
                 json['carts'] as List<Map<String, dynamic>>,
               ),
       );
-
+  ///Transforms Api Data to knows object.
   List<TetaShop> mapShops(final List<Map<String, dynamic>> json) =>
       json.map(mapShop).toList(
             growable: true,

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:injectable/injectable.dart';
 import 'package:teta_cms/src/constants.dart';
 import 'package:teta_cms/src/store/carts_api.dart';
 import 'package:teta_cms/src/store/products_api.dart';
@@ -9,6 +10,7 @@ import 'package:teta_cms/src/use_cases/get_server_request_headers/get_server_req
 import 'package:teta_cms/teta_cms.dart';
 
 /// Teta Store - Control your ecommerce
+@lazySingleton
 class TetaStore {
   /// Teta Store - Control your ecommerce
   TetaStore(
