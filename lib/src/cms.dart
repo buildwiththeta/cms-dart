@@ -13,7 +13,7 @@ import 'package:teta_cms/src/analytics.dart';
 import 'package:teta_cms/src/auth.dart';
 import 'package:teta_cms/src/client.dart';
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
-import 'package:teta_cms/src/di/injector.dart';
+import 'package:teta_cms/src/core/di/injector.dart';
 import 'package:teta_cms/src/store.dart';
 import 'package:teta_cms/src/utils.dart';
 import 'package:teta_cms/teta_cms.dart';

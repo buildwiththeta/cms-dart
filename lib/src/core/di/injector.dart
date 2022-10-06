@@ -1,7 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 
-import 'package:teta_cms/src/di/injector.config.dart';
+import 'package:teta_cms/src/core/di/injector.config.dart';
 
 ///Get the Service locator instance
 final getIt = GetIt.instance;

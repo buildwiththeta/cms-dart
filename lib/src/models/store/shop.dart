@@ -1,5 +1,5 @@
 import 'package:teta_cms/src/models/store/cart.dart';
-import 'package:teta_cms/src/models/store/product.dart';
+import 'package:teta_cms/src/features/store/data/data_sources/models/product_model.dart';
 
 /// Shop model
 class TetaShop {

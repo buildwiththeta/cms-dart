@@ -1,5 +1,5 @@
 import 'package:injectable/injectable.dart';
-import 'package:teta_cms/src/models/store/product.dart';
+import 'package:teta_cms/src/features/store/data/data_sources/models/product_model.dart';
 
 /// This class handles the deserialization of Products
 ///
@@ -11,7 +11,7 @@ import 'package:teta_cms/src/models/store/product.dart';
 @lazySingleton
 class ProductMapper {
   ///Transforms Api Data to knows object.
-  TetaProduct mapProduct(final Map<String, dynamic> json) => TetaProduct(
+  TetaProduct mapProduct(final Map<String, dynamic> json) => TetaProduct.fact(
         id: json['_id'] as String,
         name: json['name'] as String? ?? '',
         price: json['price'] as num? ?? 0,

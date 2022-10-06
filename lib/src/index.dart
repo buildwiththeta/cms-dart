@@ -11,6 +11,9 @@ import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dar
 import 'package:teta_cms/src/models/stream_actions.dart';
 import 'package:teta_cms/teta_cms.dart';
 
+export 'package:teta_cms/src/features/store/data/data_sources/models/product_model.dart';
+export 'package:teta_cms/src/features/store/domain/entities/teta_products_entity.dart';
+export 'package:teta_cms/src/features/store/domain/use_cases/get_all_products_use_case.dart';
 export 'package:teta_cms/src/models/filter.dart';
 
 part 'components/utils.dart';

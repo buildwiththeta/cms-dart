@@ -12,4 +12,11 @@ linter:
     library_private_types_in_public_api: false
     prefer_final_parameters: true
 analyzer:
-  exclude: [lib/src/di/injector.config.dart]
+  exclude:
+    - bin/cache/**
+    - lib/src/http/**
+    - test/**/*.mocks.*
+    - test/**/*_mocks.*
+    - lib/**/**.config.dart
+    - lib/**/**.freezed.dart
+    - lib/**/**.g.dart

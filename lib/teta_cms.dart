@@ -1,6 +1,7 @@
 library teta_cms;
 
 export 'src/cms.dart';
+export 'src/features/store/data/data_sources/models/product_model.dart';
 export 'src/flutter/future_builder.dart';
 export 'src/flutter/stream_builder.dart';
 export 'src/index.dart';
@@ -16,7 +17,6 @@ export 'src/models/provider.dart';
 export 'src/models/response.dart';
 export 'src/models/row.dart';
 export 'src/models/store/cart.dart';
-export 'src/models/store/product.dart';
 export 'src/models/store/shop.dart';
 export 'src/models/teta_analytics_type.dart';
 export 'src/models/user.dart';

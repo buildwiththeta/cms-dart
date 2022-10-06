@@ -2,7 +2,7 @@ import 'package:injectable/injectable.dart';
 import 'package:teta_cms/src/mappers/cart_mapper.dart';
 import 'package:teta_cms/src/mappers/product_mapper.dart';
 import 'package:teta_cms/src/models/store/cart.dart';
-import 'package:teta_cms/src/models/store/product.dart';
+import 'package:teta_cms/src/features/store/data/data_sources/models/product_model.dart';
 import 'package:teta_cms/src/models/store/shop.dart';
 ///Transforms Api Data to knows object.
 @lazySingleton

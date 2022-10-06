@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:injectable/injectable.dart';
 import 'package:teta_cms/src/constants.dart';
+import 'package:teta_cms/src/features/store/domain/entities/teta_products_entity.dart';
 import 'package:teta_cms/src/mappers/product_mapper.dart';
 import 'package:teta_cms/src/use_cases/get_server_request_headers/get_server_request_headers.dart';
 import 'package:teta_cms/teta_cms.dart';
@@ -166,7 +167,6 @@ class TetaStoreProductsApi {
       uri,
       headers: {
         ...getServerRequestHeaders.execute(),
-        'content-type': 'application/json',
       },
     );
 
