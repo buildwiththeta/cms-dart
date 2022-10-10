@@ -1,3 +1,8 @@
+# 0.2.0
+
+* General fixing
+* Change endpoint url for analytics service
+
 # 0.1.8
 
 * Add Utils
