@@ -29,7 +29,7 @@ class Constants {
   static const String storeCartUrl = 'https://cms.teta.so:9840/shop/cart/';
 
   /// Analytics url
-  static const String analyticsUrl = 'https://analytics.teta.so:8001/';
+  static const String analyticsUrl = 'https://backdata.teta.so:8001/';
 
   static const String reverseProxyUrl = 'https://cms.teta.so:9720/proxy';
 }
