@@ -8,7 +8,9 @@ import 'package:teta_cms/src/models/response.dart';
 
 ///This is exposed to the user
 class GetAllProductsUseCase {
-  final ProductsRepo _productsRepo = getIt.get<ProductsRepo>();
+  GetAllProductsUseCase({final ProductsRepo? productsRepo})
+      : this._productsRepo = productsRepo ?? getIt.get<ProductsRepo>();
+  final ProductsRepo _productsRepo;
 
   Future<TetaProductsResponse> execute() async {
     try {

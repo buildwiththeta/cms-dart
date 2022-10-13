@@ -41,21 +41,35 @@ const String _prod = 'prod';
 // ignore_for_file: unnecessary_lambdas
 // ignore_for_file: lines_longer_than_80_chars
 /// initializes the registration of provided dependencies inside of [GetIt]
-_i1.GetIt $initGetIt(_i1.GetIt get,
-    {String? environment, _i2.EnvironmentFilter? environmentFilter}) {
-  final gh = _i2.GetItHelper(get, environment, environmentFilter);
+_i1.GetIt $initGetIt(
+  _i1.GetIt get, {
+  String? environment,
+  _i2.EnvironmentFilter? environmentFilter,
+}) {
+  final gh = _i2.GetItHelper(
+    get,
+    environment,
+    environmentFilter,
+  );
   final dioModule = _$DioModule();
   final productsApiModule = _$ProductsApiModule();
-  gh.factory<_i3.BaseUrl>(() => _i3.ProdBaseUrl(), registerFor: {_prod});
+  gh.factory<_i3.BaseUrl>(
+    () => _i3.ProdBaseUrl(),
+    registerFor: {_prod},
+  );
   gh.lazySingleton<_i4.CartMapper>(() => _i4.CartMapper());
   gh.factory<_i5.Dio>(() => dioModule.dio);
   gh.lazySingleton<_i6.ProductMapper>(() => _i6.ProductMapper());
-  gh.factory<_i7.ProductsApi>(
-      () => productsApiModule.get(get<_i5.Dio>(), get<_i3.BaseUrl>()));
+  gh.factory<_i7.ProductsApi>(() => productsApiModule.get(
+        get<_i5.Dio>(),
+        get<_i3.BaseUrl>(),
+      ));
   gh.lazySingleton<_i8.ServerRequestMetadataStore>(
       () => _i8.ServerRequestMetadataStore());
-  gh.lazySingleton<_i9.ShopMapper>(
-      () => _i9.ShopMapper(get<_i6.ProductMapper>(), get<_i4.CartMapper>()));
+  gh.lazySingleton<_i9.ShopMapper>(() => _i9.ShopMapper(
+        get<_i6.ProductMapper>(),
+        get<_i4.CartMapper>(),
+      ));
   gh.lazySingleton<_i10.TetaAnalytics>(
       () => _i10.TetaAnalytics(get<_i8.ServerRequestMetadataStore>()));
   gh.lazySingleton<_i11.TetaBackups>(
@@ -75,29 +89,36 @@ _i1.GetIt $initGetIt(_i1.GetIt get,
   gh.lazySingleton<_i18.GetServerRequestHeaders>(() =>
       _i18.GetServerRequestHeaders(get<_i8.ServerRequestMetadataStore>()));
   gh.lazySingleton<_i19.ProductsRepo>(() => _i19.ProductsRepo(
-      get<_i7.ProductsApi>(), get<_i8.ServerRequestMetadataStore>()));
+        get<_i7.ProductsApi>(),
+        get<_i8.ServerRequestMetadataStore>(),
+      ));
   gh.lazySingleton<_i20.TetaAuth>(() => _i20.TetaAuth(
-      get<_i15.TetaProjectSettings>(),
-      get<_i17.TetaUserUtils>(),
-      get<_i13.TetaEmail>(),
-      get<_i8.ServerRequestMetadataStore>(),
-      get<_i18.GetServerRequestHeaders>()));
+        get<_i15.TetaProjectSettings>(),
+        get<_i17.TetaUserUtils>(),
+        get<_i13.TetaEmail>(),
+        get<_i8.ServerRequestMetadataStore>(),
+        get<_i18.GetServerRequestHeaders>(),
+      ));
   gh.lazySingleton<_i21.TetaClient>(() => _i21.TetaClient(
-      get<_i11.TetaBackups>(),
-      get<_i14.TetaPolicies>(),
-      get<_i8.ServerRequestMetadataStore>()));
+        get<_i11.TetaBackups>(),
+        get<_i14.TetaPolicies>(),
+        get<_i8.ServerRequestMetadataStore>(),
+      ));
   gh.lazySingleton<_i22.TetaStoreCartsApi>(() => _i22.TetaStoreCartsApi(
-      get<_i4.CartMapper>(),
-      get<_i18.GetServerRequestHeaders>(),
-      get<_i5.Dio>()));
+        get<_i4.CartMapper>(),
+        get<_i18.GetServerRequestHeaders>(),
+        get<_i5.Dio>(),
+      ));
   gh.lazySingleton<_i23.TetaStoreProductsApi>(() => _i23.TetaStoreProductsApi(
-      get<_i6.ProductMapper>(),
-      get<_i18.GetServerRequestHeaders>(),
-      get<_i5.Dio>()));
+        get<_i6.ProductMapper>(),
+        get<_i18.GetServerRequestHeaders>(),
+        get<_i5.Dio>(),
+      ));
   gh.lazySingleton<_i24.TetaStore>(() => _i24.TetaStore(
-      get<_i18.GetServerRequestHeaders>(),
-      get<_i23.TetaStoreProductsApi>(),
-      get<_i22.TetaStoreCartsApi>()));
+        get<_i18.GetServerRequestHeaders>(),
+        get<_i23.TetaStoreProductsApi>(),
+        get<_i22.TetaStoreCartsApi>(),
+      ));
   return get;
 }
 
