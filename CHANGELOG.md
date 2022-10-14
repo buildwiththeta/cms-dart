@@ -1,3 +1,7 @@
+# 0.2.1
+
+* Refactor of Analytics module
+
 # 0.2.0
 
 * General fixing
