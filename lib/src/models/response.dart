@@ -45,9 +45,21 @@ class TetaCartResponse extends TetaResponse<TetaCart?, TetaErrorResponse?> {
 }
 
 class TetaPaymentIntentResponse
-    extends TetaResponse<String?, TetaErrorResponse?> {
+    extends TetaResponse<PaymentIntentData?, TetaErrorResponse?> {
   TetaPaymentIntentResponse({
-    final String? data,
+    final PaymentIntentData? data,
     final TetaErrorResponse? error,
   }) : super(data: data, error: error);
+}
+
+class PaymentIntentData {
+  PaymentIntentData({
+    required this.paymentIntent,
+    required this.paymentIntentClientSecret,
+    required this.stripePublishableKey,
+  });
+
+  final String paymentIntent;
+  final String paymentIntentClientSecret;
+  final String stripePublishableKey;
 }

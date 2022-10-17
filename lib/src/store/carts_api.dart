@@ -128,9 +128,14 @@ class TetaStoreCartsApi {
           ),
         );
       }
-
+      final jsonDecoded = jsonDecode(res.data!) as Map<String, dynamic>;
+      final paymentIntentData = PaymentIntentData(
+        paymentIntent: jsonDecoded['id'] as String,
+        paymentIntentClientSecret: jsonDecoded['key'] as String,
+        stripePublishableKey: jsonDecoded['stripe_publishable_key'] as String ,
+      );
       return TetaPaymentIntentResponse(
-        data: (jsonDecode(res.data!) as Map<String, dynamic>)['key'] as String,
+        data: paymentIntentData,
       );
     } catch (e) {
       return TetaPaymentIntentResponse(
