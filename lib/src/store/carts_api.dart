@@ -132,7 +132,8 @@ class TetaStoreCartsApi {
       final paymentIntentData = PaymentIntentData(
         paymentIntent: jsonDecoded['id'] as String,
         paymentIntentClientSecret: jsonDecoded['key'] as String,
-        stripePublishableKey: jsonDecoded['stripe_publishable_key'] as String ,
+        stripePublishableKey: jsonDecoded['stripe_publishable_key'] as String,
+        merchantIdentifier: jsonDecoded['stripe_user_id'] as String,
       );
       return TetaPaymentIntentResponse(
         data: paymentIntentData,

@@ -57,9 +57,11 @@ class PaymentIntentData {
     required this.paymentIntent,
     required this.paymentIntentClientSecret,
     required this.stripePublishableKey,
+    required this.merchantIdentifier,
   });
 
   final String paymentIntent;
   final String paymentIntentClientSecret;
   final String stripePublishableKey;
+  final String merchantIdentifier;
 }
