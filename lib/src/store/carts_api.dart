@@ -109,7 +109,8 @@ class TetaStoreCartsApi {
     );
   }
 
-  Future<TetaPaymentIntentResponse> getPaymentIntent() async {
+  /// Get required data to buy the items from the cart
+  Future<TetaPaymentIntentResponse> getPaymentIntent(final String shippingId) async {
     final userId = (await TetaCMS.instance.auth.user.get).uid;
 
     try {
@@ -117,6 +118,11 @@ class TetaStoreCartsApi {
         '${Constants.storeCartUrl}$userId/buy',
         options: Options(
           headers: getServerRequestHeaders.execute(),
+        ),
+        data: jsonEncode(
+          {
+            'shipping_id': shippingId,
+          },
         ),
       );
 
@@ -130,8 +136,8 @@ class TetaStoreCartsApi {
       }
       final jsonDecoded = jsonDecode(res.data!) as Map<String, dynamic>;
       final paymentIntentData = PaymentIntentData(
-        paymentIntent: jsonDecoded['id'] as String,
-        paymentIntentClientSecret: jsonDecoded['key'] as String,
+        paymentIntent: jsonDecoded['paymentIntentId'] as String,
+        paymentIntentClientSecret: jsonDecoded['paymentIntentClientSecret'] as String,
         stripePublishableKey: jsonDecoded['stripe_publishable_key'] as String,
         merchantIdentifier: jsonDecoded['stripe_user_id'] as String,
       );

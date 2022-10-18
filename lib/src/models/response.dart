@@ -1,4 +1,5 @@
 import 'package:teta_cms/src/models/store/cart.dart';
+import 'package:teta_cms/src/models/store/credentials.dart';
 import 'package:teta_cms/src/models/store/product.dart';
 
 class TetaResponse<DATA, ERROR> {
@@ -64,4 +65,36 @@ class PaymentIntentData {
   final String paymentIntentClientSecret;
   final String stripePublishableKey;
   final String merchantIdentifier;
+}
+
+class TetaCredentialsResponse
+    extends TetaResponse<ShopCredentials?, TetaErrorResponse?> {
+  TetaCredentialsResponse({
+    final ShopCredentials? data,
+    final TetaErrorResponse? error,
+  }) : super(data: data, error: error);
+}
+
+class TetaTransactionsResponse
+    extends TetaResponse<List<TransactionModel>?, TetaErrorResponse?> {
+  TetaTransactionsResponse({
+    final List<TransactionModel>? data,
+    final TetaErrorResponse? error,
+  }) : super(data: data, error: error);
+}
+
+class TransactionModel {
+  TransactionModel({
+   required this.userId,
+   required this.paymentIntentId,
+   required this.state,
+   required this.ammount,
+   required this.items,
+  });
+
+  final String userId;
+  final String paymentIntentId;
+  final String state;
+  final String ammount;
+  final List<TetaProduct> items;
 }
