@@ -170,6 +170,39 @@ class TetaStore {
     );
   }
 
+  /// Gets all the store's transactions for a user
+  Future<TetaReceiptResponse> getReceiptLink(
+      final String paymentIntentId) async {
+    final token = (await getShopCredentials()).data!.accessToken;
+
+    final uri = Uri.parse(
+      'https://api.stripe.com/v1/payment_intents/$paymentIntentId',
+    );
+
+    final res = await http.get(
+      uri,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (res.statusCode != 200) {
+      return TetaReceiptResponse(
+        error: TetaErrorResponse(
+          code: res.statusCode,
+          message: res.body,
+        ),
+      );
+    }
+
+    final responseBodyDecoded = jsonDecode(res.body) as Map<String, dynamic>;
+
+    final receiptUrl = (responseBodyDecoded['charges']['data']
+            as List<Map<String, dynamic>>)[0]['receipt_url'] as String? ??
+        '';
+    return TetaReceiptResponse(
+      data: receiptUrl,
+    );
+  }
+
   /// Delete a store
   Future<TetaResponse> delete() async {
     final uri = Uri.parse(

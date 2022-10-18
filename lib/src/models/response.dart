@@ -75,6 +75,14 @@ class TetaCredentialsResponse
   }) : super(data: data, error: error);
 }
 
+class TetaReceiptResponse
+    extends TetaResponse<String?, TetaErrorResponse?> {
+  TetaReceiptResponse({
+    final String? data,
+    final TetaErrorResponse? error,
+  }) : super(data: data, error: error);
+}
+
 class TetaTransactionsResponse
     extends TetaResponse<List<TransactionModel>?, TetaErrorResponse?> {
   TetaTransactionsResponse({
