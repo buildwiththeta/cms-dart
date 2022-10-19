@@ -4,8 +4,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:teta_cms/src/constants.dart';
 import 'package:teta_cms/src/mappers/credentials_mapper.dart';
+import 'package:teta_cms/src/mappers/shipping_mapper.dart';
 import 'package:teta_cms/src/mappers/transactions_mapper.dart';
 import 'package:teta_cms/src/models/store/credentials.dart';
+import 'package:teta_cms/src/models/store/shipping.dart';
 import 'package:teta_cms/src/store/carts_api.dart';
 import 'package:teta_cms/src/store/products_api.dart';
 import 'package:teta_cms/src/use_cases/get_server_request_headers/get_server_request_headers.dart';
@@ -20,6 +22,7 @@ class TetaStore {
     this.cart,
     this.transactionsMapper,
     this.credentialsMapper,
+    this.shippingMapper,
   );
 
   /// Headers
@@ -32,9 +35,13 @@ class TetaStore {
   final TetaStoreCartsApi cart;
 
   /// Transactions mapper
-  TransactionsMapper transactionsMapper;
+  final TransactionsMapper transactionsMapper;
 
-  CredentialsMapper credentialsMapper;
+  /// Credentials mapper
+  final CredentialsMapper credentialsMapper;
+
+  /// Shipping mapper
+  final ShippingMapper shippingMapper;
 
   /// Gets products of the current cart
   Future<TetaProductsResponse> getCartProducts() async {
@@ -83,6 +90,115 @@ class TetaStore {
     return TetaTransactionsResponse(
       data: transactionsMapper.mapTransactions(responseBodyDecoded),
     );
+  }
+
+  /// Gets all the store's transactions
+  Future<TetaShippingResponse> getShippingMethods() async {
+    final uri = Uri.parse(
+      '${Constants.storeUrl}shipping/list',
+    );
+
+    final res = await http.get(
+      uri,
+      headers: getServerRequestHeaders.execute(),
+    );
+
+    if (res.statusCode != 200) {
+      return TetaShippingResponse(
+        error: TetaErrorResponse(
+          code: res.statusCode,
+          message: res.body,
+        ),
+      );
+    }
+
+    final responseBodyDecoded =
+        jsonDecode(res.body) as List<Map<String, dynamic>>;
+
+    return TetaShippingResponse(
+      data: shippingMapper.mapShippings(responseBodyDecoded),
+    );
+  }
+
+  /// Add a shipping method
+  Future<TetaShippingResponse> addShippingMethod(
+    final Shipping shipping,
+  ) async {
+    final uri = Uri.parse(
+      '${Constants.storeUrl}shipping',
+    );
+
+    final res = await http.post(
+      uri,
+      headers: getServerRequestHeaders.execute(),
+      body: jsonEncode(
+        shipping.toJson(),
+      ),
+    );
+
+    if (res.statusCode != 200) {
+      return TetaShippingResponse(
+        error: TetaErrorResponse(
+          code: res.statusCode,
+          message: res.body,
+        ),
+      );
+    }
+
+    return TetaShippingResponse();
+  }
+
+  /// Update a shipping method
+  Future<TetaShippingResponse> updateShippingMethod(
+    final Shipping shipping,
+  ) async {
+    final uri = Uri.parse(
+      '${Constants.storeUrl}shipping/${shipping.id}',
+    );
+
+    final res = await http.put(
+      uri,
+      headers: getServerRequestHeaders.execute(),
+      body: jsonEncode(
+        shipping.toJson(),
+      ),
+    );
+
+    if (res.statusCode != 200) {
+      return TetaShippingResponse(
+        error: TetaErrorResponse(
+          code: res.statusCode,
+          message: res.body,
+        ),
+      );
+    }
+
+    return TetaShippingResponse();
+  }
+
+  /// Delete a shipping method
+  Future<TetaShippingResponse> deleteShippingMethod(
+    final String shippingId,
+  ) async {
+    final uri = Uri.parse(
+      '${Constants.storeUrl}shipping/$shippingId',
+    );
+
+    final res = await http.delete(
+      uri,
+      headers: getServerRequestHeaders.execute(),
+    );
+
+    if (res.statusCode != 200) {
+      return TetaShippingResponse(
+        error: TetaErrorResponse(
+          code: res.statusCode,
+          message: res.body,
+        ),
+      );
+    }
+
+    return TetaShippingResponse();
   }
 
   /// Get shop credentials

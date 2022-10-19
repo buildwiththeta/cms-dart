@@ -1,6 +1,7 @@
 import 'package:teta_cms/src/models/store/cart.dart';
 import 'package:teta_cms/src/models/store/credentials.dart';
 import 'package:teta_cms/src/models/store/product.dart';
+import 'package:teta_cms/src/models/store/shipping.dart';
 
 class TetaResponse<DATA, ERROR> {
   TetaResponse({
@@ -87,6 +88,14 @@ class TetaTransactionsResponse
     extends TetaResponse<List<TransactionModel>?, TetaErrorResponse?> {
   TetaTransactionsResponse({
     final List<TransactionModel>? data,
+    final TetaErrorResponse? error,
+  }) : super(data: data, error: error);
+}
+
+class TetaShippingResponse
+    extends TetaResponse<List<Shipping>?, TetaErrorResponse?> {
+  TetaShippingResponse({
+    final List<Shipping>? data,
     final TetaErrorResponse? error,
   }) : super(data: data, error: error);
 }
