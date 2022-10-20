@@ -9,6 +9,7 @@ import 'package:teta_cms/src/models/store/product.dart';
 class ProductMapper {
   TetaProduct mapProduct(final Map<String, dynamic> json) => TetaProduct(
         id: json['_id'] as String,
+        prjId: json['prj_id'] as int? ?? 0,
         name: json['name'] as String? ?? '',
         price: json['price'] as num? ?? 0,
         count: json['count'] as num? ?? 0,

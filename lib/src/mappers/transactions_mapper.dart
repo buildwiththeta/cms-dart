@@ -17,6 +17,7 @@ class TransactionsMapper {
   TransactionModel mapTransaction(Map<String, dynamic> json) {
     return TransactionModel(
       userId: json['user_id'] as String,
+      prjId: json['prj_id'] as int,
       paymentIntentId: json['paymentIntentId'] as String,
       state: json['state'] as String,
       ammount: json['amount'] as String,

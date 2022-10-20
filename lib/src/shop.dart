@@ -3,30 +3,35 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:teta_cms/src/constants.dart';
+import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/src/mappers/credentials_mapper.dart';
 import 'package:teta_cms/src/mappers/shipping_mapper.dart';
+import 'package:teta_cms/src/mappers/shop_settings_mapper.dart';
 import 'package:teta_cms/src/mappers/transactions_mapper.dart';
 import 'package:teta_cms/src/models/store/credentials.dart';
 import 'package:teta_cms/src/models/store/shipping.dart';
+import 'package:teta_cms/src/models/store/shop_settings.dart';
 import 'package:teta_cms/src/store/carts_api.dart';
 import 'package:teta_cms/src/store/products_api.dart';
 import 'package:teta_cms/src/use_cases/get_server_request_headers/get_server_request_headers.dart';
 import 'package:teta_cms/teta_cms.dart';
 
 /// Teta Store - Control your ecommerce
-class TetaStore {
+class TetaShop {
   /// Teta Store - Control your ecommerce
-  TetaStore(
-    this.getServerRequestHeaders,
+  TetaShop(
+    this._getServerRequestHeaders,
     this.products,
     this.cart,
-    this.transactionsMapper,
-    this.credentialsMapper,
-    this.shippingMapper,
+    this._transactionsMapper,
+    this._credentialsMapper,
+    this._shippingMapper,
+    this._shopSettingsMapper,
+    this._metadataStore,
   );
 
   /// Headers
-  final GetServerRequestHeaders getServerRequestHeaders;
+  final GetServerRequestHeaders _getServerRequestHeaders;
 
   /// Products apis
   final TetaStoreProductsApi products;
@@ -35,44 +40,27 @@ class TetaStore {
   final TetaStoreCartsApi cart;
 
   /// Transactions mapper
-  final TransactionsMapper transactionsMapper;
+  final TransactionsMapper _transactionsMapper;
 
   /// Credentials mapper
-  final CredentialsMapper credentialsMapper;
+  final CredentialsMapper _credentialsMapper;
 
   /// Shipping mapper
-  final ShippingMapper shippingMapper;
+  final ShippingMapper _shippingMapper;
 
-  /// Gets products of the current cart
-  Future<TetaProductsResponse> getCartProducts() async {
-    try {
-      final cartResponse = await cart.get();
-      final cartProducts = <TetaProduct>[];
-      for (final element in cartResponse.data!.content) {
-        cartProducts.add((await products.get(element.prodId)).data!);
-      }
-      return TetaProductsResponse(
-        data: cartProducts,
-      );
-    } catch (e) {
-      return TetaProductsResponse(
-        error: TetaErrorResponse(
-          code: 403,
-          message: e.toString(),
-        ),
-      );
-    }
-  }
+  final ShopSettingsMapper _shopSettingsMapper;
 
-  /// Gets all the store's transactions
+  final ServerRequestMetadataStore _metadataStore;
+
+  /// Gets all the transactions for shop linked to this project id
   Future<TetaTransactionsResponse> transactions() async {
     final uri = Uri.parse(
-      '${Constants.storeUrl}transactions',
+      '${Constants.shopBaseUrl}/shop/transactions',
     );
 
     final res = await http.get(
       uri,
-      headers: getServerRequestHeaders.execute(),
+      headers: _getServerRequestHeaders.execute(),
     );
 
     if (res.statusCode != 200) {
@@ -87,20 +75,93 @@ class TetaStore {
     final responseBodyDecoded =
         jsonDecode(res.body) as List<Map<String, dynamic>>;
 
+    final transactions =
+        _transactionsMapper.mapTransactions(responseBodyDecoded);
+    final prjId = _metadataStore.getMetadata().prjId;
     return TetaTransactionsResponse(
-      data: transactionsMapper.mapTransactions(responseBodyDecoded),
+      data: transactions
+          .where((final transaction) => transaction.prjId == prjId)
+          .toList(
+            growable: true,
+          ),
+    );
+  }
+
+  /// Gets all the transactions for user linked to this project id
+  Future<TetaTransactionsResponse> transactionsForUser() async {
+    final userId = (await TetaCMS.instance.auth.user.get).uid;
+
+    final uri = Uri.parse(
+      '${Constants.shopBaseUrl}/user/$userId/transactions',
+    );
+
+    final res = await http.get(
+      uri,
+      headers: _getServerRequestHeaders.execute(),
+    );
+
+    if (res.statusCode != 200) {
+      return TetaTransactionsResponse(
+        error: TetaErrorResponse(
+          code: res.statusCode,
+          message: res.body,
+        ),
+      );
+    }
+
+    final responseBodyDecoded =
+        jsonDecode(res.body) as List<Map<String, dynamic>>;
+
+    final transactions =
+        _transactionsMapper.mapTransactions(responseBodyDecoded);
+    final prjId = _metadataStore.getMetadata().prjId;
+    return TetaTransactionsResponse(
+      data: transactions
+          .where((final transaction) => transaction.prjId == prjId)
+          .toList(
+            growable: true,
+          ),
+    );
+  }
+
+  /// Check if a payment was successfully
+  Future<TetaResponse> checkPayment(final String paymentIntentId) async {
+    final userId = (await TetaCMS.instance.auth.user.get).uid;
+
+    final uri = Uri.parse(
+      '${Constants.shopBaseUrl}/shop/transactions/$paymentIntentId/check',
+    );
+
+    final res = await http.get(
+      uri,
+      headers: _getServerRequestHeaders.execute(),
+    );
+
+    if (res.statusCode != 200) {
+      return TetaResponse<dynamic, dynamic>(
+        error: TetaErrorResponse(
+          code: res.statusCode,
+          message: res.body,
+        ),
+        data: null,
+      );
+    }
+
+    return TetaResponse<dynamic, dynamic>(
+      data: null,
+      error: null,
     );
   }
 
   /// Gets all the store's transactions
   Future<TetaShippingResponse> getShippingMethods() async {
     final uri = Uri.parse(
-      '${Constants.storeUrl}shipping/list',
+      '${Constants.shopBaseUrl}/shipping/list',
     );
 
     final res = await http.get(
       uri,
-      headers: getServerRequestHeaders.execute(),
+      headers: _getServerRequestHeaders.execute(),
     );
 
     if (res.statusCode != 200) {
@@ -116,7 +177,7 @@ class TetaStore {
         jsonDecode(res.body) as List<Map<String, dynamic>>;
 
     return TetaShippingResponse(
-      data: shippingMapper.mapShippings(responseBodyDecoded),
+      data: _shippingMapper.mapShippings(responseBodyDecoded),
     );
   }
 
@@ -125,12 +186,12 @@ class TetaStore {
     final Shipping shipping,
   ) async {
     final uri = Uri.parse(
-      '${Constants.storeUrl}shipping',
+      '${Constants.shopBaseUrl}/shipping',
     );
 
     final res = await http.post(
       uri,
-      headers: getServerRequestHeaders.execute(),
+      headers: _getServerRequestHeaders.execute(),
       body: jsonEncode(
         shipping.toJson(),
       ),
@@ -153,12 +214,12 @@ class TetaStore {
     final Shipping shipping,
   ) async {
     final uri = Uri.parse(
-      '${Constants.storeUrl}shipping/${shipping.id}',
+      '${Constants.shopBaseUrl}/shipping/${shipping.id}',
     );
 
     final res = await http.put(
       uri,
-      headers: getServerRequestHeaders.execute(),
+      headers: _getServerRequestHeaders.execute(),
       body: jsonEncode(
         shipping.toJson(),
       ),
@@ -181,12 +242,12 @@ class TetaStore {
     final String shippingId,
   ) async {
     final uri = Uri.parse(
-      '${Constants.storeUrl}shipping/$shippingId',
+      '${Constants.shopBaseUrl}/shipping/$shippingId',
     );
 
     final res = await http.delete(
       uri,
-      headers: getServerRequestHeaders.execute(),
+      headers: _getServerRequestHeaders.execute(),
     );
 
     if (res.statusCode != 200) {
@@ -204,12 +265,12 @@ class TetaStore {
   /// Get shop credentials
   Future<TetaCredentialsResponse> getShopCredentials() async {
     final uri = Uri.parse(
-      '${Constants.storeUrl}shop/credentials',
+      '${Constants.shopBaseUrl}/shop/credentials',
     );
 
     final res = await http.get(
       uri,
-      headers: getServerRequestHeaders.execute(),
+      headers: _getServerRequestHeaders.execute(),
     );
 
     if (res.statusCode != 200) {
@@ -224,7 +285,34 @@ class TetaStore {
     final responseBodyDecoded = jsonDecode(res.body) as Map<String, dynamic>;
 
     return TetaCredentialsResponse(
-      data: credentialsMapper.mapCredentials(responseBodyDecoded),
+      data: _credentialsMapper.mapCredentials(responseBodyDecoded),
+    );
+  }
+
+  /// Init shop
+  Future<TetaResponse> createShop() async {
+    final uri = Uri.parse(
+      '${Constants.shopBaseUrl}/shop',
+    );
+
+    final res = await http.post(
+      uri,
+      headers: _getServerRequestHeaders.execute(),
+    );
+
+    if (res.statusCode != 200) {
+      return TetaResponse<dynamic, dynamic>(
+        error: TetaErrorResponse(
+          code: res.statusCode,
+          message: res.body,
+        ),
+        data: null,
+      );
+    }
+
+    return TetaResponse<dynamic, dynamic>(
+      data: null,
+      error: null,
     );
   }
 
@@ -233,12 +321,12 @@ class TetaStore {
     final ShopCredentials shopCredentials,
   ) async {
     final uri = Uri.parse(
-      '${Constants.storeUrl}shop/credentials',
+      '${Constants.shopBaseUrl}/shop/credentials',
     );
 
     final res = await http.put(
       uri,
-      headers: getServerRequestHeaders.execute(),
+      headers: _getServerRequestHeaders.execute(),
       body: jsonEncode(shopCredentials.toJson()),
     );
 
@@ -251,38 +339,8 @@ class TetaStore {
       );
     }
 
-    final responseBodyDecoded = jsonDecode(res.body) as Map<String, dynamic>;
-
     return TetaCredentialsResponse(
-      data: credentialsMapper.mapCredentials(responseBodyDecoded),
-    );
-  }
-
-  /// Gets all the store's transactions for a user
-  Future<TetaTransactionsResponse> transactionsForUser() async {
-    final uri = Uri.parse(
-      '${Constants.storeUrl}user/transactions',
-    );
-
-    final res = await http.get(
-      uri,
-      headers: getServerRequestHeaders.execute(),
-    );
-
-    if (res.statusCode != 200) {
-      return TetaTransactionsResponse(
-        error: TetaErrorResponse(
-          code: res.statusCode,
-          message: res.body,
-        ),
-      );
-    }
-
-    final responseBodyDecoded =
-        jsonDecode(res.body) as List<Map<String, dynamic>>;
-
-    return TetaTransactionsResponse(
-      data: transactionsMapper.mapTransactions(responseBodyDecoded),
+      data: shopCredentials,
     );
   }
 
@@ -319,69 +377,67 @@ class TetaStore {
     );
   }
 
-  /// Delete a store
-  Future<TetaResponse> delete() async {
+  /// Sets shop settings
+  Future<TetaShopSettingsResponse> setSettings(
+      final ShopSettings shopSettings) async {
     final uri = Uri.parse(
-      Constants.storeUrl,
-    );
-
-    final res = await http.delete(
-      uri,
-      headers: getServerRequestHeaders.execute(),
-    );
-
-    if (res.statusCode != 200) {
-      return TetaResponse<dynamic, TetaErrorResponse>(
-        error: TetaErrorResponse(
-          code: res.statusCode,
-          message: res.body,
-        ),
-        data: null,
-      );
-    }
-
-    return TetaResponse<String, dynamic>(
-      data: json.encode(res.body),
-      error: null,
-    );
-  }
-
-  /// Sets a new currency
-  Future<TetaResponse> setCurrency(final String currency) async {
-    final uri = Uri.parse(
-      '${Constants.storeUrl}currency/$currency',
+      '${Constants.shopBaseUrl}/shop/settings',
     );
 
     final res = await http.put(
       uri,
-      headers: getServerRequestHeaders.execute(),
+      headers: _getServerRequestHeaders.execute(),
     );
 
     if (res.statusCode != 200) {
-      return TetaResponse<dynamic, TetaErrorResponse>(
+      return TetaShopSettingsResponse(
         error: TetaErrorResponse(
           code: res.statusCode,
           message: res.body,
         ),
-        data: null,
       );
     }
 
-    return TetaResponse<String, dynamic>(
-      data: json.encode(res.body),
-      error: null,
+    return TetaShopSettingsResponse(
+      data: shopSettings,
+    );
+  }
+
+  /// Get shop settings
+  Future<TetaShopSettingsResponse> getSettings() async {
+    final uri = Uri.parse(
+      '${Constants.shopBaseUrl}/shop/settings',
+    );
+
+    final res = await http.get(
+      uri,
+      headers: _getServerRequestHeaders.execute(),
+    );
+
+    if (res.statusCode != 200) {
+      return TetaShopSettingsResponse(
+        error: TetaErrorResponse(
+          code: res.statusCode,
+          message: res.body,
+        ),
+      );
+    }
+    final resBodyMap = jsonDecode(res.body) as Map<String, dynamic>;
+
+    return TetaShopSettingsResponse(
+      data: _shopSettingsMapper.mapSettings(resBodyMap),
     );
   }
 
   /// Sets a new status for the transaction
   Future<TetaResponse> setTransactionStatus(final String status) async {
     final uri = Uri.parse(
-      '${Constants.storeUrl}currency/$status',
+      '${Constants.shopBaseUrl}/currency/$status',
     );
 
     final res = await http.put(
       uri,
-      headers: getServerRequestHeaders.execute(),
+      headers: _getServerRequestHeaders.execute(),
     );
 
     if (res.statusCode != 200) {

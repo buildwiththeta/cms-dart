@@ -4,6 +4,7 @@ class TetaProduct {
   TetaProduct({
     required this.id,
     required this.name,
+    required this.prjId,
     this.price = 0.0,
     this.count = 0,
     this.isPublic = false,
@@ -14,6 +15,9 @@ class TetaProduct {
 
   /// Product id
   final String id;
+
+  /// Product id
+  final int prjId;
 
   /// Product name
   final String name;
@@ -39,6 +43,7 @@ class TetaProduct {
   /// Generate a model from a json schema
   static TetaProduct fromSchema(final Map<String, String> json) => TetaProduct(
         id: json['id'] ?? '',
+        prjId: json['prj_id'] as int? ?? 0,
         name: json['name'] ?? '',
         price: double.tryParse(json['price'] ?? '') ?? 0,
         count: int.tryParse(json['count'] ?? '') ?? 0,

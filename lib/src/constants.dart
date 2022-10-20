@@ -18,15 +18,8 @@ class Constants {
     'Content-Type': 'application/json',
   };
 
-  /// Store url for products
-  static const String storeProductUrl =
-      'https://cms.teta.so:9840/shop/product/';
-
   /// Store url for shop
-  static const String storeUrl = 'https://cms.teta.so:9840/shop/';
-
-  /// Store url for cart
-  static const String storeCartUrl = 'https://cms.teta.so:9840/shop/cart/';
+  static const String shopBaseUrl = 'https://cms.teta.so:9000';
 
   /// Analytics url
   static const String analyticsUrl = 'https://backdata.teta.so:8002/';

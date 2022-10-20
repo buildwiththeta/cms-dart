@@ -1,7 +1,7 @@
-import 'package:teta_cms/src/models/store/cart.dart';
 import 'package:teta_cms/src/models/store/credentials.dart';
 import 'package:teta_cms/src/models/store/product.dart';
 import 'package:teta_cms/src/models/store/shipping.dart';
+import 'package:teta_cms/src/models/store/shop_settings.dart';
 
 class TetaResponse<DATA, ERROR> {
   TetaResponse({
@@ -39,13 +39,6 @@ class TetaProductsResponse
   }) : super(data: data, error: error);
 }
 
-class TetaCartResponse extends TetaResponse<TetaCart?, TetaErrorResponse?> {
-  TetaCartResponse({
-    final TetaCart? data,
-    final TetaErrorResponse? error,
-  }) : super(data: data, error: error);
-}
-
 class TetaPaymentIntentResponse
     extends TetaResponse<PaymentIntentData?, TetaErrorResponse?> {
   TetaPaymentIntentResponse({
@@ -76,8 +69,7 @@ class TetaCredentialsResponse
   }) : super(data: data, error: error);
 }
 
-class TetaReceiptResponse
-    extends TetaResponse<String?, TetaErrorResponse?> {
+class TetaReceiptResponse extends TetaResponse<String?, TetaErrorResponse?> {
   TetaReceiptResponse({
     final String? data,
     final TetaErrorResponse? error,
@@ -100,16 +92,26 @@ class TetaShippingResponse
   }) : super(data: data, error: error);
 }
 
+class TetaShopSettingsResponse
+    extends TetaResponse<ShopSettings?, TetaErrorResponse?> {
+  TetaShopSettingsResponse({
+    final ShopSettings? data,
+    final TetaErrorResponse? error,
+  }) : super(data: data, error: error);
+}
+
 class TransactionModel {
   TransactionModel({
-   required this.userId,
-   required this.paymentIntentId,
-   required this.state,
-   required this.ammount,
-   required this.items,
+    required this.userId,
+    required this.prjId,
+    required this.paymentIntentId,
+    required this.state,
+    required this.ammount,
+    required this.items,
   });
 
   final String userId;
+  final int prjId;
   final String paymentIntentId;
   final String state;
   final String ammount;

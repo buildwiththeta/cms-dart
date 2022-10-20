@@ -12,28 +12,28 @@ import 'package:teta_cms/teta_cms.dart';
 class TetaStoreProductsApi {
   /// Set of apis to control products
   TetaStoreProductsApi(
-    this.productMapper,
-    this.getServerRequestHeaders,
-    this.dio,
+    this._productMapper,
+    this._getServerRequestHeaders,
+    this._dio,
   );
 
   /// Product mapper
-  final ProductMapper productMapper;
+  final ProductMapper _productMapper;
 
   /// Http headers
-  final GetServerRequestHeaders getServerRequestHeaders;
+  final GetServerRequestHeaders _getServerRequestHeaders;
 
   /// Client Dio
-  final Dio dio;
+  final Dio _dio;
 
   /// Gets all the products.
   /// The products are taken by the project's shop.
   Future<TetaProductsResponse> all() async {
     try {
-      final res = await dio.get<String>(
-        '${Constants.storeProductUrl}list',
+      final res = await _dio.get<String>(
+        '${Constants.shopBaseUrl}/product/list',
         options: Options(
-          headers: getServerRequestHeaders.execute(),
+          headers: _getServerRequestHeaders.execute(),
         ),
       );
 
@@ -50,7 +50,7 @@ class TetaStoreProductsApi {
           .toList(growable: false);
 
       return TetaProductsResponse(
-        data: productMapper.mapProducts(decodedList),
+        data: _productMapper.mapProducts(decodedList),
       );
     } catch (e) {
       return TetaProductsResponse(
@@ -66,12 +66,12 @@ class TetaStoreProductsApi {
   /// The product is selected in the project's shop
   Future<TetaProductResponse> get(final String prodId) async {
     final uri = Uri.parse(
-      '${Constants.storeProductUrl}$prodId',
+      '${Constants.shopBaseUrl}/product/$prodId',
     );
 
     final res = await http.get(
       uri,
-      headers: getServerRequestHeaders.execute(),
+      headers: _getServerRequestHeaders.execute(),
     );
 
     TetaCMS.printWarning('list products body: ${res.body}');
@@ -86,7 +86,7 @@ class TetaStoreProductsApi {
     }
 
     return TetaProductResponse(
-      data: productMapper
+      data: _productMapper
           .mapProduct(json.decode(res.body) as Map<String, dynamic>),
     );
   }
@@ -96,12 +96,12 @@ class TetaStoreProductsApi {
   /// If everything goes ok it returns {'ok': true}
   Future<TetaResponse> insert(final TetaProduct product) async {
     final uri = Uri.parse(
-      Constants.storeProductUrl,
+      '${Constants.shopBaseUrl}/product',
     );
 
     final res = await http.post(
       uri,
-      headers: getServerRequestHeaders.execute(),
+      headers: _getServerRequestHeaders.execute(),
       body: json.encode(
         product.toJson(),
       ),
@@ -129,12 +129,12 @@ class TetaStoreProductsApi {
   /// Wants a product object to update all the fields.
   Future<TetaProductResponse> update(final TetaProduct product) async {
     final uri = Uri.parse(
-      '${Constants.storeProductUrl}${product.id}',
+      '${Constants.shopBaseUrl}/product/${product.id}',
     );
 
-    final res = await http.post(
+    final res = await http.put(
       uri,
-      headers: getServerRequestHeaders.execute(),
+      headers: _getServerRequestHeaders.execute(),
       body: json.encode(
         product.toJson(),
       ),
@@ -157,13 +157,13 @@ class TetaStoreProductsApi {
   /// Deletes a product by id
   Future<TetaResponse> delete(final String prodId) async {
     final uri = Uri.parse(
-      '${Constants.storeProductUrl}$prodId',
+      '${Constants.shopBaseUrl}/product/$prodId',
     );
 
-    final res = await http.post(
+    final res = await http.delete(
       uri,
       headers: {
-        ...getServerRequestHeaders.execute(),
+        ..._getServerRequestHeaders.execute(),
         'content-type': 'application/json',
       },
     );
