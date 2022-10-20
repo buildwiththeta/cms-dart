@@ -4,33 +4,34 @@ import 'dart:typed_data';
 
 import 'package:enum_to_string/enum_to_string.dart';
 import 'package:http/http.dart' as http;
+import 'package:injectable/injectable.dart';
 import 'package:teta_cms/src/constants.dart';
+import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/teta_cms.dart';
 
 /// Control all the policies in a project
+@lazySingleton
 class TetaPolicies {
   /// Control all the policies in a project
-  TetaPolicies(
-    this.token,
-    this.prjId,
-  );
+  TetaPolicies(this._serverRequestMetadata);
 
-  /// Token of the current prj
-  final String token;
-
-  /// Id of the current prj
-  final int prjId;
+  ///This stores the token and project id headers.
+  final ServerRequestMetadataStore _serverRequestMetadata;
 
   /// Get all policies
   Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>> all(
     final String collId,
   ) async {
-    final uri = Uri.parse('${Constants.tetaUrl}cms/policy/$prjId/$collId');
+    final serverMetadata = _serverRequestMetadata.getMetadata();
+
+    final uri = Uri.parse(
+      '${Constants.tetaUrl}cms/policy/${serverMetadata.prjId}/$collId',
+    );
 
     final res = await http.get(
       uri,
       headers: {
-        'authorization': 'Bearer $token',
+        'authorization': 'Bearer ${serverMetadata.token}',
       },
     );
 
@@ -85,15 +86,17 @@ class TetaPolicies {
     final String value,
     final TetaPolicyScope scope,
   ) async {
+    final serverMetadata = _serverRequestMetadata.getMetadata();
+
     final scopeStr = EnumToString.convertToString(scope);
     final uri = Uri.parse(
-      '${Constants.tetaUrl}cms/policy/$scopeStr/$prjId/$collId/$key/$value',
+      '${Constants.tetaUrl}cms/policy/$scopeStr/${serverMetadata.prjId}/$collId/$key/$value',
     );
 
     final res = await http.post(
       uri,
       headers: {
-        'authorization': 'Bearer $token',
+        'authorization': 'Bearer ${serverMetadata.token}',
       },
     );
 
@@ -131,14 +134,17 @@ class TetaPolicies {
     final String collId,
     final TetaPolicyScope scope,
   ) async {
+    final serverMetadata = _serverRequestMetadata.getMetadata();
+
     final scopeStr = EnumToString.convertToString(scope);
-    final uri =
-        Uri.parse('${Constants.tetaUrl}cms/policy/$prjId/$collId/$scopeStr');
+    final uri = Uri.parse(
+      '${Constants.tetaUrl}cms/policy/${serverMetadata.prjId}/$collId/$scopeStr',
+    );
 
     final res = await http.delete(
       uri,
       headers: {
-        'authorization': 'Bearer $token',
+        'authorization': 'Bearer ${serverMetadata.token}',
       },
     );
 

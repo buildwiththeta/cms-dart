@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:injectable/injectable.dart';
 import 'package:teta_cms/src/constants.dart';
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/src/mappers/credentials_mapper.dart';
@@ -17,6 +18,7 @@ import 'package:teta_cms/src/use_cases/get_server_request_headers/get_server_req
 import 'package:teta_cms/teta_cms.dart';
 
 /// Teta Store - Control your ecommerce
+@lazySingleton
 class TetaShop {
   /// Teta Store - Control your ecommerce
   TetaShop(

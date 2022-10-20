@@ -2,34 +2,40 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:injectable/injectable.dart';
 import 'package:teta_cms/src/constants.dart';
+import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/src/db/backups.dart';
 import 'package:teta_cms/src/db/policy.dart';
 import 'package:teta_cms/teta_cms.dart';
 
 /// The CMS client to interact with the db
+@lazySingleton
 class TetaClient {
   /// Client to interact with the Teta CMS's db
   TetaClient(
-    this.token,
-    this.prjId,
-  )   : backups = TetaBackups(token, prjId),
-        policies = TetaPolicies(token, prjId);
-
-  /// Token of the current prj
-  final String token;
-
-  /// Id of the current prj
-  final int prjId;
+    this.backups,
+    this.policies,
+    this._serverRequestMetadata,
+  );
 
   /// Backups area
-  late final TetaBackups backups;
+  final TetaBackups backups;
 
   /// Policies area
-  late final TetaPolicies policies;
+  final TetaPolicies policies;
+
+  ///This stores the token and project id headers.
+  final ServerRequestMetadataStore _serverRequestMetadata;
 
   /// Http header for count
   Map<String, String> get countHeader => {'cms-count-only': '1'};
+
+  ///Get token
+  String get token => _serverRequestMetadata.getMetadata().token;
+
+  /// Get current project id
+  int get prjId => _serverRequestMetadata.getMetadata().prjId;
 
   /// Creates a new collection with name [collectionName] and prj_id [prjId].
   ///
@@ -39,13 +45,15 @@ class TetaClient {
   Future<Map<String, dynamic>> createCollection(
     final String collectionName,
   ) async {
+    final serverMetadata = _serverRequestMetadata.getMetadata();
+
     final uri = Uri.parse(
-      '${Constants.tetaUrl}cms/$prjId/$collectionName',
+      '${Constants.tetaUrl}cms/${serverMetadata.prjId}/$collectionName',
     );
 
     final res = await http.post(
       uri,
-      headers: {'authorization': 'Bearer $token'},
+      headers: {'authorization': 'Bearer ${serverMetadata.token}'},
     );
 
     TetaCMS.log('createCollection: ${res.body}');
@@ -78,14 +86,16 @@ class TetaClient {
   Future<bool> deleteCollection(
     final String collectionId,
   ) async {
+    final serverMetadata = _serverRequestMetadata.getMetadata();
+
     final uri = Uri.parse(
-      '${Constants.tetaUrl}cms/$prjId/$collectionId',
+      '${Constants.tetaUrl}cms/${serverMetadata.prjId}/$collectionId',
     );
 
     final res = await http.delete(
       uri,
       headers: {
-        'authorization': 'Bearer $token',
+        'authorization': 'Bearer ${serverMetadata.token}',
       },
     );
 
@@ -118,15 +128,17 @@ class TetaClient {
     final String collectionId,
     final Map<String, dynamic> document,
   ) async {
+    final serverMetadata = _serverRequestMetadata.getMetadata();
+
     final uri = Uri.parse(
-      '${Constants.tetaUrl}cms/$prjId/$collectionId',
+      '${Constants.tetaUrl}cms/${serverMetadata.prjId}/$collectionId',
     );
 
     final res = await http.put(
       uri,
       headers: {
         'content-type': 'application/json',
-        'authorization': 'Bearer $token',
+        'authorization': 'Bearer ${serverMetadata.token}',
       },
       body: json.encode(document),
     );
@@ -162,14 +174,16 @@ class TetaClient {
     final String collectionId,
     final String documentId,
   ) async {
+    final serverMetadata = _serverRequestMetadata.getMetadata();
+
     final uri = Uri.parse(
-      '${Constants.tetaUrl}cms/$prjId/$collectionId/$documentId',
+      '${Constants.tetaUrl}cms/${serverMetadata.prjId}/$collectionId/$documentId',
     );
 
     final res = await http.delete(
       uri,
       headers: {
-        'authorization': 'Bearer $token',
+        'authorization': 'Bearer ${serverMetadata.token}',
       },
     );
 
@@ -205,16 +219,18 @@ class TetaClient {
     final int limit = 20,
     final bool showDrafts = false,
   }) async {
+    final serverMetadata = _serverRequestMetadata.getMetadata();
+
     final finalFilters = [
       ...filters,
       if (!showDrafts) Filter('_vis', 'public'),
     ];
-    final uri = Uri.parse('${Constants.tetaUrl}cms/$prjId/$collectionId');
+    final uri = Uri.parse('${Constants.tetaUrl}cms/${serverMetadata.prjId}/$collectionId');
 
     final res = await http.get(
       uri,
       headers: {
-        'authorization': 'Bearer $token',
+        'authorization': 'Bearer ${serverMetadata.token}',
         'cms-filters':
             json.encode(finalFilters.map((final e) => e.toJson()).toList()),
         'cms-pagination': json.encode(<String, dynamic>{
@@ -262,16 +278,18 @@ class TetaClient {
     final int limit = 20,
     final bool showDrafts = false,
   }) async {
+    final serverMetadata = _serverRequestMetadata.getMetadata();
+
     final finalFilters = [
       ...filters,
       if (!showDrafts) Filter('_vis', 'public'),
     ];
-    final uri = Uri.parse('${Constants.tetaUrl}cms/$prjId/$collectionId');
+    final uri = Uri.parse('${Constants.tetaUrl}cms/${serverMetadata.prjId}/$collectionId');
 
     final res = await http.get(
       uri,
       headers: {
-        'authorization': 'Bearer $token',
+        'authorization': 'Bearer ${serverMetadata.token}',
         'cms-filters':
             json.encode(finalFilters.map((final e) => e.toJson()).toList()),
         'cms-pagination': json.encode(<String, dynamic>{
@@ -310,12 +328,14 @@ class TetaClient {
   ///
   /// Returns the collections as `List<Map<String,dynamic>>` without `docs`
   Future<List<CollectionObject>> getCollections() async {
-    final uri = Uri.parse('${Constants.tetaUrl}cms/$prjId');
+    final serverMetadata = _serverRequestMetadata.getMetadata();
+
+    final uri = Uri.parse('${Constants.tetaUrl}cms/${serverMetadata.prjId}');
 
     final res = await http.get(
       uri,
       headers: {
-        'authorization': 'Bearer $token',
+        'authorization': 'Bearer ${serverMetadata.token}',
       },
     );
 
@@ -364,15 +384,17 @@ class TetaClient {
     final String name,
     final Map<String, dynamic>? attributes,
   ) async {
+    final serverMetadata = _serverRequestMetadata.getMetadata();
+
     final uri = Uri.parse(
-      '${Constants.tetaUrl}cms/$prjId/$collectionId',
+      '${Constants.tetaUrl}cms/${serverMetadata.prjId}/$collectionId',
     );
 
     final res = await http.patch(
       uri,
       headers: {
         'content-type': 'application/json',
-        'authorization': 'Bearer $token',
+        'authorization': 'Bearer ${serverMetadata.token}',
       },
       body: json.encode(<String, dynamic>{
         'name': name,
@@ -412,15 +434,17 @@ class TetaClient {
     final String documentId,
     final Map<String, dynamic> content,
   ) async {
+    final serverMetadata = _serverRequestMetadata.getMetadata();
+
     final uri = Uri.parse(
-      '${Constants.tetaUrl}cms/$prjId/$collectionId/$documentId',
+      '${Constants.tetaUrl}cms/${serverMetadata.prjId}/$collectionId/$documentId',
     );
 
     final res = await http.put(
       uri,
       headers: {
         'content-type': 'application/json',
-        'authorization': 'Bearer $token',
+        'authorization': 'Bearer ${serverMetadata.token}',
       },
       body: json.encode(content),
     );
@@ -451,15 +475,17 @@ class TetaClient {
   Future<TetaResponse<List<dynamic>?, TetaErrorResponse?>> query(
     final String query,
   ) async {
+    final serverMetadata = _serverRequestMetadata.getMetadata();
+
     final uri = Uri.parse('${Constants.tetaUrl}cms/aya');
 
     final res = await http.post(
       uri,
       headers: {
-        'authorization': 'Bearer $token',
+        'authorization': 'Bearer ${serverMetadata.token}',
       },
       body: '''
-      ON prj_id* $prjId;
+      ON prj_id* ${serverMetadata.prjId};
       $query
       ''',
     );
@@ -497,16 +523,19 @@ class TetaClient {
     );
   }
 
+  ///This is used to proxy calls to Google Api for Desktop and Web.
   Future<String> proxy(
     final String url,
     final Map<String, String> headers,
   ) async {
+    final serverMetadata = _serverRequestMetadata.getMetadata();
+
     final enc = Uri.encodeComponent(url);
     final uri = Uri.parse('${Constants.reverseProxyUrl}/$enc');
     final res = await http.get(
       uri,
       headers: {
-        'authorization': 'Bearer $token',
+        'authorization': 'Bearer ${serverMetadata.token}',
         ...headers,
       },
     );

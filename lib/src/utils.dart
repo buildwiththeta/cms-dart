@@ -2,33 +2,33 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:injectable/injectable.dart';
+import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/teta_cms.dart';
 
+@lazySingleton
 class TetaCMSUtils {
-  TetaCMSUtils(
-    this.token,
-    this.prjId,
-  );
+  ///Constructor
+  TetaCMSUtils(this._serverRequestMetadata);
 
-  /// Token of the current prj
-  final String token;
-
-  /// Id of the current prj
-  final int prjId;
+  ///This stores the token and project id headers.
+  final ServerRequestMetadataStore _serverRequestMetadata;
 
   Future<TetaResponse<bool, TetaErrorResponse?>> braintreePay(
     final dynamic nounce,
     final dynamic deviceData,
     final dynamic amount,
   ) async {
-    final url = 'http://cms.teta.so:9183/pay/$prjId';
+    final serverMetadata = _serverRequestMetadata.getMetadata();
+
+    final url = 'http://cms.teta.so:9183/pay/${serverMetadata.prjId}';
     final uri = Uri.parse(
       '$url?payment_method_nonce=$nounce&device_data=$deviceData&amount=$amount',
     );
 
     final res = await http.post(
       uri,
-      headers: {'authorization': 'Bearer $token'},
+      headers: {'authorization': 'Bearer ${serverMetadata.token}'},
     );
 
     TetaCMS.log('custom query: ${res.body}');

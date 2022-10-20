@@ -1,20 +1,17 @@
 part of 'index.dart';
 
 /// Teta Realtime - Use Realtime subscriptions
+@lazySingleton
 class TetaRealtime {
-  /// Teta Realtime - Use Realtime subscriptions
+  ///Constructor
   TetaRealtime(
-    this.token,
-    this.prjId,
+    this._serverRequestMetadata,
   );
 
-  /// Token of the current prj
-  final String token;
-
-  /// Id of the current prj
-  final int prjId;
-
   socket_io.Socket? _socket;
+
+  ///This stores the token and project id headers.
+  final ServerRequestMetadataStore _serverRequestMetadata;
 
   /// List of all the streams
   List<RealtimeSubscription> streams = [];
@@ -75,6 +72,8 @@ class TetaRealtime {
     final String? documentId,
     final Function(SocketChangeEvent)? callback,
   }) async {
+    final serverMetadata = _serverRequestMetadata.getMetadata();
+
     if (_socket == null) await _openSocket();
 
     TetaCMS.printWarning('Socket Id: ${_socket!.id}');
@@ -84,14 +83,14 @@ class TetaRealtime {
     if (docId == null) throw Exception('documentId is required');
 
     final uri = Uri.parse(
-      '${Constants.tetaUrl}stream/listen/${_socket!.id}/${action.type}/$prjId/$collId/$docId',
+      '${Constants.tetaUrl}stream/listen/${_socket!.id}/${action.type}/${serverMetadata.prjId}/$collId/$docId',
     );
 
     final res = await http.post(
       uri,
       headers: {
         'content-type': 'application/json',
-        'authorization': 'Bearer $token',
+        'authorization': 'Bearer ${serverMetadata.token}',
       },
     );
 

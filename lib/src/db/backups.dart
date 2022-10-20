@@ -3,31 +3,32 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
+import 'package:injectable/injectable.dart';
 import 'package:teta_cms/src/constants.dart';
+import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/teta_cms.dart';
 
 /// Controls all the backups of the current prj
+@lazySingleton
 class TetaBackups {
   /// Controls all the backups of the current prj
   TetaBackups(
-    this.token,
-    this.prjId,
+    this._serverRequestMetadata,
   );
 
-  /// Token of the current prj
-  final String token;
-
-  /// Id of the current prj
-  final int prjId;
+  ///This stores the token and project id headers.
+  final ServerRequestMetadataStore _serverRequestMetadata;
 
   /// Get all backups
   Future<TetaResponse<List<dynamic>?, TetaErrorResponse?>> all() async {
-    final uri = Uri.parse('${Constants.tetaUrl}backup/$prjId/list');
+    final serverMetadata = _serverRequestMetadata.getMetadata();
+
+    final uri = Uri.parse('${Constants.tetaUrl}backup/${serverMetadata.prjId}/list');
 
     final res = await http.get(
       uri,
       headers: {
-        'authorization': 'Bearer $token',
+        'authorization': 'Bearer ${serverMetadata.token}',
       },
     );
 
@@ -70,14 +71,16 @@ class TetaBackups {
   Future<TetaResponse<Uint8List, TetaErrorResponse?>> download(
     final String? backupId,
   ) async {
+    final serverMetadata = _serverRequestMetadata.getMetadata();
+
     if (backupId != null) {
       final uri =
-          Uri.parse('${Constants.tetaUrl}backup/$prjId/download/$backupId');
+          Uri.parse('${Constants.tetaUrl}backup/${serverMetadata.prjId}/download/$backupId');
 
       final res = await http.get(
         uri,
         headers: {
-          'authorization': 'Bearer $token',
+          'authorization': 'Bearer ${serverMetadata.token}',
         },
       );
 
@@ -121,14 +124,16 @@ class TetaBackups {
   Future<TetaResponse<void, TetaErrorResponse?>> restore(
     final String? backupId,
   ) async {
+    final serverMetadata = _serverRequestMetadata.getMetadata();
+
     if (backupId != null) {
       final uri =
-          Uri.parse('${Constants.tetaUrl}backup/$prjId/restore/$backupId');
+          Uri.parse('${Constants.tetaUrl}backup/${serverMetadata.prjId}/restore/$backupId');
 
       final res = await http.get(
         uri,
         headers: {
-          'authorization': 'Bearer $token',
+          'authorization': 'Bearer ${serverMetadata.token}',
         },
       );
 

@@ -1,16 +1,18 @@
+import 'package:injectable/injectable.dart';
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 
 /// Teta Store Headers
+@lazySingleton
 class GetServerRequestHeaders {
   /// Teta Store Headers
-  GetServerRequestHeaders(this.metadataStore);
+  GetServerRequestHeaders(this._metadataStore);
 
   /// Metadata of the store
-  final ServerRequestMetadataStore metadataStore;
+  final ServerRequestMetadataStore _metadataStore;
 
   /// Returns the json
   Map<String, String> execute() {
-    final metadata = metadataStore.getMetadata();
+    final metadata = _metadataStore.getMetadata();
 
     return <String, String>{
       'authorization': 'Bearer ${metadata.token}',

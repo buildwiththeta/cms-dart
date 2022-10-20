@@ -2,33 +2,34 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:injectable/injectable.dart';
 import 'package:teta_cms/src/constants.dart';
+import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/teta_cms.dart';
 
 /// Project settings
+@lazySingleton
 class TetaEmail {
   /// Project settings
   TetaEmail(
-    this.token,
-    this.prjId,
+    this._serverRequestMetadata,
   );
 
-  /// Token of the current prj
-  final String token;
-
-  /// Id of the current prj
-  final int prjId;
+  ///This stores the token and project id headers.
+  final ServerRequestMetadataStore _serverRequestMetadata;
 
   /// Get email info
   Future<TetaResponse<TetaEmailResponse?, TetaErrorResponse?>> info() async {
+    final requestMetadata = _serverRequestMetadata.getMetadata();
+
     final uri = Uri.parse(
-      '${Constants.emailUrl}info/$prjId',
+      '${Constants.emailUrl}info/${requestMetadata.prjId}',
     );
 
     final res = await http.get(
       uri,
       headers: {
-        'authorization': 'Bearer $token',
+        'authorization': 'Bearer ${requestMetadata.token}',
       },
     );
 
@@ -81,14 +82,16 @@ class TetaEmail {
     required final String fromAddress,
     required final String to,
   }) async {
+    final requestMetadata = _serverRequestMetadata.getMetadata();
+
     final uri = Uri.parse(
-      '${Constants.emailUrl}send/$prjId/$templateId',
+      '${Constants.emailUrl}send/${requestMetadata.prjId}/$templateId',
     );
 
     final res = await http.post(
       uri,
       headers: {
-        'authorization': 'Bearer $token',
+        'authorization': 'Bearer ${requestMetadata.token}',
         'content-type': 'application/json',
       },
       body: json.encode(<String, dynamic>{
@@ -126,14 +129,16 @@ class TetaEmail {
   Future<TetaResponse<bool, TetaErrorResponse?>> insertTemplate(
     final TetaEmailTemplate template,
   ) async {
+    final requestMetadata = _serverRequestMetadata.getMetadata();
+
     final uri = Uri.parse(
-      '${Constants.emailUrl}email/template/$prjId',
+      '${Constants.emailUrl}email/template/${requestMetadata.prjId}',
     );
 
     final res = await http.post(
       uri,
       headers: {
-        'authorization': 'Bearer $token',
+        'authorization': 'Bearer ${requestMetadata.token}',
         'content-type': 'application/json',
       },
       body: json.encode(template.toJson()),
@@ -168,14 +173,16 @@ class TetaEmail {
   Future<TetaResponse<bool, TetaErrorResponse?>> deleteTemplate(
     final String templateId,
   ) async {
+    final requestMetadata = _serverRequestMetadata.getMetadata();
+
     final uri = Uri.parse(
-      '${Constants.emailUrl}email/template/$prjId/$templateId',
+      '${Constants.emailUrl}email/template/${requestMetadata.prjId}/$templateId',
     );
 
     final res = await http.delete(
       uri,
       headers: {
-        'authorization': 'Bearer $token',
+        'authorization': 'Bearer ${requestMetadata.token}',
       },
     );
 
@@ -210,14 +217,16 @@ class TetaEmail {
   Future<TetaResponse<bool, TetaErrorResponse?>> updateTemplate(
     final TetaEmailTemplate template,
   ) async {
+    final requestMetadata = _serverRequestMetadata.getMetadata();
+
     final uri = Uri.parse(
-      '${Constants.emailUrl}email/template/$prjId',
+      '${Constants.emailUrl}email/template/${requestMetadata.prjId}',
     );
 
     final res = await http.post(
       uri,
       headers: {
-        'authorization': 'Bearer $token',
+        'authorization': 'Bearer ${requestMetadata.token}',
         'content-type': 'application/json',
       },
       body: json.encode(template.toJson()),
