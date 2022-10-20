@@ -41,9 +41,13 @@ class TetaStoreCartsApi {
       );
     }
 
+    final decodedList = (jsonDecode(res.body) as List<dynamic>)
+        .map((final dynamic e) => e as Map<String, dynamic>)
+        .toList(growable: false);
+
     return TetaProductsResponse(
       data: _productMapper.mapProducts(
-        json.decode(res.body) as List<Map<String, dynamic>>,
+        decodedList,
       ),
     );
   }
