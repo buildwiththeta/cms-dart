@@ -132,7 +132,7 @@ class TetaCMS {
     realtime = getIt.get<TetaRealtime>();
     auth = getIt.get<TetaAuth>();
     client = getIt.get<TetaClient>();
-    store = getIt.get<TetaStore>();
+    store = getIt.get<TetaShop>();
     utils = getIt.get<TetaCMSUtils>();
 
     if (!UniversalPlatform.isWeb && !Hive.isBoxOpen('Teta Auth')) {

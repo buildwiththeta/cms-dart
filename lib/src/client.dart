@@ -16,7 +16,7 @@ class TetaClient {
   TetaClient(
     this.backups,
     this.policies,
-    this.serverRequestMetadata,
+    this._serverRequestMetadata,
   );
 
   /// Backups area
@@ -26,16 +26,16 @@ class TetaClient {
   final TetaPolicies policies;
 
   ///This stores the token and project id headers.
-  final ServerRequestMetadataStore serverRequestMetadata;
+  final ServerRequestMetadataStore _serverRequestMetadata;
 
   /// Http header for count
   Map<String, String> get countHeader => {'cms-count-only': '1'};
 
   ///Get token
-  String get token => serverRequestMetadata.getMetadata().token;
+  String get token => _serverRequestMetadata.getMetadata().token;
 
   /// Get current project id
-  int get prjId => serverRequestMetadata.getMetadata().prjId;
+  int get prjId => _serverRequestMetadata.getMetadata().prjId;
 
   /// Creates a new collection with name [collectionName] and prj_id [prjId].
   ///
@@ -45,7 +45,7 @@ class TetaClient {
   Future<Map<String, dynamic>> createCollection(
     final String collectionName,
   ) async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
       '${Constants.tetaUrl}cms/${serverMetadata.prjId}/$collectionName',
@@ -86,7 +86,7 @@ class TetaClient {
   Future<bool> deleteCollection(
     final String collectionId,
   ) async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
       '${Constants.tetaUrl}cms/${serverMetadata.prjId}/$collectionId',
@@ -128,7 +128,7 @@ class TetaClient {
     final String collectionId,
     final Map<String, dynamic> document,
   ) async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
       '${Constants.tetaUrl}cms/${serverMetadata.prjId}/$collectionId',
@@ -174,7 +174,7 @@ class TetaClient {
     final String collectionId,
     final String documentId,
   ) async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
       '${Constants.tetaUrl}cms/${serverMetadata.prjId}/$collectionId/$documentId',
@@ -219,7 +219,7 @@ class TetaClient {
     final int limit = 20,
     final bool showDrafts = false,
   }) async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final finalFilters = [
       ...filters,
@@ -278,7 +278,7 @@ class TetaClient {
     final int limit = 20,
     final bool showDrafts = false,
   }) async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final finalFilters = [
       ...filters,
@@ -328,7 +328,7 @@ class TetaClient {
   ///
   /// Returns the collections as `List<Map<String,dynamic>>` without `docs`
   Future<List<CollectionObject>> getCollections() async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse('${Constants.tetaUrl}cms/${serverMetadata.prjId}');
 
@@ -384,7 +384,7 @@ class TetaClient {
     final String name,
     final Map<String, dynamic>? attributes,
   ) async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
       '${Constants.tetaUrl}cms/${serverMetadata.prjId}/$collectionId',
@@ -434,7 +434,7 @@ class TetaClient {
     final String documentId,
     final Map<String, dynamic> content,
   ) async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
       '${Constants.tetaUrl}cms/${serverMetadata.prjId}/$collectionId/$documentId',
@@ -475,7 +475,7 @@ class TetaClient {
   Future<TetaResponse<List<dynamic>?, TetaErrorResponse?>> query(
     final String query,
   ) async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse('${Constants.tetaUrl}cms/aya');
 
@@ -528,7 +528,7 @@ class TetaClient {
     final String url,
     final Map<String, String> headers,
   ) async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final enc = Uri.encodeComponent(url);
     final uri = Uri.parse('${Constants.reverseProxyUrl}/$enc');

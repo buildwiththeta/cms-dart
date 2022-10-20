@@ -13,16 +13,16 @@ import 'package:teta_cms/teta_cms.dart';
 @lazySingleton
 class TetaPolicies {
   /// Control all the policies in a project
-  TetaPolicies(this.serverRequestMetadata);
+  TetaPolicies(this._serverRequestMetadata);
 
   ///This stores the token and project id headers.
-  final ServerRequestMetadataStore serverRequestMetadata;
+  final ServerRequestMetadataStore _serverRequestMetadata;
 
   /// Get all policies
   Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>> all(
     final String collId,
   ) async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
       '${Constants.tetaUrl}cms/policy/${serverMetadata.prjId}/$collId',
@@ -86,7 +86,7 @@ class TetaPolicies {
     final String value,
     final TetaPolicyScope scope,
   ) async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final scopeStr = EnumToString.convertToString(scope);
     final uri = Uri.parse(
@@ -134,7 +134,7 @@ class TetaPolicies {
     final String collId,
     final TetaPolicyScope scope,
   ) async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final scopeStr = EnumToString.convertToString(scope);
     final uri = Uri.parse(

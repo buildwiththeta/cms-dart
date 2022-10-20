@@ -25,8 +25,8 @@ class TetaAuth {
     this.project,
     this.user,
     this.email,
-    this.serverRequestMetadata,
-    this.getServerRequestHeaders,
+    this._serverRequestMetadata,
+    this._getServerRequestHeaders,
   );
 
   /// Project settings
@@ -39,21 +39,21 @@ class TetaAuth {
   final TetaEmail email;
 
   ///This stores the token and project id headers.
-  final ServerRequestMetadataStore serverRequestMetadata;
+  final ServerRequestMetadataStore _serverRequestMetadata;
 
   ///Get standard Teta heders
-  final GetServerRequestHeaders getServerRequestHeaders;
+  final GetServerRequestHeaders _getServerRequestHeaders;
 
   /// Insert a new user inside the prj
   Future<bool> insertUser(final String userToken) async {
-    final requestMetadata = serverRequestMetadata.getMetadata();
+    final requestMetadata = _serverRequestMetadata.getMetadata();
     final uri = Uri.parse(
       '${Constants.tetaUrl}auth/users/${requestMetadata.prjId}',
     );
 
     final res = await http.post(
       uri,
-      headers: getServerRequestHeaders.execute(),
+      headers: _getServerRequestHeaders.execute(),
       body: json.encode(
         <String, dynamic>{
           'token': userToken,
@@ -90,7 +90,7 @@ class TetaAuth {
     final int limit = 10,
     final int page = 0,
   }) async {
-    final requestMetadata = serverRequestMetadata.getMetadata();
+    final requestMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
       '${Constants.tetaUrl}auth/users/$prjId',
@@ -139,7 +139,7 @@ class TetaAuth {
     required final TetaProvider provider,
   }) async {
     TetaCMS.log('signIn');
-    final requestMetadata = serverRequestMetadata.getMetadata();
+    final requestMetadata = _serverRequestMetadata.getMetadata();
 
     final param = EnumToString.convertToString(provider);
     final device = UniversalPlatform.isWeb ? 'web' : 'mobile';
@@ -168,7 +168,7 @@ class TetaAuth {
     /// The external provider
     final TetaProvider provider = TetaProvider.google,
   }) async {
-    final requestMetadata = serverRequestMetadata.getMetadata();
+    final requestMetadata = _serverRequestMetadata.getMetadata();
 
     final url = await _signIn(prjId: requestMetadata.prjId, provider: provider);
     await CMSPlatform.login(url, (final userToken) async {
@@ -237,7 +237,7 @@ class TetaAuth {
   Future<TetaResponse<dynamic, TetaErrorResponse?>> get(
     final String ayayaQuery,
   ) async {
-    final requestMetadata = serverRequestMetadata.getMetadata();
+    final requestMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
       '${Constants.tetaUrl}auth/aya',

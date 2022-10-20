@@ -12,14 +12,14 @@ import 'package:teta_cms/teta_cms.dart';
 class TetaProjectSettings {
   /// Project settings
   TetaProjectSettings(
-    this.serverRequestMetadata,
+    this._serverRequestMetadata,
   );
 
   ///This stores the token and project id headers.
-  final ServerRequestMetadataStore serverRequestMetadata;
+  final ServerRequestMetadataStore _serverRequestMetadata;
 
   Future<TetaResponse<List<dynamic>, TetaErrorResponse?>> invoices() async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
       '${Constants.tetaUrl}auth/invoices/${serverMetadata.prjId}',
@@ -53,7 +53,7 @@ class TetaProjectSettings {
   }
 
   Future<TetaResponse<double, TetaErrorResponse?>> retrieveSpaceUsed() async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
       '${Constants.tetaUrl}cms/space/${serverMetadata.prjId}',
@@ -88,7 +88,7 @@ class TetaProjectSettings {
 
   Future<TetaResponse<TetaPlanResponse?, TetaErrorResponse?>>
       retrievePlanInfo() async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
       '${Constants.tetaUrl}auth/premium/${serverMetadata.prjId}',
@@ -125,7 +125,7 @@ class TetaProjectSettings {
   Future<void> saveCredentials({
     required final TetaAuthCredentials credentials,
   }) async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
       '${Constants.tetaUrl}auth/credentials/${serverMetadata.prjId}',
@@ -162,7 +162,7 @@ class TetaProjectSettings {
 
   /// Retrieve project credentials
   Future<TetaAuthCredentials> retrieveCredentials() async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
       '${Constants.tetaUrl}auth/credentials/services/${serverMetadata.prjId}',

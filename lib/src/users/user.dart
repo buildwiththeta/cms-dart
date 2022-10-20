@@ -12,15 +12,15 @@ import 'package:teta_cms/teta_cms.dart';
 class TetaUserUtils {
   /// User utils
   TetaUserUtils(
-    this.serverRequestMetadata,
+    this._serverRequestMetadata,
   );
 
   ///This stores the token and project id headers.
-  final ServerRequestMetadataStore serverRequestMetadata;
+  final ServerRequestMetadataStore _serverRequestMetadata;
 
   /// Check if users is logged in
   Future<TetaUser> get get async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final box = await Hive.openBox<dynamic>('Teta Auth');
     final accessToken = await box.get('access_tkn') as String?;

@@ -5,13 +5,13 @@ part of 'index.dart';
 class TetaRealtime {
   ///Constructor
   TetaRealtime(
-    this.serverRequestMetadata,
+    this._serverRequestMetadata,
   );
 
   socket_io.Socket? _socket;
 
   ///This stores the token and project id headers.
-  final ServerRequestMetadataStore serverRequestMetadata;
+  final ServerRequestMetadataStore _serverRequestMetadata;
 
   /// List of all the streams
   List<RealtimeSubscription> streams = [];
@@ -72,7 +72,7 @@ class TetaRealtime {
     final String? documentId,
     final Function(SocketChangeEvent)? callback,
   }) async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     if (_socket == null) await _openSocket();
 

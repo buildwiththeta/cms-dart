@@ -13,15 +13,15 @@ import 'package:teta_cms/teta_cms.dart';
 class TetaBackups {
   /// Controls all the backups of the current prj
   TetaBackups(
-    this.serverRequestMetadata,
+    this._serverRequestMetadata,
   );
 
   ///This stores the token and project id headers.
-  final ServerRequestMetadataStore serverRequestMetadata;
+  final ServerRequestMetadataStore _serverRequestMetadata;
 
   /// Get all backups
   Future<TetaResponse<List<dynamic>?, TetaErrorResponse?>> all() async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse('${Constants.tetaUrl}backup/${serverMetadata.prjId}/list');
 
@@ -71,7 +71,7 @@ class TetaBackups {
   Future<TetaResponse<Uint8List, TetaErrorResponse?>> download(
     final String? backupId,
   ) async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     if (backupId != null) {
       final uri =
@@ -124,7 +124,7 @@ class TetaBackups {
   Future<TetaResponse<void, TetaErrorResponse?>> restore(
     final String? backupId,
   ) async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     if (backupId != null) {
       final uri =

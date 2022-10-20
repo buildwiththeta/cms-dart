@@ -1,5 +1,7 @@
-import '../models/store/shipping.dart';
+import 'package:injectable/injectable.dart';
+import 'package:teta_cms/src/models/store/shipping.dart';
 
+@lazySingleton
 class ShippingMapper {
   Shipping mapShipping(final Map<String, dynamic> json) => Shipping(
         id: json['id'] as String? ?? '',

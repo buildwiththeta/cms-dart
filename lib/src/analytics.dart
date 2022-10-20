@@ -11,12 +11,12 @@ import 'package:teta_cms/teta_cms.dart';
 @lazySingleton
 class TetaAnalytics {
   ///
-  TetaAnalytics(this.serverRequestMetadata) {
+  TetaAnalytics(this._serverRequestMetadata) {
     init();
   }
 
   ///This stores the token and project id headers.
-  final ServerRequestMetadataStore serverRequestMetadata;
+  final ServerRequestMetadataStore _serverRequestMetadata;
 
   /// Detected id of the logged user
   String? _currentUserId;
@@ -36,7 +36,7 @@ class TetaAnalytics {
     final uri = Uri.parse(
       '${Constants.analyticsUrl}events/add/${EnumToString.convertToString(type)}',
     );
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final res = await http.post(
       uri,
@@ -77,7 +77,7 @@ class TetaAnalytics {
     final uri = Uri.parse(
       '${Constants.analyticsUrl}events/aya',
     );
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final res = await http.post(
       uri,

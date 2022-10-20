@@ -9,17 +9,17 @@ import 'package:teta_cms/teta_cms.dart';
 @lazySingleton
 class TetaCMSUtils {
   ///Constructor
-  TetaCMSUtils(this.serverRequestMetadata);
+  TetaCMSUtils(this._serverRequestMetadata);
 
   ///This stores the token and project id headers.
-  final ServerRequestMetadataStore serverRequestMetadata;
+  final ServerRequestMetadataStore _serverRequestMetadata;
 
   Future<TetaResponse<bool, TetaErrorResponse?>> braintreePay(
     final dynamic nounce,
     final dynamic deviceData,
     final dynamic amount,
   ) async {
-    final serverMetadata = serverRequestMetadata.getMetadata();
+    final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final url = 'http://cms.teta.so:9183/pay/${serverMetadata.prjId}';
     final uri = Uri.parse(

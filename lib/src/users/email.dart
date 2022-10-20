@@ -12,15 +12,15 @@ import 'package:teta_cms/teta_cms.dart';
 class TetaEmail {
   /// Project settings
   TetaEmail(
-    this.serverRequestMetadata,
+    this._serverRequestMetadata,
   );
 
   ///This stores the token and project id headers.
-  final ServerRequestMetadataStore serverRequestMetadata;
+  final ServerRequestMetadataStore _serverRequestMetadata;
 
   /// Get email info
   Future<TetaResponse<TetaEmailResponse?, TetaErrorResponse?>> info() async {
-    final requestMetadata = serverRequestMetadata.getMetadata();
+    final requestMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
       '${Constants.emailUrl}info/${requestMetadata.prjId}',
@@ -82,7 +82,7 @@ class TetaEmail {
     required final String fromAddress,
     required final String to,
   }) async {
-    final requestMetadata = serverRequestMetadata.getMetadata();
+    final requestMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
       '${Constants.emailUrl}send/${requestMetadata.prjId}/$templateId',
@@ -129,7 +129,7 @@ class TetaEmail {
   Future<TetaResponse<bool, TetaErrorResponse?>> insertTemplate(
     final TetaEmailTemplate template,
   ) async {
-    final requestMetadata = serverRequestMetadata.getMetadata();
+    final requestMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
       '${Constants.emailUrl}email/template/${requestMetadata.prjId}',
@@ -173,7 +173,7 @@ class TetaEmail {
   Future<TetaResponse<bool, TetaErrorResponse?>> deleteTemplate(
     final String templateId,
   ) async {
-    final requestMetadata = serverRequestMetadata.getMetadata();
+    final requestMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
       '${Constants.emailUrl}email/template/${requestMetadata.prjId}/$templateId',
@@ -217,7 +217,7 @@ class TetaEmail {
   Future<TetaResponse<bool, TetaErrorResponse?>> updateTemplate(
     final TetaEmailTemplate template,
   ) async {
-    final requestMetadata = serverRequestMetadata.getMetadata();
+    final requestMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
       '${Constants.emailUrl}email/template/${requestMetadata.prjId}',
