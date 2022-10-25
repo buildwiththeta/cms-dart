@@ -56,37 +56,54 @@ class TetaShop {
 
   /// Gets all the transactions for shop linked to this project id
   Future<TetaTransactionsResponse> transactions() async {
-    final uri = Uri.parse(
-      '${Constants.shopBaseUrl}/shop/transactions',
-    );
+    try {
+      final uri = Uri.parse(
+        '${Constants.shopBaseUrl}/shop/transactions',
+      );
 
-    final res = await http.get(
-      uri,
-      headers: _getServerRequestHeaders.execute(),
-    );
+      final res = await http.get(
+        uri,
+        headers: _getServerRequestHeaders.execute(),
+      );
 
-    if (res.statusCode != 200) {
+      print('Transactions response 1${res.statusCode} ${res.body}');
+      if (res.statusCode != 200) {
+        return TetaTransactionsResponse(
+          error: TetaErrorResponse(
+            code: res.statusCode,
+            message: res.body,
+          ),
+        );
+      }
+
+      final decodedList = (jsonDecode(res.body) as List<dynamic>)
+          .map((final dynamic e) => e as Map<String, dynamic>)
+          .toList(growable: false);
+
+      final transactions =
+      _transactionsMapper.mapTransactions(decodedList);
+
+      final prjId = _metadataStore
+          .getMetadata()
+          .prjId;
+
+      final filteredTransactions = transactions
+          .where((final transaction) => transaction.prjId == prjId)
+          .toList(
+        growable: true,
+      );
+
+      return TetaTransactionsResponse(
+        data: transactions,
+      );
+    } catch (e, st) {
       return TetaTransactionsResponse(
         error: TetaErrorResponse(
-          code: res.statusCode,
-          message: res.body,
+          code: 400,
+          message: 'Transaction error: ${e.toString()} \nStack trace: ${st.toString()}',
         ),
       );
     }
-
-    final responseBodyDecoded =
-        jsonDecode(res.body) as List<Map<String, dynamic>>;
-
-    final transactions =
-        _transactionsMapper.mapTransactions(responseBodyDecoded);
-    final prjId = _metadataStore.getMetadata().prjId;
-    return TetaTransactionsResponse(
-      data: transactions
-          .where((final transaction) => transaction.prjId == prjId)
-          .toList(
-            growable: true,
-          ),
-    );
   }
 
   /// Gets all the transactions for user linked to this project id

@@ -17,6 +17,10 @@ class TransactionsMapper {
           );
 
   TransactionModel mapTransaction(Map<String, dynamic> json) {
+    final decodedList = (json['items']  as List<dynamic>)
+        .map((final dynamic e) => e as Map<String, dynamic>)
+        .toList(growable: false);
+
     return TransactionModel(
       userId: json['user_id'] as String,
       prjId: json['prj_id'] as int,
@@ -24,7 +28,7 @@ class TransactionsMapper {
       state: json['state'] as String,
       ammount: json['amount'] as String,
       items: _productMapper.mapProducts(
-        jsonDecode(json['items'] as String) as List<Map<String, dynamic>>,
+        decodedList,
       ),
     );
   }

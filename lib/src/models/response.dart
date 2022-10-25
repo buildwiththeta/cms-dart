@@ -116,4 +116,8 @@ class TransactionModel {
   final String state;
   final String ammount;
   final List<TetaProduct> items;
+
+  Map<String, dynamic> toJson() => <String, dynamic> {
+
+  };
 }
