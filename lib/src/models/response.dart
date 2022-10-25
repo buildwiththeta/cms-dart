@@ -118,6 +118,10 @@ class TransactionModel {
   final List<TetaProduct> items;
 
   Map<String, dynamic> toJson() => <String, dynamic> {
-
+    'user_id': userId,
+    'prj_id': prjId,
+    'paymentIntentId': paymentIntentId,
+    'state': state,
+    'amount': ammount,
   };
 }
