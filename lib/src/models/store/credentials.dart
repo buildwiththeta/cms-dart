@@ -10,7 +10,7 @@ class ShopCredentials {
   });
 
   final String accessToken;
-  final String livemode;
+  final bool livemode;
   final String refreshToken;
   final String tokenType;
   final String stripePublishableKey;
@@ -32,7 +32,7 @@ class ShopCredentials {
   static ShopCredentials fromSchema(Map<String, dynamic> json) =>
       ShopCredentials(
         accessToken: json['access_token'] as String? ?? '',
-        livemode: json['livemode'] as String? ?? '',
+        livemode: json['livemode'] as bool? ?? false,
         refreshToken: json['refresh_token'] as String? ?? '',
         tokenType: json['token_type'] as String? ?? '',
         stripePublishableKey: json['stripe_publishable_key'] as String? ?? '',

@@ -301,9 +301,9 @@ class TetaShop {
     }
 
     final responseBodyDecoded = jsonDecode(res.body) as Map<String, dynamic>;
-
+    final mappedCredentials = _credentialsMapper.mapCredentials(responseBodyDecoded);
     return TetaCredentialsResponse(
-      data: _credentialsMapper.mapCredentials(responseBodyDecoded),
+      data: mappedCredentials,
     );
   }
 
@@ -345,7 +345,7 @@ class TetaShop {
     final res = await http.put(
       uri,
       headers: _getServerRequestHeaders.execute(),
-      body: jsonEncode(shopCredentials.toJson()),
+      body: jsonEncode(shopCredentials),
     );
 
     if (res.statusCode != 200) {
