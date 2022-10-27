@@ -15,6 +15,10 @@ export 'src/models/policy_scope.dart';
 export 'src/models/provider.dart';
 export 'src/models/response.dart';
 export 'src/models/row.dart';
+export 'src/models/store/credentials.dart';
 export 'src/models/store/product.dart';
+export 'src/models/store/shipping.dart';
+export 'src/models/store/shop_settings.dart';
+
 export 'src/models/teta_analytics_type.dart';
 export 'src/models/user.dart';
