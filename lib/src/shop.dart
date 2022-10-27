@@ -66,7 +66,6 @@ class TetaShop {
         headers: _getServerRequestHeaders.execute(),
       );
 
-      print('Transactions response 1${res.statusCode} ${res.body}');
       if (res.statusCode != 200) {
         return TetaTransactionsResponse(
           error: TetaErrorResponse(
