@@ -79,18 +79,15 @@ class TetaShop {
           .map((final dynamic e) => e as Map<String, dynamic>)
           .toList(growable: false);
 
-      final transactions =
-      _transactionsMapper.mapTransactions(decodedList);
+      final transactions = _transactionsMapper.mapTransactions(decodedList);
 
-      final prjId = _metadataStore
-          .getMetadata()
-          .prjId;
+      final prjId = _metadataStore.getMetadata().prjId;
 
       final filteredTransactions = transactions
           .where((final transaction) => transaction.prjId == prjId)
           .toList(
-        growable: true,
-      );
+            growable: true,
+          );
 
       return TetaTransactionsResponse(
         data: transactions,
@@ -99,7 +96,8 @@ class TetaShop {
       return TetaTransactionsResponse(
         error: TetaErrorResponse(
           code: 400,
-          message: 'Transaction error: ${e.toString()} \nStack trace: ${st.toString()}',
+          message:
+              'Transaction error: ${e.toString()} \nStack trace: ${st.toString()}',
         ),
       );
     }
@@ -301,7 +299,8 @@ class TetaShop {
     }
 
     final responseBodyDecoded = jsonDecode(res.body) as Map<String, dynamic>;
-    final mappedCredentials = _credentialsMapper.mapCredentials(responseBodyDecoded);
+    final mappedCredentials =
+        _credentialsMapper.mapCredentials(responseBodyDecoded);
     return TetaCredentialsResponse(
       data: mappedCredentials,
     );
@@ -387,9 +386,10 @@ class TetaShop {
 
     final responseBodyDecoded = jsonDecode(res.body) as Map<String, dynamic>;
 
-    final receiptUrl = (responseBodyDecoded['charges']['data']
-            as List<Map<String, dynamic>>)[0]['receipt_url'] as String? ??
-        '';
+    final receiptList =
+        responseBodyDecoded['charges']['data'] as List<dynamic>;
+
+    final receiptUrl = (receiptList[0] as Map<String, dynamic>)['receipt_url'] as String? ?? '';
     return TetaReceiptResponse(
       data: receiptUrl,
     );
@@ -402,11 +402,9 @@ class TetaShop {
       '${Constants.shopBaseUrl}/shop/settings',
     );
 
-    final res = await http.put(
-      uri,
-      headers: _getServerRequestHeaders.execute(),
-      body: jsonEncode(shopSettings)
-    );
+    final res = await http.put(uri,
+        headers: _getServerRequestHeaders.execute(),
+        body: jsonEncode(shopSettings));
 
     if (res.statusCode != 200) {
       return TetaShopSettingsResponse(
