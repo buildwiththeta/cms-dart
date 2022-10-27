@@ -405,6 +405,7 @@ class TetaShop {
     final res = await http.put(
       uri,
       headers: _getServerRequestHeaders.execute(),
+      body: jsonEncode(shopSettings)
     );
 
     if (res.statusCode != 200) {
