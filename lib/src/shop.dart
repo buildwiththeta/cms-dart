@@ -447,9 +447,9 @@ class TetaShop {
   }
 
   /// Sets a new status for the transaction
-  Future<TetaResponse> setTransactionStatus(final String status) async {
+  Future<TetaResponse> setTransactionStatus(final String status, final String paymentIntentId) async {
     final uri = Uri.parse(
-      '${Constants.shopBaseUrl}/currency/$status',
+      '${Constants.shopBaseUrl}/shop/transactions/$paymentIntentId/status/$status',
     );
 
     final res = await http.put(
