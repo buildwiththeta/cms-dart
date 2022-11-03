@@ -189,11 +189,12 @@ class TetaShop {
       );
     }
 
-    final responseBodyDecoded =
-        jsonDecode(res.body) as List<Map<String, dynamic>>;
+    final decodedList = (jsonDecode(res.body) as List<dynamic>)
+        .map((final dynamic e) => e as Map<String, dynamic>)
+        .toList(growable: false);
 
     return TetaShippingResponse(
-      data: _shippingMapper.mapShippings(responseBodyDecoded),
+      data: _shippingMapper.mapShippings(decodedList),
     );
   }
 
@@ -447,9 +448,9 @@ class TetaShop {
   }
 
   /// Sets a new status for the transaction
-  Future<TetaResponse> setTransactionStatus(final String status) async {
+  Future<TetaResponse> setTransactionStatus(final String status, final String paymentIntentId) async {
     final uri = Uri.parse(
-      '${Constants.shopBaseUrl}/currency/$status',
+      '${Constants.shopBaseUrl}/shop/transactions/$paymentIntentId/status/$status',
     );
 
     final res = await http.put(

@@ -16,6 +16,7 @@ export 'src/models/provider.dart';
 export 'src/models/response.dart';
 export 'src/models/row.dart';
 export 'src/models/store/credentials.dart';
+export 'src/models/store/user_address.dart';
 export 'src/models/store/product.dart';
 export 'src/models/store/shipping.dart';
 export 'src/models/store/shop_settings.dart';

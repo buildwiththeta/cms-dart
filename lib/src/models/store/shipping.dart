@@ -11,9 +11,16 @@ class Shipping {
   final num cost;
   final String description;
 
+  static Shipping fromSchema(final Map<String, dynamic> json) => Shipping(
+        id: json['_id'] as String? ?? '',
+        name: json['name'] as String? ?? '',
+        cost: json['cost'] as num? ?? 0,
+        description: json['description'] as String? ?? '',
+      );
+
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
-      'id': id,
+      '_id': id,
       'name': name,
       'cost': cost,
       'description': description,
