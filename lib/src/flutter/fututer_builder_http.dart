@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:universal_html/html.dart';
@@ -60,10 +62,13 @@ class _TetaFutureBuilderHttpState<T> extends State<TetaFutureBuilderHttp<T>> {
         newURL = newURL + "&${key}=${value}";
       }
     });
-
-    await http.get(
+    var response = await http.get(
       Uri.parse(newURL),
       headers: headersGlobal,
     );
+
+    final json = response.body;
+    final data = jsonDecode(json) as List<dynamic>;
+    return data;
   }
 }
