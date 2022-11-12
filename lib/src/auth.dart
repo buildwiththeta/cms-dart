@@ -179,7 +179,7 @@ class TetaAuth {
     final url = await _signIn(
       prjId: requestMetadata.prjId,
       provider: provider,
-      fromEditor: fromEditor,
+      fromEditor: fromEditor ?? false,
     );
     await CMSPlatform.login(url, (final userToken) async {
       if (!UniversalPlatform.isWeb) {
