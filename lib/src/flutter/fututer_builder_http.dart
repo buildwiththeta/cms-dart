@@ -68,7 +68,15 @@ class _TetaFutureBuilderHttpState<T> extends State<TetaFutureBuilderHttp<T>> {
     );
 
     final json = response.body;
-    final data = jsonDecode(json) as List<dynamic>;
-    return data;
+
+    dynamic resp = jsonDecode(json);
+    if (resp is List) {
+      final data = resp;
+      return data;
+    } else {
+      final data = <dynamic>[];
+      data.add(resp);
+      return data;
+    }
   }
 }

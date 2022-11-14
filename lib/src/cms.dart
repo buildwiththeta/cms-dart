@@ -14,6 +14,7 @@ import 'package:teta_cms/src/auth.dart';
 import 'package:teta_cms/src/client.dart';
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/src/di/injector.dart';
+import 'package:teta_cms/src/httpRequest.dart';
 import 'package:teta_cms/src/shop.dart';
 import 'package:teta_cms/src/utils.dart';
 import 'package:teta_cms/teta_cms.dart';
@@ -96,6 +97,9 @@ class TetaCMS {
   /// Utils
   late TetaCMSUtils utils;
 
+  /// Http Request
+  late TetaHttpRequest httpRequest;
+
   /// Dispose the instance to free up resources.
   void dispose() {
     _initialized = false;
@@ -134,6 +138,7 @@ class TetaCMS {
     client = getIt.get<TetaClient>();
     store = getIt.get<TetaShop>();
     utils = getIt.get<TetaCMSUtils>();
+    httpRequest = getIt.get<TetaHttpRequest>();
 
     if (!UniversalPlatform.isWeb && !Hive.isBoxOpen('Teta Auth')) {
       Hive.init((await getApplicationDocumentsDirectory()).path);

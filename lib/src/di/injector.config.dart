@@ -30,8 +30,9 @@ import 'package:teta_cms/src/use_cases/get_server_request_headers/get_server_req
 import 'package:teta_cms/src/users/email.dart' as _i12;
 import 'package:teta_cms/src/users/settings.dart' as _i14;
 import 'package:teta_cms/src/users/user.dart' as _i16;
-import 'package:teta_cms/src/utils.dart'
-    as _i11; // ignore_for_file: unnecessary_lambdas
+import 'package:teta_cms/src/utils.dart' as _i11;
+import 'package:teta_cms/src/httpRequest.dart' as _i25;
+// ignore_for_file: unnecessary_lambdas
 
 // ignore_for_file: lines_longer_than_80_chars
 /// initializes the registration of provided dependencies inside of [GetIt]
@@ -105,6 +106,7 @@ _i1.GetIt $initGetIt(
         get<_i8.ShopSettingsMapper>(),
         get<_i6.ServerRequestMetadataStore>(),
       ));
+  gh.lazySingleton<_i25.TetaHttpRequest>(() => _i25.TetaHttpRequest());
   return get;
 }
 
