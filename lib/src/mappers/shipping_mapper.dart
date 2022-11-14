@@ -4,7 +4,7 @@ import 'package:teta_cms/src/models/store/shipping.dart';
 @lazySingleton
 class ShippingMapper {
   Shipping mapShipping(final Map<String, dynamic> json) => Shipping(
-        id: json['_id'] as String? ?? '',
+        id: json['id'] as String? ?? '',
         name: json['name'] as String? ?? '',
         cost: json['cost'] as num,
         description: json['description'] as String? ?? '',

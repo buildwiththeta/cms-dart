@@ -66,6 +66,7 @@ class TetaShop {
         headers: _getServerRequestHeaders.execute(),
       );
 
+      print('Transactions response 1${res.statusCode} ${res.body}');
       if (res.statusCode != 200) {
         return TetaTransactionsResponse(
           error: TetaErrorResponse(
@@ -79,15 +80,18 @@ class TetaShop {
           .map((final dynamic e) => e as Map<String, dynamic>)
           .toList(growable: false);
 
-      final transactions = _transactionsMapper.mapTransactions(decodedList);
+      final transactions =
+      _transactionsMapper.mapTransactions(decodedList);
 
-      final prjId = _metadataStore.getMetadata().prjId;
+      final prjId = _metadataStore
+          .getMetadata()
+          .prjId;
 
       final filteredTransactions = transactions
           .where((final transaction) => transaction.prjId == prjId)
           .toList(
-            growable: true,
-          );
+        growable: true,
+      );
 
       return TetaTransactionsResponse(
         data: transactions,
@@ -96,8 +100,7 @@ class TetaShop {
       return TetaTransactionsResponse(
         error: TetaErrorResponse(
           code: 400,
-          message:
-              'Transaction error: ${e.toString()} \nStack trace: ${st.toString()}',
+          message: 'Transaction error: ${e.toString()} \nStack trace: ${st.toString()}',
         ),
       );
     }
@@ -189,12 +192,11 @@ class TetaShop {
       );
     }
 
-    final decodedList = (jsonDecode(res.body) as List<dynamic>)
-        .map((final dynamic e) => e as Map<String, dynamic>)
-        .toList(growable: false);
+    final responseBodyDecoded =
+        jsonDecode(res.body) as List<Map<String, dynamic>>;
 
     return TetaShippingResponse(
-      data: _shippingMapper.mapShippings(decodedList),
+      data: _shippingMapper.mapShippings(responseBodyDecoded),
     );
   }
 
@@ -300,10 +302,9 @@ class TetaShop {
     }
 
     final responseBodyDecoded = jsonDecode(res.body) as Map<String, dynamic>;
-    final mappedCredentials =
-        _credentialsMapper.mapCredentials(responseBodyDecoded);
+
     return TetaCredentialsResponse(
-      data: mappedCredentials,
+      data: _credentialsMapper.mapCredentials(responseBodyDecoded),
     );
   }
 
@@ -345,7 +346,7 @@ class TetaShop {
     final res = await http.put(
       uri,
       headers: _getServerRequestHeaders.execute(),
-      body: jsonEncode(shopCredentials),
+      body: jsonEncode(shopCredentials.toJson()),
     );
 
     if (res.statusCode != 200) {
@@ -387,10 +388,9 @@ class TetaShop {
 
     final responseBodyDecoded = jsonDecode(res.body) as Map<String, dynamic>;
 
-    final receiptList =
-        responseBodyDecoded['charges']['data'] as List<dynamic>;
-
-    final receiptUrl = (receiptList[0] as Map<String, dynamic>)['receipt_url'] as String? ?? '';
+    final receiptUrl = (responseBodyDecoded['charges']['data']
+            as List<Map<String, dynamic>>)[0]['receipt_url'] as String? ??
+        '';
     return TetaReceiptResponse(
       data: receiptUrl,
     );
@@ -403,9 +403,10 @@ class TetaShop {
       '${Constants.shopBaseUrl}/shop/settings',
     );
 
-    final res = await http.put(uri,
-        headers: _getServerRequestHeaders.execute(),
-        body: jsonEncode(shopSettings));
+    final res = await http.put(
+      uri,
+      headers: _getServerRequestHeaders.execute(),
+    );
 
     if (res.statusCode != 200) {
       return TetaShopSettingsResponse(
@@ -448,9 +449,9 @@ class TetaShop {
   }
 
   /// Sets a new status for the transaction
-  Future<TetaResponse> setTransactionStatus(final String status, final String paymentIntentId) async {
+  Future<TetaResponse> setTransactionStatus(final String status) async {
     final uri = Uri.parse(
-      '${Constants.shopBaseUrl}/shop/transactions/$paymentIntentId/status/$status',
+      '${Constants.shopBaseUrl}/currency/$status',
     );
 
     final res = await http.put(

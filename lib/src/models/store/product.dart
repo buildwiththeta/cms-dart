@@ -55,7 +55,6 @@ class TetaProduct {
 
   /// Generate a json from the model
   Map<String, dynamic> toJson() => <String, dynamic>{
-        '_id': id,
         'name': name,
         'description': description,
         'price': price,

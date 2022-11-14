@@ -12,7 +12,7 @@ class CMSPlatform {
     if (await canLaunchUrlString(url)) {
       await launchUrlString(
         url,
-        mode: LaunchMode.inAppWebView,
+        mode: LaunchMode.externalApplication,
       );
       await callback('');
     }

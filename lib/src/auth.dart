@@ -137,17 +137,12 @@ class TetaAuth {
   Future<String> _signIn({
     required final int prjId,
     required final TetaProvider provider,
-    final bool fromEditor = false,
   }) async {
     TetaCMS.log('signIn');
     final requestMetadata = _serverRequestMetadata.getMetadata();
 
     final param = EnumToString.convertToString(provider);
-    final device = UniversalPlatform.isWeb
-        ? 'web'
-        : fromEditor
-            ? 'mobile_redirect_teta'
-            : 'mobile';
+    final device = UniversalPlatform.isWeb ? 'web' : 'mobile';
     final res = await http.post(
       Uri.parse('https://auth.teta.so/auth/$param/$prjId/$device'),
       headers: {
@@ -172,15 +167,10 @@ class TetaAuth {
 
     /// The external provider
     final TetaProvider provider = TetaProvider.google,
-    final bool? fromEditor,
   }) async {
     final requestMetadata = _serverRequestMetadata.getMetadata();
 
-    final url = await _signIn(
-      prjId: requestMetadata.prjId,
-      provider: provider,
-      fromEditor: fromEditor ?? false,
-    );
+    final url = await _signIn(prjId: requestMetadata.prjId, provider: provider);
     await CMSPlatform.login(url, (final userToken) async {
       if (!UniversalPlatform.isWeb) {
         uriLinkStream.listen(

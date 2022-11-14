@@ -47,9 +47,7 @@ _i1.GetIt $initGetIt(
     environmentFilter,
   );
   final dioModule = _$DioModule();
-  if (!_i1.GetIt.instance.isRegistered(instance: _i3.CredentialsMapper)) {
-    gh.lazySingleton<_i3.CredentialsMapper>(() => _i3.CredentialsMapper());
-  }
+  gh.lazySingleton<_i3.CredentialsMapper>(() => _i3.CredentialsMapper());
   gh.factory<_i4.Dio>(() => dioModule.dio);
   gh.lazySingleton<_i5.ProductMapper>(() => _i5.ProductMapper());
   gh.lazySingleton<_i6.ServerRequestMetadataStore>(
