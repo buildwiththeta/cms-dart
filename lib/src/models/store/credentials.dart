@@ -10,7 +10,7 @@ class ShopCredentials {
   });
 
   final String accessToken;
-  final String livemode;
+  final bool livemode;
   final String refreshToken;
   final String tokenType;
   final String stripePublishableKey;
@@ -18,7 +18,8 @@ class ShopCredentials {
   final String scope;
 
   /// Generate a json from the model
-  Map<String, dynamic> toJson() => <String, dynamic>{
+  Map<String, dynamic> toJson() =>
+      <String, dynamic>{
         'access_token': accessToken,
         'livemode': livemode,
         'refresh_token': refreshToken,
@@ -27,4 +28,15 @@ class ShopCredentials {
         'stripe_user_id': stripeUserId,
         'scope': scope,
       };
+
+  static ShopCredentials fromSchema(Map<String, dynamic> json) =>
+      ShopCredentials(
+        accessToken: json['access_token'] as String? ?? '',
+        livemode: json['livemode'] as bool? ?? false,
+        refreshToken: json['refresh_token'] as String? ?? '',
+        tokenType: json['token_type'] as String? ?? '',
+        stripePublishableKey: json['stripe_publishable_key'] as String? ?? '',
+        stripeUserId: json['stripe_user_id'] as String? ?? '',
+        scope: json['scope'] as String? ?? '',
+      );
 }

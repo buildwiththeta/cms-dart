@@ -120,7 +120,7 @@ class TetaStoreCartsApi {
 
   /// Get required data to buy the items from the cart
   Future<TetaPaymentIntentResponse> getPaymentIntent(
-      final String shippingId) async {
+      final String shippingId, final UserAddress userAddress) async {
     final userId = (await TetaCMS.instance.auth.user.get).uid;
 
     try {
@@ -130,9 +130,9 @@ class TetaStoreCartsApi {
           headers: _getServerRequestHeaders.execute(),
         ),
         data: jsonEncode(
-          {
+          <String, dynamic>{
             'shipping_id': shippingId,
-          },
+          }..addAll(userAddress.toJson()),
         ),
       );
 

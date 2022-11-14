@@ -130,6 +130,7 @@ class TetaCMS {
       diInitialized = true;
     }
 
+    getIt.unregister();
     getIt
         .get<ServerRequestMetadataStore>()
         .updateMetadata(token: token, prjId: prjId);
