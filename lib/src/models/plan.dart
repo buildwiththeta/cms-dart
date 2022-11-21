@@ -1,7 +1,7 @@
 enum TetaPlan {
   free,
-  dev,
-  pro,
+  individual,
+  startup,
 }
 
 class TetaPlanResponse {
@@ -14,10 +14,10 @@ class TetaPlanResponse {
       : isPremium = json['isPremium'] as bool? ?? false,
         plan = (json['premiumPlan'] as int?) == 1 ||
                 (json['premiumPlan'] as int?) == 99
-            ? TetaPlan.dev
+            ? TetaPlan.individual
             : (json['premiumPlan'] as int?) == 2 ||
                     (json['premiumPlan'] as int?) == 199
-                ? TetaPlan.pro
+                ? TetaPlan.startup
                 : TetaPlan.free;
 
   final bool isPremium;
