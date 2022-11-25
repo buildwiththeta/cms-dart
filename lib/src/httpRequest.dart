@@ -4,25 +4,34 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:injectable/injectable.dart';
 import 'package:teta_cms/src/models/response.dart';
 
+@lazySingleton
 class TetaHttpRequest {
-  /// Post Request
-  Future<TetaResponse<List<dynamic>?, List<dynamic>?>> post(
+  //Get Request
+  Future<TetaResponse<List<dynamic>?, List<dynamic>?>> get(
     final String url,
     final String expectedStatusCode,
     final Map<String, dynamic> parameters,
     final Map<String, dynamic> body,
-    final Map<String, dynamic> headers,
-  ) async {
+    final Map<String, dynamic> headers, {
+    final bool test = false,
+  }) async {
     var urlString = url;
+    var firstLoop = true;
     parameters.forEach((key, dynamic value) {
-      urlString = urlString + "/${key.toString()}/${value.toString()}";
+      if (firstLoop) {
+        urlString = '$urlString?$key=${value.toString()}';
+        firstLoop = false;
+      } else {
+        urlString = '$urlString&$key=${value.toString()}';
+      }
     });
 
-    final Uri uri = Uri.parse(urlString);
+    final uri = Uri.parse(urlString);
 
-    Map<String, String> headersNew = {
+    var headersNew = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Credentials': 'true',
       'Access-Control-Allow-Headers':
@@ -30,7 +39,93 @@ class TetaHttpRequest {
       'Access-Control-Allow-Methods': 'POST, OPTIONS'
     };
     headers.forEach((key, dynamic value) {
-      headersNew[key.toString()] = value.toString();
+      headersNew[key] = value.toString();
+    });
+
+    final res = await http.get(
+      uri,
+      headers: headersNew,
+    );
+    final statusCode = <String, dynamic>{'statusCode': res.statusCode};
+    //Error Part
+    if (test == false) {
+      if (res.statusCode != int.parse(expectedStatusCode)) {
+        final json = res.body;
+        final dynamic docs = jsonDecode(json);
+        if (docs is List) {
+          final listDocs = (docs as List<dynamic>)
+              .map((final dynamic e) => <String, dynamic>{...e, ...statusCode})
+              .toList();
+
+          return TetaResponse<List<dynamic>?, List<dynamic>>(
+            data: null,
+            error: listDocs,
+          );
+        } else {
+          final listDocs = <dynamic>[
+            <String, dynamic>{...docs, ...statusCode}
+          ];
+
+          return TetaResponse<List<dynamic>?, List<dynamic>>(
+            data: null,
+            error: listDocs,
+          );
+        }
+      }
+    }
+    //Response Part
+    final json = res.body;
+    dynamic docs = jsonDecode(json);
+    if (docs is List) {
+      final listDocs = (docs as List<dynamic>)
+          .map((final dynamic e) => <String, dynamic>{...e, ...statusCode})
+          .toList();
+      return TetaResponse<List<dynamic>, List<dynamic>?>(
+        data: listDocs,
+        error: null,
+      );
+    } else {
+      final listDocs = <dynamic>[
+        <String, dynamic>{...docs, ...statusCode}
+      ];
+      return TetaResponse<List<dynamic>, List<dynamic>?>(
+        data: listDocs,
+        error: null,
+      );
+    }
+  }
+
+  /// Post Request
+  Future<TetaResponse<List<dynamic>?, List<dynamic>?>> post(
+    final String url,
+    final String expectedStatusCode,
+    final Map<String, dynamic> parameters,
+    final Map<String, dynamic> body,
+    final Map<String, dynamic> headers, {
+    final bool test = false,
+  }) async {
+    var urlString = url;
+    var firstLoop = true;
+    parameters.forEach((key, dynamic value) {
+      if (firstLoop) {
+        urlString = '$urlString?$key=${value.toString()}';
+        firstLoop = false;
+      } else {
+        urlString = '$urlString&$key=${value.toString()}';
+      }
+    });
+
+    final uri = Uri.parse(urlString);
+
+    var headersNew = {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': 'true',
+      'Access-Control-Allow-Headers':
+          'Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS'
+    };
+    headers.forEach((key, dynamic value) {
+      headersNew[key] = value.toString();
     });
 
     final res = await http.post(
@@ -41,24 +136,30 @@ class TetaHttpRequest {
 
     final statusCode = <String, dynamic>{'statusCode': res.statusCode};
     //Error Part
-    if (res.statusCode != int.parse(expectedStatusCode)) {
-      final json = res.body;
-      final dynamic docs = jsonDecode(json);
+    if (test == false) {
+      if (res.statusCode != int.parse(expectedStatusCode)) {
+        final json = res.body;
+        final dynamic docs = jsonDecode(json);
 
-      if (docs is List) {
-        final List<dynamic> listdocs = (docs as List<dynamic>)
-            .map((final dynamic e) => <String, dynamic>{...e, ...statusCode})
-            .toList();
+        if (docs is List) {
+          final List<dynamic> listDocs = (docs as List<dynamic>)
+              .map((final dynamic e) => <String, dynamic>{...e, ...statusCode})
+              .toList();
 
-        return TetaResponse<List<dynamic>?, List<dynamic>>(
-            data: null, error: listdocs);
-      } else {
-        final List<dynamic> listdocs = <dynamic>[
-          <String, dynamic>{...docs, ...statusCode}
-        ];
+          return TetaResponse<List<dynamic>?, List<dynamic>>(
+            data: null,
+            error: listDocs,
+          );
+        } else {
+          final listDocs = <dynamic>[
+            <String, dynamic>{...docs, ...statusCode}
+          ];
 
-        return TetaResponse<List<dynamic>?, List<dynamic>>(
-            data: null, error: listdocs);
+          return TetaResponse<List<dynamic>?, List<dynamic>>(
+            data: null,
+            error: listDocs,
+          );
+        }
       }
     }
     //Response Part
@@ -66,19 +167,19 @@ class TetaHttpRequest {
     dynamic docs = jsonDecode(json);
 
     if (docs is List) {
-      final List<dynamic> listdocs = (docs as List<dynamic>)
+      final List<dynamic> listDocs = (docs as List<dynamic>)
           .map((final dynamic e) => <String, dynamic>{...e, ...statusCode})
           .toList();
       return TetaResponse<List<dynamic>, List<dynamic>?>(
-        data: listdocs,
+        data: listDocs,
         error: null,
       );
     } else {
-      final List<dynamic> listdocs = <dynamic>[
+      final listDocs = <dynamic>[
         <String, dynamic>{...docs, ...statusCode}
       ];
       return TetaResponse<List<dynamic>, List<dynamic>?>(
-        data: listdocs,
+        data: listDocs,
         error: null,
       );
     }
@@ -89,15 +190,22 @@ class TetaHttpRequest {
     final String url,
     final String expectedStatusCode,
     final Map<String, dynamic> parameters,
-    final Map<String, dynamic> headers,
-  ) async {
+    final Map<String, dynamic> headers, {
+    final bool test = false,
+  }) async {
     var urlString = url;
 
+    var firstLoop = true;
     parameters.forEach((key, dynamic value) {
-      urlString = urlString + "/${key.toString()}/${value.toString()}";
+      if (firstLoop) {
+        urlString = '$urlString?$key=${value.toString()}';
+        firstLoop = false;
+      } else {
+        urlString = '$urlString&$key=${value.toString()}';
+      }
     });
 
-    Map<String, String> headersNew = {
+    var headersNew = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Credentials': 'true',
       'Access-Control-Allow-Headers':
@@ -105,35 +213,36 @@ class TetaHttpRequest {
       'Access-Control-Allow-Methods': 'POST, OPTIONS'
     };
     headers.forEach((key, dynamic value) {
-      headersNew[key.toString()] = value.toString();
+      headersNew[key] = value.toString();
     });
-    final Uri uri = Uri.parse(urlString);
+    final uri = Uri.parse(urlString);
 
     final res = await http.delete(uri, headers: headersNew);
     final statusCode = <String, dynamic>{'statusCode': res.statusCode};
+    if (test == false) {
+      if (res.statusCode != int.parse(expectedStatusCode)) {
+        final json = res.body;
+        final dynamic docs = jsonDecode(json);
 
-    if (res.statusCode != int.parse(expectedStatusCode)) {
-      final json = res.body;
-      final dynamic docs = jsonDecode(json);
+        if (docs is List) {
+          final List<dynamic> listDocs = (docs as List<dynamic>)
+              .map((final dynamic e) => <String, dynamic>{...e, ...statusCode})
+              .toList();
 
-      if (docs is List) {
-        final List<dynamic> listdocs = (docs as List<dynamic>)
-            .map((final dynamic e) => <String, dynamic>{...e, ...statusCode})
-            .toList();
+          return TetaResponse<List<dynamic>?, List<dynamic>>(
+            data: null,
+            error: listDocs,
+          );
+        } else {
+          final listDocs = <dynamic>[
+            <String, dynamic>{...docs, ...statusCode}
+          ];
 
-        return TetaResponse<List<dynamic>?, List<dynamic>>(
-          data: null,
-          error: listdocs,
-        );
-      } else {
-        final List<dynamic> listdocs = <dynamic>[
-          <String, dynamic>{...docs, ...statusCode}
-        ];
-
-        return TetaResponse<List<dynamic>?, List<dynamic>>(
-          data: null,
-          error: listdocs,
-        );
+          return TetaResponse<List<dynamic>?, List<dynamic>>(
+            data: null,
+            error: listDocs,
+          );
+        }
       }
     }
 
@@ -151,15 +260,22 @@ class TetaHttpRequest {
     final String expectedStatusCode,
     final Map<String, dynamic> parameters,
     final Map<String, dynamic> body,
-    final Map<String, dynamic> headers,
-  ) async {
+    final Map<String, dynamic> headers, {
+    final bool test = false,
+  }) async {
     var urlString = url;
+    var firstLoop = true;
     parameters.forEach((key, dynamic value) {
-      urlString = urlString + "/${key.toString()}/${value.toString()}";
+      if (firstLoop) {
+        urlString = urlString + "?${key.toString()}=${value.toString()}";
+        firstLoop = false;
+      } else {
+        urlString = urlString + "&${key.toString()}=${value.toString()}";
+      }
     });
-    final Uri uri = Uri.parse(urlString);
+    final uri = Uri.parse(urlString);
 
-    Map<String, String> headersNew = {
+    var headersNew = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Credentials': 'true',
       'Access-Control-Allow-Headers':
@@ -167,7 +283,7 @@ class TetaHttpRequest {
       'Access-Control-Allow-Methods': 'POST, OPTIONS'
     };
     headers.forEach((key, dynamic value) {
-      headersNew[key.toString()] = value.toString();
+      headersNew[key] = value.toString();
     });
 
     final res = await http.put(
@@ -178,40 +294,46 @@ class TetaHttpRequest {
     final statusCode = <String, dynamic>{'statusCode': res.statusCode};
 
     //Error Part
-    if (res.statusCode != int.parse(expectedStatusCode)) {
-      final json = res.body;
-      dynamic docs = jsonDecode(json);
-      if (docs is List) {
-        final List<dynamic> listdocs = (docs as List<dynamic>)
-            .map((final dynamic e) => <String, dynamic>{...e, ...statusCode})
-            .toList();
-        return TetaResponse<List<dynamic>?, List<dynamic>>(
-            data: null, error: listdocs);
-      } else {
-        final List<dynamic> listdocs = <dynamic>[
-          <String, dynamic>{...docs, ...statusCode}
-        ];
-        return TetaResponse<List<dynamic>?, List<dynamic>>(
-            data: null, error: listdocs);
+    if (test == false) {
+      if (res.statusCode != int.parse(expectedStatusCode)) {
+        final json = res.body;
+        dynamic docs = jsonDecode(json);
+        if (docs is List) {
+          final List<dynamic> listDocs = (docs as List<dynamic>)
+              .map((final dynamic e) => <String, dynamic>{...e, ...statusCode})
+              .toList();
+          return TetaResponse<List<dynamic>?, List<dynamic>>(
+            data: null,
+            error: listDocs,
+          );
+        } else {
+          final listDocs = <dynamic>[
+            <String, dynamic>{...docs, ...statusCode}
+          ];
+          return TetaResponse<List<dynamic>?, List<dynamic>>(
+            data: null,
+            error: listDocs,
+          );
+        }
       }
     }
 
     final json = res.body;
     dynamic docs = jsonDecode(json);
     if (docs is List) {
-      final List<dynamic> listdocs = (docs as List<dynamic>)
+      final List<dynamic> listDocs = (docs as List<dynamic>)
           .map((final dynamic e) => <String, dynamic>{...e, ...statusCode})
           .toList();
       return TetaResponse<List<dynamic>, List<dynamic>?>(
-        data: listdocs,
+        data: listDocs,
         error: null,
       );
     } else {
-      final List<dynamic> listdocs = <dynamic>[
+      final listDocs = <dynamic>[
         <String, dynamic>{...docs, ...statusCode}
       ];
       return TetaResponse<List<dynamic>, List<dynamic>?>(
-        data: listdocs,
+        data: listDocs,
         error: null,
       );
     }

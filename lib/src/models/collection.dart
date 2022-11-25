@@ -18,6 +18,9 @@ enum CollectionRole {
 
   /// Used for custom queries
   query,
+
+  /// Used for Api calls
+  request
 }
 
 class CollectionObject extends Equatable {
