@@ -111,6 +111,8 @@ class TetaProjectSettings {
       );
     }
 
+    print(res.body);
+
     final data = TetaPlanResponse.fromJson(
       json.decode(res.body) as Map<String, dynamic>,
     );

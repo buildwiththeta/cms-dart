@@ -8,6 +8,7 @@ class TetaPlanResponse {
   TetaPlanResponse({
     required this.isPremium,
     required this.plan,
+    this.downgradedStillActive,
   });
 
   TetaPlanResponse.fromJson(final Map<String, dynamic> json)
@@ -18,8 +19,11 @@ class TetaPlanResponse {
             : (json['premiumPlan'] as int?) == 2 ||
                     (json['premiumPlan'] as int?) == 199
                 ? TetaPlan.startup
-                : TetaPlan.free;
+                : TetaPlan.free {
+    downgradedStillActive = !isPremium && plan != TetaPlan.free;
+  }
 
   final bool isPremium;
   final TetaPlan plan;
+  bool? downgradedStillActive;
 }
