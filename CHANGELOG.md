@@ -1,3 +1,7 @@
+# 0.2.2
+* New OAuth providers
+* Http request widgets
+
 # 0.2.1
 
 * Refactor of Analytics module
