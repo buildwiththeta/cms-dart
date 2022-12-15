@@ -28,6 +28,9 @@
 .dart_tool/
 .packages
 build/
+.flutter-plugins-dependencies
+.flutter-plugins
+.metadata
 
 
 # Miscellaneous
