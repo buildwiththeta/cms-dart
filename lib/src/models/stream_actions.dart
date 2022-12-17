@@ -13,7 +13,7 @@ class StreamAction {
       StreamAction('CREATE_COLLECTION', false);
 
   static const StreamAction deleteCollection =
-      StreamAction('CREATE_COLLECTION', false);
+      StreamAction('DELETE_COLLECTION', false);
 
   static const StreamAction updateCollection =
       StreamAction('UPDATE_COLLECTION', false);

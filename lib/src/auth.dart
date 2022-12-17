@@ -48,7 +48,7 @@ class TetaAuth {
   Future<bool> insertUser(final String userToken) async {
     final requestMetadata = _serverRequestMetadata.getMetadata();
     final uri = Uri.parse(
-      '${Constants.tetaUrl}auth/users/${requestMetadata.prjId}',
+      '${Constants.oldTetaUrl}/auth/users/${requestMetadata.prjId}',
     );
 
     final res = await http.post(
@@ -250,7 +250,7 @@ class TetaAuth {
     final requestMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
-      '${Constants.tetaUrl}auth/aya',
+      '${Constants.oldTetaUrl}auth/aya',
     );
 
     final res = await http.post(

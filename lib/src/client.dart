@@ -37,6 +37,59 @@ class TetaClient {
   /// Get current project id
   int get prjId => _serverRequestMetadata.getMetadata().prjId;
 
+  Future<List<dynamic>> getDocuments(
+    final String collectionId, {
+    final List<Filter> filters = const [],
+    final int page = 0,
+    final int limit = 20,
+    final bool showDrafts = false,
+  }) async {
+    final serverMetadata = _serverRequestMetadata.getMetadata();
+
+    final finalFilters = [
+      ...filters,
+      if (!showDrafts) Filter('_vis', 'public'),
+    ];
+    final uri = Uri.parse('${Constants.tetaUrl}document/$collectionId/list');
+
+    final res = await http.get(
+      uri,
+      headers: {
+        'authorization': 'Bearer ${serverMetadata.token}',
+        'x-teta-prj-id': serverMetadata.prjId.toString(),
+        'cms-filters':
+            json.encode(finalFilters.map((final e) => e.toJson()).toList()),
+        'cms-pagination': json.encode(<String, dynamic>{
+          'page': page,
+          'pageElems': limit,
+        }),
+      },
+    );
+
+    TetaCMS.log('getDocuments: ${res.body}');
+
+    if (res.statusCode != 200) {
+      throw Exception('getDocuments returned status ${res.statusCode}');
+    }
+
+    try {
+      unawaited(
+        TetaCMS.instance.analytics.insertEvent(
+          TetaAnalyticsType.getCollection,
+          'Teta CMS: cms request',
+          <String, dynamic>{
+            'weight': res.bodyBytes.lengthInBytes,
+          },
+          isUserIdPreferableIfExists: true,
+        ),
+      );
+    } catch (_) {}
+
+    final data = json.decode(res.body) as List<dynamic>;
+
+    return data;
+  }
+
   /// Creates a new collection with name [collectionName] and prj_id [prjId].
   ///
   /// Throws an exception on request error ( statusCode != 200 )
@@ -48,12 +101,19 @@ class TetaClient {
     final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
-      '${Constants.tetaUrl}cms/${serverMetadata.prjId}/$collectionName',
+      '${Constants.tetaUrl}collection',
     );
 
     final res = await http.post(
       uri,
-      headers: {'authorization': 'Bearer ${serverMetadata.token}'},
+      headers: {
+        'content-type': 'application/json',
+        'authorization': 'Bearer ${serverMetadata.token}',
+        'x-teta-prj-id': serverMetadata.prjId.toString(),
+        },
+      body: json.encode(<String, dynamic>{
+        'name': collectionName,
+      }),
     );
 
     TetaCMS.log('createCollection: ${res.body}');
@@ -89,20 +149,21 @@ class TetaClient {
     final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
-      '${Constants.tetaUrl}cms/${serverMetadata.prjId}/$collectionId',
+      '${Constants.tetaUrl}collection/$collectionId',
     );
 
     final res = await http.delete(
       uri,
       headers: {
         'authorization': 'Bearer ${serverMetadata.token}',
+        'x-teta-prj-id': serverMetadata.prjId.toString(),
       },
     );
 
     TetaCMS.log('deleteCollection: ${res.body}');
 
     if (res.statusCode != 200) {
-      throw Exception('deleteDocument returned status ${res.statusCode}');
+      throw Exception('deleteCollection returned status ${res.statusCode}');
     }
 
     try {
@@ -131,14 +192,15 @@ class TetaClient {
     final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
-      '${Constants.tetaUrl}cms/${serverMetadata.prjId}/$collectionId',
+      '${Constants.tetaUrl}document/$collectionId',
     );
 
-    final res = await http.put(
+    final res = await http.post(
       uri,
       headers: {
         'content-type': 'application/json',
         'authorization': 'Bearer ${serverMetadata.token}',
+        'x-teta-prj-id': serverMetadata.prjId.toString(),
       },
       body: json.encode(document),
     );
@@ -177,13 +239,14 @@ class TetaClient {
     final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
-      '${Constants.tetaUrl}cms/${serverMetadata.prjId}/$collectionId/$documentId',
+      '${Constants.tetaUrl}document/$collectionId/$documentId',
     );
 
     final res = await http.delete(
       uri,
       headers: {
         'authorization': 'Bearer ${serverMetadata.token}',
+        'x-teta-prj-id': serverMetadata.prjId.toString(),
       },
     );
 
@@ -219,51 +282,14 @@ class TetaClient {
     final int limit = 20,
     final bool showDrafts = false,
   }) async {
-    final serverMetadata = _serverRequestMetadata.getMetadata();
-
     final finalFilters = [
       ...filters,
       if (!showDrafts) Filter('_vis', 'public'),
     ];
-    final uri = Uri.parse('${Constants.tetaUrl}cms/${serverMetadata.prjId}/$collectionId');
 
-    final res = await http.get(
-      uri,
-      headers: {
-        'authorization': 'Bearer ${serverMetadata.token}',
-        'cms-filters':
-            json.encode(finalFilters.map((final e) => e.toJson()).toList()),
-        'cms-pagination': json.encode(<String, dynamic>{
-          'page': page,
-          'pageElems': limit,
-        }),
-      },
-    );
+    final data = await getDocuments(collectionId, filters: finalFilters, page: page, limit: limit, showDrafts: showDrafts);
 
-    TetaCMS.log('getCollection: ${res.body}');
-
-    if (res.statusCode != 200) {
-      throw Exception('getCollection returned status ${res.statusCode}');
-    }
-
-    try {
-      unawaited(
-        TetaCMS.instance.analytics.insertEvent(
-          TetaAnalyticsType.getCollection,
-          'Teta CMS: cms request',
-          <String, dynamic>{
-            'weight': res.bodyBytes.lengthInBytes,
-          },
-          isUserIdPreferableIfExists: true,
-        ),
-      );
-    } catch (_) {}
-
-    final data = json.decode(res.body) as Map<String, dynamic>;
-
-    final docs = data['docs'] as List<dynamic>;
-
-    return docs;
+    return data;
   }
 
   /// Gets the collection with id [collectionId] if prj_id is [prjId].
@@ -284,7 +310,7 @@ class TetaClient {
       ...filters,
       if (!showDrafts) Filter('_vis', 'public'),
     ];
-    final uri = Uri.parse('${Constants.tetaUrl}cms/${serverMetadata.prjId}/$collectionId');
+    final uri = Uri.parse('${Constants.tetaUrl}collection/${serverMetadata.prjId}/$collectionId');
 
     final res = await http.get(
       uri,
@@ -330,12 +356,13 @@ class TetaClient {
   Future<List<CollectionObject>> getCollections() async {
     final serverMetadata = _serverRequestMetadata.getMetadata();
 
-    final uri = Uri.parse('${Constants.tetaUrl}cms/${serverMetadata.prjId}');
+    final uri = Uri.parse('${Constants.tetaUrl}collection/list');
 
     final res = await http.get(
       uri,
       headers: {
         'authorization': 'Bearer ${serverMetadata.token}',
+        'x-teta-prj-id': serverMetadata.prjId.toString(),
       },
     );
 
@@ -387,7 +414,7 @@ class TetaClient {
     final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
-      '${Constants.tetaUrl}cms/${serverMetadata.prjId}/$collectionId',
+      '${Constants.tetaUrl}collection/$collectionId',
     );
 
     final res = await http.patch(
@@ -395,6 +422,7 @@ class TetaClient {
       headers: {
         'content-type': 'application/json',
         'authorization': 'Bearer ${serverMetadata.token}',
+        'x-teta-prj-id': serverMetadata.prjId.toString(),
       },
       body: json.encode(<String, dynamic>{
         'name': name,
@@ -437,7 +465,7 @@ class TetaClient {
     final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
-      '${Constants.tetaUrl}cms/${serverMetadata.prjId}/$collectionId/$documentId',
+      '${Constants.tetaUrl}document/$collectionId/$documentId',
     );
 
     final res = await http.put(
@@ -445,6 +473,7 @@ class TetaClient {
       headers: {
         'content-type': 'application/json',
         'authorization': 'Bearer ${serverMetadata.token}',
+        'x-teta-prj-id': serverMetadata.prjId.toString(),
       },
       body: json.encode(content),
     );

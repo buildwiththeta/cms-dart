@@ -111,8 +111,6 @@ class TetaProjectSettings {
       );
     }
 
-    print(res.body);
-
     final data = TetaPlanResponse.fromJson(
       json.decode(res.body) as Map<String, dynamic>,
     );
@@ -167,7 +165,7 @@ class TetaProjectSettings {
     final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
-      '${Constants.tetaUrl}auth/credentials/services/${serverMetadata.prjId}',
+      '${Constants.oldTetaUrl}auth/credentials/services/${serverMetadata.prjId}',
     );
 
     final res = await http.get(

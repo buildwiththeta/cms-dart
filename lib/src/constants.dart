@@ -7,8 +7,10 @@ class Constants {
   static const String prjIdKey = 'prj_id';
 
   static const String _host = 'cms.teta.so';
-  static const String _port = '9840';
+  static const String _port = '9010'; //9840
 
+  /// Old CMS Teta url
+  static const String oldTetaUrl = 'https://$_host:9840/';
   /// Standard Teta url
   static const String tetaUrl = 'https://$_host:$_port/';
   /// Standard email url
