@@ -9,9 +9,6 @@ import 'package:teta_cms/src/mappers/credentials_mapper.dart';
 import 'package:teta_cms/src/mappers/shipping_mapper.dart';
 import 'package:teta_cms/src/mappers/shop_settings_mapper.dart';
 import 'package:teta_cms/src/mappers/transactions_mapper.dart';
-import 'package:teta_cms/src/models/store/credentials.dart';
-import 'package:teta_cms/src/models/store/shipping.dart';
-import 'package:teta_cms/src/models/store/shop_settings.dart';
 import 'package:teta_cms/src/store/carts_api.dart';
 import 'package:teta_cms/src/store/products_api.dart';
 import 'package:teta_cms/src/use_cases/get_server_request_headers/get_server_request_headers.dart';
@@ -387,10 +384,11 @@ class TetaShop {
 
     final responseBodyDecoded = jsonDecode(res.body) as Map<String, dynamic>;
 
-    final receiptList =
-        responseBodyDecoded['charges']['data'] as List<dynamic>;
+    final receiptList = responseBodyDecoded['charges']['data'] as List<dynamic>;
 
-    final receiptUrl = (receiptList[0] as Map<String, dynamic>)['receipt_url'] as String? ?? '';
+    final receiptUrl =
+        (receiptList[0] as Map<String, dynamic>)['receipt_url'] as String? ??
+            '';
     return TetaReceiptResponse(
       data: receiptUrl,
     );
@@ -448,7 +446,8 @@ class TetaShop {
   }
 
   /// Sets a new status for the transaction
-  Future<TetaResponse> setTransactionStatus(final String status, final String paymentIntentId) async {
+  Future<TetaResponse> setTransactionStatus(
+      final String status, final String paymentIntentId) async {
     final uri = Uri.parse(
       '${Constants.shopBaseUrl}/shop/transactions/$paymentIntentId/status/$status',
     );
