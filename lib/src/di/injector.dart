@@ -4,7 +4,7 @@ import 'package:injectable/injectable.dart';
 import 'package:teta_cms/src/di/injector.config.dart';
 
 ///Get the Service locator instance
-final getIt = GetIt.instance;
+final getIt = GetIt.I;
 
 /// Flag is initialized
 bool diInitialized = false;
