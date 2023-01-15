@@ -5,7 +5,7 @@ enum TetaPlan {
 }
 
 class TetaPlanResponse {
-  TetaPlanResponse({
+  const TetaPlanResponse({
     required this.isPremium,
     required this.plan,
     this.downgradedStillActive,
@@ -25,5 +25,5 @@ class TetaPlanResponse {
 
   final bool isPremium;
   final TetaPlan plan;
-  bool? downgradedStillActive;
+  final bool? downgradedStillActive;
 }
