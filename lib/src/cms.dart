@@ -56,16 +56,16 @@ class TetaCMS {
   ///
   /// This must be called only once. If called more than once, an
   /// [AssertionError] is thrown
-  static TetaCMS initialize({
+  static Future<TetaCMS> initialize({
     required final int prjId,
     required final String token,
     final bool? debug,
-  }) {
+  }) async {
     /*assert(
       !_instance._initialized,
       'This instance is already initialized',
     );*/
-    _instance._init(
+    await _instance._init(
       token,
       prjId,
     );
@@ -130,7 +130,7 @@ class TetaCMS {
       diInitialized = true;
     }
 
-    getIt?.unregister();
+    getIt.unregister();
     getIt
         .get<ServerRequestMetadataStore>()
         .updateMetadata(token: token, prjId: prjId);
