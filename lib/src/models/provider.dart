@@ -14,4 +14,9 @@ enum TetaProvider {
 
   /// Published
   apple,
+  twitch,
+  linkedin,
+  discord,
+  gitlab,
+  bitbucket,
 }
