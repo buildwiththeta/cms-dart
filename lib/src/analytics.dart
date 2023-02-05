@@ -18,6 +18,29 @@ class TetaAnalytics {
   ///This stores the token and project id headers.
   final ServerRequestMetadataStore _serverRequestMetadata;
 
+  ///Get token
+  String get token => _serverRequestMetadata.getMetadata().token;
+
+  /// Get current project id
+  int get prjId => _serverRequestMetadata.getMetadata().prjId;
+
+  Map<String, String> get _getPrjHeader => <String, String>{
+        'x-identifier': prjId.toString(),
+      };
+
+  Map<String, String> get _getJsonHeader => <String, String>{
+        'content-type': 'application/json',
+      };
+
+  /// Get auth token, content-type and prj id headers
+  Map<String, String> get _getDefaultHeaders {
+    return <String, String>{
+      'authorization': 'Bearer $token}',
+      ..._getJsonHeader,
+      ..._getPrjHeader,
+    };
+  }
+
   /// Detected id of the logged user
   String? _currentUserId;
 
@@ -27,7 +50,7 @@ class TetaAnalytics {
   }
 
   /// Creates a new event
-  Future<TetaResponse> insertEvent(
+  Future<TetaResponse<dynamic, TetaErrorResponse?>> insertEvent(
     final TetaAnalyticsType type,
     final String description,
     final Map<String, dynamic> properties, {
@@ -40,11 +63,7 @@ class TetaAnalytics {
 
     final res = await http.post(
       uri,
-      headers: {
-        'content-type': 'application/json',
-        'authorization': 'Bearer ${serverMetadata.token}',
-        'x-identifier': '${serverMetadata.prjId}',
-      },
+      headers: _getDefaultHeaders,
       body: json.encode(<String, dynamic>{
         'description': description,
         'prj_id': {serverMetadata.prjId},
@@ -53,7 +72,6 @@ class TetaAnalytics {
         ...properties,
       }),
     );
-
     if (res.statusCode != 200) {
       return TetaResponse<dynamic, TetaErrorResponse>(
         data: null,
@@ -63,7 +81,6 @@ class TetaAnalytics {
         ),
       );
     }
-
     return TetaResponse<dynamic, TetaErrorResponse?>(
       data: res.body,
       error: null,
@@ -78,30 +95,26 @@ class TetaAnalytics {
       '${Constants.analyticsUrl}events/aya',
     );
     final serverMetadata = _serverRequestMetadata.getMetadata();
-
     final res = await http.post(
       uri,
       headers: {
         'authorization': 'Bearer ${serverMetadata.token}',
-        'x-identifier': '${serverMetadata.prjId}',
+        ..._getPrjHeader,
       },
       body: ayayaQuery,
     );
-
     if (res.statusCode != 200) {
       return TetaResponse<dynamic, TetaErrorResponse>(
-        data: <dynamic>[],
+        data: null,
         error: TetaErrorResponse(
           code: res.statusCode,
           message: res.body,
         ),
       );
     }
-
     final isCount = ((json.decode(res.body) as List<dynamic>?)?.first
             as Map<String, dynamic>?)?['count'] !=
         null;
-
     return TetaResponse<dynamic, TetaErrorResponse?>(
       data: !isCount
           ? (((json.decode(res.body) as List<dynamic>?)?.first

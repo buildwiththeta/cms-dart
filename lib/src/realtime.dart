@@ -145,13 +145,15 @@ class TetaRealtime {
       <String, dynamic>{},
       isUserIdPreferableIfExists: true,
     );
-    TetaCMS.instance.client.getCollections().then(streamController.add);
+    TetaCMS.instance.client.getCollections().then((final e) {
+      if (e.error == null) streamController.add(e.data!);
+    });
     on(
       callback: (final e) async {
         TetaCMS.log('on stream collections event. $e');
         final resp = await TetaCMS.instance.client.getCollections();
         TetaCMS.log('on resp get collections: $resp');
-        streamController.add(resp);
+        if (resp.error == null) streamController.add(resp.data!);
       },
     );
     return streamController;
@@ -182,13 +184,15 @@ class TetaRealtime {
     );
     TetaCMS.instance.client
         .getCollection(
-          collectionId,
-          filters: filters,
-          limit: limit,
-          page: page,
-          showDrafts: showDrafts,
-        )
-        .then(streamController.add);
+      collectionId,
+      filters: filters,
+      limit: limit,
+      page: page,
+      showDrafts: showDrafts,
+    )
+        .then((final e) {
+      if (e.error == null) streamController.add(e.data!);
+    });
     on(
       collectionId: collectionId,
       callback: (final e) async {
@@ -210,7 +214,7 @@ class TetaRealtime {
           page: page,
           showDrafts: showDrafts,
         );
-        streamController.add(resp);
+        if (resp.error == null) streamController.add(resp.data!);
       },
     );
     return streamController;
