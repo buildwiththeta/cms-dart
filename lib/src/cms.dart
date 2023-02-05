@@ -1,10 +1,8 @@
-import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hive/hive.dart';
-import 'package:http/http.dart' as http;
 import 'package:injectable/injectable.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path_provider_android/path_provider_android.dart';
@@ -167,45 +165,5 @@ class TetaCMS {
   /// Print an error message only in debug mode
   static void printError(final String text) => log('\x1B[31m$text\x1B[0m');
 
-  /// Retrieve the project token
-  static Future<String?> getToken() async {
-    final box = await Hive.openBox<dynamic>('supabase_authentication');
-    final accessToken =
-        ((json.decode(box.get('SUPABASE_PERSIST_SESSION_KEY') as String)
-                as Map<String, dynamic>)['currentSession']
-            as Map<String, dynamic>?)?['access_token'] as String?;
-    final refreshToken =
-        ((json.decode(box.get('SUPABASE_PERSIST_SESSION_KEY') as String)
-                as Map<String, dynamic>)['currentSession']
-            as Map<String, dynamic>?)?['refresh_token'] as String?;
-    //SUPABASE_PERSIST_SESSION_KEY
-    if (accessToken != null && refreshToken != null) {
-      const url = 'https://auth.teta.so/auth';
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {'content-type': 'application/json'},
-        body: json.encode(
-          <String, dynamic>{
-            'access_token': accessToken,
-            'refresh_token': refreshToken,
-          },
-        ),
-      );
-      if (response.statusCode == 200) {
-        final list = json.decode(response.body) as List<dynamic>;
-        final result = list.first as bool;
-        final token = list.last as String;
-        if (result) {
-          return token;
-        } else {
-          throw Exception('Error putDoc $token');
-        }
-      } else {
-        throw Exception(
-          'Error putDoc ${response.statusCode}: ${response.body}',
-        );
-      }
-    }
-    throw Exception('Access token and/or refresh token are null');
-  }
+  
 }
