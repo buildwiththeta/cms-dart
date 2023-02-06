@@ -48,7 +48,7 @@ class TetaAuth {
   Future<bool> insertUser(final String userToken) async {
     final requestMetadata = _serverRequestMetadata.getMetadata();
     final uri = Uri.parse(
-      '${Constants.tetaUrl}auth/users/${requestMetadata.prjId}',
+      '${Constants.oldTetaUrl}auth/users/${requestMetadata.prjId}',
     );
 
     final res = await http.post(
@@ -60,13 +60,9 @@ class TetaAuth {
         },
       ),
     );
-
-    TetaCMS.printWarning('insertUser body: ${res.body}');
-
     if (res.statusCode != 200) {
       throw Exception('insertUser resulted in ${res.statusCode} ${res.body}');
     }
-
     if (res.body != '{"warn":"User already registered"}') {
       try {
         unawaited(
@@ -93,7 +89,7 @@ class TetaAuth {
     final requestMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
-      '${Constants.tetaUrl}auth/users/$prjId',
+      '${Constants.oldTetaUrl}auth/users/$prjId',
     );
 
     final res = await http.get(
@@ -139,9 +135,7 @@ class TetaAuth {
     required final TetaProvider provider,
     final bool fromEditor = false,
   }) async {
-    TetaCMS.log('signIn');
     final requestMetadata = _serverRequestMetadata.getMetadata();
-
     final param = EnumToString.convertToString(provider);
     final device = UniversalPlatform.isWeb
         ? 'web'
@@ -250,7 +244,7 @@ class TetaAuth {
     final requestMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
-      '${Constants.tetaUrl}auth/aya',
+      '${Constants.oldTetaUrl}auth/aya',
     );
 
     final res = await http.post(

@@ -22,7 +22,7 @@ class TetaProjectSettings {
     final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
-      '${Constants.tetaUrl}auth/invoices/${serverMetadata.prjId}',
+      '${Constants.oldTetaUrl}auth/invoices/${serverMetadata.prjId}',
     );
 
     final res = await http.get(
@@ -56,7 +56,7 @@ class TetaProjectSettings {
     final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
-      '${Constants.tetaUrl}cms/space/${serverMetadata.prjId}',
+      '${Constants.oldTetaUrl}cms/space/${serverMetadata.prjId}',
     );
 
     final res = await http.get(
@@ -91,7 +91,7 @@ class TetaProjectSettings {
     final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
-      '${Constants.tetaUrl}auth/premium/${serverMetadata.prjId}',
+      '${Constants.oldTetaUrl}auth/premium/${serverMetadata.prjId}',
     );
 
     final res = await http.get(
@@ -130,7 +130,7 @@ class TetaProjectSettings {
     final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
-      '${Constants.tetaUrl}auth/credentials/${serverMetadata.prjId}',
+      '${Constants.oldTetaUrl}auth/credentials/${serverMetadata.prjId}',
     );
 
     final res = await http.post(
@@ -167,7 +167,7 @@ class TetaProjectSettings {
     final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
-      '${Constants.tetaUrl}auth/credentials/services/${serverMetadata.prjId}',
+      '${Constants.oldTetaUrl}auth/credentials/services/${serverMetadata.prjId}',
     );
 
     final res = await http.get(

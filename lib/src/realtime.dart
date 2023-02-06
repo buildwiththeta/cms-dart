@@ -1,6 +1,65 @@
 part of 'index.dart';
 
-/// Teta Realtime - Use Realtime subscriptions
+/// bye
+class RealtimeHandler {
+  /// bye
+  RealtimeHandler(
+    this.action,
+    this.collection,
+    this.document,
+    this.callback,
+    this.off,
+  );
+
+  /// bye
+  String collection;
+
+  /// bye
+  String document;
+
+  /// bye
+  StreamAction action;
+
+  /// bye
+  Function(SocketChangeEvent) callback;
+
+  /// bye
+  Function() off;
+}
+
+bool _matchColl(final String cColl, final String sColl) {
+  if (cColl == '*') return true;
+  return cColl == sColl;
+}
+
+bool _matchDoc(final String cDoc, final String? sDoc) {
+  if (sDoc == null) return true;
+  if (cDoc == '*') return true;
+  return cDoc == sDoc;
+}
+
+bool _matchAction(
+    final StreamAction cAction, final String sAction, final String sType) {
+  if (cAction == StreamAction.all) return true;
+
+  if (cAction == StreamAction.createCollection) {
+    return sType == 'collection' && sAction == 'create';
+  } else if (cAction == StreamAction.createDoc) {
+    return sType == 'document' && sAction == 'create';
+  } else if (cAction == StreamAction.updateCollection) {
+    return sType == 'collection' && sAction == 'edit';
+  } else if (cAction == StreamAction.updateDoc) {
+    return sType == 'document' && sAction == 'edit';
+  } else if (cAction == StreamAction.deleteCollection) {
+    return sType == 'collection' && sAction == 'delete';
+  } else if (cAction == StreamAction.deleteDoc) {
+    return sType == 'document' && sAction == 'delete';
+  }
+
+  return false;
+}
+
+/// Teta Realtime
 @lazySingleton
 class TetaRealtime {
   ///Constructor
@@ -14,7 +73,7 @@ class TetaRealtime {
   final ServerRequestMetadataStore _serverRequestMetadata;
 
   /// List of all the streams
-  List<RealtimeSubscription> streams = [];
+  List<RealtimeHandler> handlers = [];
 
   Future<void> _openSocket() {
     final completer = Completer<void>();
@@ -25,7 +84,7 @@ class TetaRealtime {
     }
 
     final opts = socket_io.OptionBuilder()
-        .setPath('/nosql')
+        .setPath('/cms_stream')
         .setTransports(['websocket'])
         .disableAutoConnect()
         .build();
@@ -37,11 +96,20 @@ class TetaRealtime {
       completer.complete();
     });
 
-    _socket?.on('change', (final dynamic data) {
+    _socket?.on('event', (final dynamic data) {
+      TetaCMS.printError('Socket Event: $data');
       final event = SocketChangeEvent.fromJson(data as Map<String, dynamic>);
 
-      for (final stream in streams) {
-        if (stream.uid == event.uid) stream.callback(event);
+      for (final handler in handlers) {
+        final matchingAction =
+            _matchAction(handler.action, event.action, event.type);
+        final matchingDoc = _matchDoc(handler.document, event.documentId);
+        final matchingColl = _matchColl(handler.collection, event.collectionId);
+        if (!matchingAction) return;
+        if (!matchingDoc) return;
+        if (!matchingColl) return;
+        TetaCMS.printWarning('Calling Hand: ${handler.action}');
+        handler.callback(event);
       }
     });
 
@@ -50,11 +118,11 @@ class TetaRealtime {
     return completer.future;
   }
 
-  void _closeStream(final String uid) {
-    final stream = streams.firstWhere((final stream) => stream.uid == uid);
-    streams.remove(stream);
+  void _off(final RealtimeHandler _handler) {
+    final handler = handlers.firstWhere((final h) => h == _handler);
+    handlers.remove(handler);
 
-    if (streams.isEmpty) {
+    if (handlers.isEmpty) {
       _socket!.close();
       _socket = null;
     }
@@ -66,7 +134,7 @@ class TetaRealtime {
   ///
   /// Returns a `NoSqlStream`
   ///
-  Future<RealtimeSubscription> on({
+  Future<RealtimeHandler> on({
     final StreamAction action = StreamAction.all,
     final String? collectionId,
     final String? documentId,
@@ -82,29 +150,15 @@ class TetaRealtime {
     final docId = action.targetDocument ? documentId : '*';
     if (docId == null) throw Exception('documentId is required');
 
-    final uri = Uri.parse(
-      '${Constants.tetaUrl}stream/listen/${_socket!.id}/${action.type}/${serverMetadata.prjId}/$collId/$docId',
-    );
+    _socket?.emit('sub', serverMetadata.prjId);
 
-    final res = await http.post(
-      uri,
-      headers: {
-        'content-type': 'application/json',
-        'authorization': 'Bearer ${serverMetadata.token}',
-      },
-    );
+    final handler =
+        RealtimeHandler(action, collId, docId, callback!, () => null);
+    handler.off = () => _off(handler);
 
-    if (res.statusCode != 200) {
-      throw Exception('Request resulted in ${res.statusCode} - ${res.body}');
-    }
+    handlers.add(handler);
 
-    final uid =
-        (json.decode(res.body) as Map<String, dynamic>)['uid'] as String;
-
-    final stream =
-        RealtimeSubscription(uid, callback!, () => _closeStream(uid));
-    streams.add(stream);
-    return stream;
+    return handler;
   }
 
   /// Creates a websocket connection to the NoSql database
@@ -145,15 +199,21 @@ class TetaRealtime {
       <String, dynamic>{},
       isUserIdPreferableIfExists: true,
     );
-    TetaCMS.instance.client.getCollections().then((final e) {
-      if (e.error == null) streamController.add(e.data!);
-    });
+    TetaCMS.instance.client.getCollections().then(
+      (final e) {
+        if (e.error == null) {
+          streamController.add(e.data!);
+        }
+      },
+    );
     on(
       callback: (final e) async {
         TetaCMS.log('on stream collections event. $e');
         final resp = await TetaCMS.instance.client.getCollections();
         TetaCMS.log('on resp get collections: $resp');
-        if (resp.error == null) streamController.add(resp.data!);
+        if (resp.error == null) {
+          streamController.add(resp.data!);
+        }
       },
     );
     return streamController;
@@ -190,9 +250,14 @@ class TetaRealtime {
       page: page,
       showDrafts: showDrafts,
     )
-        .then((final e) {
-      if (e.error == null) streamController.add(e.data!);
-    });
+        .then(
+      (final e) {
+        TetaCMS.printWarning('${e.error}, ${e.data}');
+        if (e.error == null) {
+          streamController.add(e.data!);
+        }
+      },
+    );
     on(
       collectionId: collectionId,
       callback: (final e) async {
@@ -214,7 +279,9 @@ class TetaRealtime {
           page: page,
           showDrafts: showDrafts,
         );
-        if (resp.error == null) streamController.add(resp.data!);
+        if (resp.error == null) {
+          streamController.add(resp.data!);
+        }
       },
     );
     return streamController;

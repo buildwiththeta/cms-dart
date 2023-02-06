@@ -12,6 +12,8 @@ class Constants {
   /// Standard Teta url
   static const String tetaUrl = 'https://$_host:$_port/';
 
+  static const String oldTetaUrl = 'https://$_host:9840/';
+
   /// Standard email url
   static const String emailUrl = 'https://$_host:5001/';
 

@@ -25,7 +25,7 @@ class TetaPolicies {
     final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
-      '${Constants.tetaUrl}cms/policy/${serverMetadata.prjId}/$collId',
+      '${Constants.oldTetaUrl}cms/policy/${serverMetadata.prjId}/$collId',
     );
 
     final res = await http.get(
@@ -90,7 +90,7 @@ class TetaPolicies {
 
     final scopeStr = EnumToString.convertToString(scope);
     final uri = Uri.parse(
-      '${Constants.tetaUrl}cms/policy/$scopeStr/${serverMetadata.prjId}/$collId/$key/$value',
+      '${Constants.oldTetaUrl}cms/policy/$scopeStr/${serverMetadata.prjId}/$collId/$key/$value',
     );
 
     final res = await http.post(
@@ -138,7 +138,7 @@ class TetaPolicies {
 
     final scopeStr = EnumToString.convertToString(scope);
     final uri = Uri.parse(
-      '${Constants.tetaUrl}cms/policy/${serverMetadata.prjId}/$collId/$scopeStr',
+      '${Constants.oldTetaUrl}cms/policy/${serverMetadata.prjId}/$collId/$scopeStr',
     );
 
     final res = await http.delete(
