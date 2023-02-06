@@ -110,7 +110,7 @@ class TetaClient {
         'content-type': 'application/json',
         'authorization': 'Bearer ${serverMetadata.token}',
         'x-teta-prj-id': serverMetadata.prjId.toString(),
-        },
+      },
       body: json.encode(<String, dynamic>{
         'name': collectionName,
       }),
@@ -287,7 +287,13 @@ class TetaClient {
       if (!showDrafts) Filter('_vis', 'public'),
     ];
 
-    final data = await getDocuments(collectionId, filters: finalFilters, page: page, limit: limit, showDrafts: showDrafts);
+    final data = await getDocuments(
+      collectionId,
+      filters: finalFilters,
+      page: page,
+      limit: limit,
+      showDrafts: showDrafts,
+    );
 
     return data;
   }
@@ -310,7 +316,9 @@ class TetaClient {
       ...filters,
       if (!showDrafts) Filter('_vis', 'public'),
     ];
-    final uri = Uri.parse('${Constants.tetaUrl}collection/${serverMetadata.prjId}/$collectionId');
+    final uri = Uri.parse(
+      '${Constants.tetaUrl}collection/${serverMetadata.prjId}/$collectionId',
+    );
 
     final res = await http.get(
       uri,
