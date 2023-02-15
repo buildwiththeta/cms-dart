@@ -339,7 +339,7 @@ class TetaRealtime {
           );
         } catch (_) {}
         final resp = await TetaCMS.instance.client.getCollectionByName(
-          collectionByName,
+          collectionName,
           filters: filters,
           limit: limit,
           page: page,
