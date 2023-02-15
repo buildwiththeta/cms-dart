@@ -271,9 +271,75 @@ class TetaRealtime {
             ),
           );
         } catch (_) {}
-        TetaCMS.printWarning('$filters, $limit, $page');
         final resp = await TetaCMS.instance.client.getCollection(
           collectionId,
+          filters: filters,
+          limit: limit,
+          page: page,
+          showDrafts: showDrafts,
+        );
+        if (resp.error == null) {
+          streamController.add(resp.data!);
+        }
+      },
+    );
+    return streamController;
+  }
+
+  /// Stream a single collection with its docs only
+  StreamController<List<dynamic>> streamCollectionByName(
+    final String collectionName, {
+    final StreamAction action = StreamAction.all,
+    final List<Filter> filters = const [],
+    final int page = 0,
+    final int limit = 20,
+    final bool showDrafts = false,
+  }) {
+    late final StreamController<List<dynamic>> streamController;
+    streamController = StreamController<List<dynamic>>.broadcast(
+      onCancel: () {
+        if (!streamController.hasListener) {
+          streamController.close();
+        }
+      },
+    );
+    TetaCMS.instance.analytics.insertEvent(
+      TetaAnalyticsType.streamCollection,
+      'Teta CMS: realtime request',
+      <String, dynamic>{},
+      isUserIdPreferableIfExists: true,
+    );
+    TetaCMS.instance.client
+        .getCollectionByName(
+      collectionName,
+      filters: filters,
+      limit: limit,
+      page: page,
+      showDrafts: showDrafts,
+    )
+        .then(
+      (final e) {
+        TetaCMS.printWarning('${e.error}, ${e.data}');
+        if (e.error == null) {
+          streamController.add(e.data!);
+        }
+      },
+    );
+    on(
+      collectionId: collectionName,
+      callback: (final e) async {
+        try {
+          unawaited(
+            TetaCMS.instance.analytics.insertEvent(
+              TetaAnalyticsType.streamCollection,
+              'Teta CMS: realtime request',
+              <String, dynamic>{},
+              isUserIdPreferableIfExists: true,
+            ),
+          );
+        } catch (_) {}
+        final resp = await TetaCMS.instance.client.getCollectionByName(
+          collectionName,
           filters: filters,
           limit: limit,
           page: page,
