@@ -30,6 +30,7 @@ class CollectionObject extends Equatable {
     this.id = '0',
     this.schema = CollectionSchema.public,
     this.role = CollectionRole.nil,
+    this.keys= const <String>[],
   });
 
   CollectionObject.fromJson({
@@ -46,20 +47,24 @@ class CollectionObject extends Equatable {
               CollectionRole.values,
               json['role'] as String? ?? 'nil',
             ) ??
-            CollectionRole.nil;
+            CollectionRole.nil,
+        keys = json['keys'] != null
+            ? List<String>.from(json['keys'] as List<dynamic>)
+            : const <String>[];
 
   final String id;
   final String name;
   final int prjId;
   final CollectionSchema schema;
   final CollectionRole? role;
-
+  final List<String>? keys;
   Map<String, dynamic> toJson() => <String, dynamic>{
         'name': name,
         Constants.prjIdKey: prjId,
         'security': 'prj_id',
         'schema': EnumToString.convertToString(schema),
         'role': EnumToString.convertToString(role),
+        'keys': keys,
       };
 
   @override
@@ -69,8 +74,9 @@ class CollectionObject extends Equatable {
         prjId,
         schema,
         role,
+        keys,
       ];
 
   @override
-  String toString() => 'Collection { id: $id, name: $name, prjId: $prjId }';
+  String toString() => 'Collection { id: $id, name: $name, prjId: $prjId, keys: $keys }';
 }
