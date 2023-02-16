@@ -71,13 +71,19 @@ class TetaClient {
     final bool useUserId = false,
   }) {
     try {
-      TetaCMS.instance.analytics.insertEvent(
-        event,
-        description,
-        props,
-        isUserIdPreferableIfExists: useUserId,
+      unawaited(
+        TetaCMS.instance.analytics.insertEvent(
+          event,
+          description,
+          props,
+          isUserIdPreferableIfExists: useUserId,
+        ),
       );
-    } catch (_) {}
+    } catch (e) {
+      TetaCMS.printError(
+        'Error inserting a new event in Teta Analytics, error: $e',
+      );
+    }
   }
 
   /// Creates a new collection with name [collectionName] and prj_id [prjId].

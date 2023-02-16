@@ -8,6 +8,14 @@ Future<void> insert(final List<String> args) async {
   );
 }
 
+Future<void> insertByCollName(final List<String> args) async {
+  const collectionName = 'abc';
+  await TetaCMS.instance.client.insertDocumentByCollName(
+    collectionName,
+    <String, dynamic>{'name': 'Giulia', 'city': 'Roma'},
+  );
+}
+
 Future<void> update(final List<String> args) async {
   const collectionId = '0';
   const documentId = '0';

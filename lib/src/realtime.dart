@@ -33,13 +33,13 @@ class RealtimeHandler {
 
 bool _matchColl(
   final String cColl,
-  final String sColl,
+  final String sCollId,
   final String sCollName,
   final bool useName,
 ) {
   if (cColl == '*') return true;
 
-  return useName ? cColl == sCollName : cColl == sColl;
+  return useName ? cColl == sCollName : cColl == sCollId;
 }
 
 bool _matchDoc(final String cDoc, final String? sDoc) {
@@ -114,12 +114,16 @@ class TetaRealtime {
         final matchingAction =
             _matchAction(handler.action, event.action, event.type);
         final matchingDoc = _matchDoc(handler.document, event.documentId);
-        final matchingColl = _matchColl(handler.collection, event.collectionId,
-            event.collectionName, handler.useName);
-        if (!matchingAction) return;
-        if (!matchingDoc) return;
-        if (!matchingColl) return;
-        TetaCMS.printWarning('Calling Hand: ${handler.action}');
+        final matchingColl = _matchColl(
+          handler.collection,
+          event.collectionId,
+          event.collectionName,
+          handler.useName,
+        );
+
+        if (!matchingAction) break;
+        if (!matchingDoc) break;
+        if (!matchingColl) break;
         handler.callback(event);
       }
     });
@@ -254,12 +258,18 @@ class TetaRealtime {
         }
       },
     );
-    TetaCMS.instance.analytics.insertEvent(
-      TetaAnalyticsType.streamCollection,
-      'Teta CMS: realtime request',
-      <String, dynamic>{},
-      isUserIdPreferableIfExists: true,
-    );
+    try {
+      TetaCMS.instance.analytics.insertEvent(
+        TetaAnalyticsType.streamCollection,
+        'Teta CMS: realtime request',
+        <String, dynamic>{},
+        isUserIdPreferableIfExists: true,
+      );
+    } catch (e) {
+      TetaCMS.printError(
+        'Error inserting a new event in Teta Analytics, error: $e',
+      );
+    }
     TetaCMS.instance.client
         .getCollection(
       collectionId,
@@ -288,7 +298,11 @@ class TetaRealtime {
               isUserIdPreferableIfExists: true,
             ),
           );
-        } catch (_) {}
+        } catch (e) {
+          TetaCMS.printError(
+            'Error inserting a new event in Teta Analytics, error: $e',
+          );
+        }
         final resp = await TetaCMS.instance.client.getCollection(
           collectionId,
           filters: filters,
