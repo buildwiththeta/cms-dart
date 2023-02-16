@@ -8,9 +8,9 @@ class RealtimeHandler {
     this.collection,
     this.document,
     this.callback,
-    this.off,
-    [this.useName = true]
-  );
+    this.off, {
+    required this.useName,
+  });
 
   /// use collection name instead of collection id
   bool useName;
@@ -31,7 +31,12 @@ class RealtimeHandler {
   Function() off;
 }
 
-bool _matchColl(final String cColl, final String sColl, final String sCollName, final bool useName) {
+bool _matchColl(
+  final String cColl,
+  final String sColl,
+  final String sCollName,
+  final bool useName,
+) {
   if (cColl == '*') return true;
 
   return useName ? cColl == sCollName : cColl == sColl;
@@ -109,7 +114,8 @@ class TetaRealtime {
         final matchingAction =
             _matchAction(handler.action, event.action, event.type);
         final matchingDoc = _matchDoc(handler.document, event.documentId);
-        final matchingColl = _matchColl(handler.collection, event.collectionId, event.collectionName, handler.useName);
+        final matchingColl = _matchColl(handler.collection, event.collectionId,
+            event.collectionName, handler.useName);
         if (!matchingAction) return;
         if (!matchingDoc) return;
         if (!matchingColl) return;
@@ -142,6 +148,7 @@ class TetaRealtime {
   Future<RealtimeHandler> on({
     final StreamAction action = StreamAction.all,
     final String? collectionId,
+    final String? collectionName,
     final String? documentId,
     final Function(SocketChangeEvent)? callback,
   }) async {
@@ -151,14 +158,20 @@ class TetaRealtime {
 
     TetaCMS.printWarning('Socket Id: ${_socket!.id}');
 
-    final collId = collectionId ?? '*';
+    final collId = collectionName ?? collectionId ?? '*';
     final docId = action.targetDocument ? documentId : '*';
     if (docId == null) throw Exception('documentId is required');
 
     _socket?.emit('sub', serverMetadata.prjId);
 
-    final handler =
-        RealtimeHandler(action, collId, docId, callback!, () => null);
+    final handler = RealtimeHandler(
+      action,
+      collId,
+      docId,
+      callback!,
+      () => null,
+      useName: collectionName != null,
+    );
     handler.off = () => _off(handler);
 
     handlers.add(handler);
@@ -331,7 +344,7 @@ class TetaRealtime {
       },
     );
     on(
-      collectionId: collectionName,
+      collectionName: collectionName,
       callback: (final e) async {
         try {
           unawaited(
