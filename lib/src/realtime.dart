@@ -9,7 +9,11 @@ class RealtimeHandler {
     this.document,
     this.callback,
     this.off,
+    [this.useName = true]
   );
+
+  /// use collection name instead of collection id
+  bool useName;
 
   /// bye
   String collection;
@@ -27,9 +31,10 @@ class RealtimeHandler {
   Function() off;
 }
 
-bool _matchColl(final String cColl, final String sColl) {
+bool _matchColl(final String cColl, final String sColl, final String sCollName, final bool useName) {
   if (cColl == '*') return true;
-  return cColl == sColl;
+
+  return useName ? cColl == sCollName : cColl == sColl;
 }
 
 bool _matchDoc(final String cDoc, final String? sDoc) {
@@ -104,7 +109,7 @@ class TetaRealtime {
         final matchingAction =
             _matchAction(handler.action, event.action, event.type);
         final matchingDoc = _matchDoc(handler.document, event.documentId);
-        final matchingColl = _matchColl(handler.collection, event.collectionId);
+        final matchingColl = _matchColl(handler.collection, event.collectionId, event.collectionName, handler.useName);
         if (!matchingAction) return;
         if (!matchingDoc) return;
         if (!matchingColl) return;
