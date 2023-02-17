@@ -128,7 +128,11 @@ class TetaCMS {
       diInitialized = true;
     }
 
-    getIt.unregister();
+    try {
+      await getIt.unregister();
+    } catch (e) {
+      TetaCMS.printError('Error unregistering getIt, error: $e');
+    }
     getIt
         .get<ServerRequestMetadataStore>()
         .updateMetadata(token: token, prjId: prjId);
@@ -164,6 +168,4 @@ class TetaCMS {
 
   /// Print an error message only in debug mode
   static void printError(final String text) => log('\x1B[31m$text\x1B[0m');
-
-  
 }
