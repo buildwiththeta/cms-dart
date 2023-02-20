@@ -128,11 +128,6 @@ class TetaCMS {
       diInitialized = true;
     }
 
-    try {
-      await getIt.unregister();
-    } catch (e) {
-      TetaCMS.printError('Error unregistering getIt, error: $e');
-    }
     getIt
         .get<ServerRequestMetadataStore>()
         .updateMetadata(token: token, prjId: prjId);
