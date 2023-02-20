@@ -121,9 +121,9 @@ class TetaRealtime {
           handler.useName,
         );
 
-        if (!matchingAction) break;
-        if (!matchingDoc) break;
-        if (!matchingColl) break;
+        if (!matchingAction || !matchingDoc || !matchingColl) {
+          continue;
+        }
         handler.callback(event);
       }
     });
