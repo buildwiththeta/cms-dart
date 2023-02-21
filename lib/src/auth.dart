@@ -129,6 +129,46 @@ class TetaAuth {
     return users;
   }
 
+  Future<TetaResponse<void, TetaErrorResponse?>> removeUser({
+    required final String email,
+  }) async {
+    final requestMetadata = _serverRequestMetadata.getMetadata();
+    final uri = Uri.parse(
+      '${Constants.oldTetaUrl}auth/users/${requestMetadata.prjId}/$email',
+    );
+    final res = await http.delete(
+      uri,
+      headers: {
+        'authorization': 'Bearer ${requestMetadata.token}',
+      },
+    );
+    if (res.statusCode != 200) {
+      return TetaResponse(
+        data: null,
+        error: TetaErrorResponse(
+          code: res.statusCode,
+          message:
+              'removeUser error, code: ${res.statusCode}, error: ${res.body}',
+        ),
+      );
+    }
+
+    try {
+      unawaited(
+        TetaCMS.instance.analytics.insertEvent(
+          TetaAnalyticsType.tetaAuthRetrieveUsers,
+          'Teta Auth: remove user request',
+          <String, dynamic>{
+            'weight': res.bodyBytes.lengthInBytes,
+          },
+          isUserIdPreferableIfExists: false,
+        ),
+      );
+    } catch (_) {}
+
+    return TetaResponse(data: null, error: null);
+  }
+
   /// Returns auth url from specific provider
   Future<String> _signIn({
     required final int prjId,
