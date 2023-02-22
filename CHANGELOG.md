@@ -1,3 +1,9 @@
+# 0.3.0
+* Collections can now by called by names
+* Documents can be retrived by collections names
+* New CMS structure
+* New Realtime system
+
 # 0.2.2
 * New OAuth providers
 * Http request widgets

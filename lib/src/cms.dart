@@ -145,12 +145,6 @@ class TetaCMS {
     analytics = getIt.get<TetaAnalytics>();
   }
 
-  /// Get CMS token
-  static String _getToken() {
-    final box = Hive.box<dynamic>('Teta_CMS');
-    return box.get('tkn') as String;
-  }
-
   /// Print only in debug mode
   static void log(final String msg) {
     if (kDebugMode) {

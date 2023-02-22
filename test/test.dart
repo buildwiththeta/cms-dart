@@ -35,7 +35,7 @@ Future<void> delete(final List<String> args) async {
   );
 }
 
-Future<void> createCollection(final List<String> args) async {
+Future<void> createCollectionByName(final List<String> args) async {
   const collectionName = '0';
   await TetaCMS.instance.client.createCollection(
     collectionName,

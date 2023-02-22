@@ -31,7 +31,7 @@ class TetaHttpRequest {
 
     final uri = Uri.parse(urlString);
 
-    var headersNew = {
+    final headersNew = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Credentials': 'true',
       'Access-Control-Allow-Headers':
@@ -53,7 +53,7 @@ class TetaHttpRequest {
         final json = res.body;
         final dynamic docs = jsonDecode(json);
         if (docs is List) {
-          final listDocs = (docs as List<dynamic>)
+          final listDocs = (docs)
               .map((final dynamic e) => <String, dynamic>{...e, ...statusCode})
               .toList();
 
@@ -75,9 +75,9 @@ class TetaHttpRequest {
     }
     //Response Part
     final json = res.body;
-    dynamic docs = jsonDecode(json);
+    final dynamic docs = jsonDecode(json);
     if (docs is List) {
-      final listDocs = (docs as List<dynamic>)
+      final listDocs = (docs)
           .map((final dynamic e) => <String, dynamic>{...e, ...statusCode})
           .toList();
       return TetaResponse<List<dynamic>, List<dynamic>?>(
@@ -117,7 +117,7 @@ class TetaHttpRequest {
 
     final uri = Uri.parse(urlString);
 
-    var headersNew = {
+    final headersNew = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Credentials': 'true',
       'Access-Control-Allow-Headers':
@@ -142,7 +142,7 @@ class TetaHttpRequest {
         final dynamic docs = jsonDecode(json);
 
         if (docs is List) {
-          final List<dynamic> listDocs = (docs as List<dynamic>)
+          final List<dynamic> listDocs = (docs)
               .map((final dynamic e) => <String, dynamic>{...e, ...statusCode})
               .toList();
 
@@ -164,10 +164,10 @@ class TetaHttpRequest {
     }
     //Response Part
     final json = res.body;
-    dynamic docs = jsonDecode(json);
+    final dynamic docs = jsonDecode(json);
 
     if (docs is List) {
-      final List<dynamic> listDocs = (docs as List<dynamic>)
+      final List<dynamic> listDocs = (docs)
           .map((final dynamic e) => <String, dynamic>{...e, ...statusCode})
           .toList();
       return TetaResponse<List<dynamic>, List<dynamic>?>(
@@ -205,7 +205,7 @@ class TetaHttpRequest {
       }
     });
 
-    var headersNew = {
+    final headersNew = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Credentials': 'true',
       'Access-Control-Allow-Headers':
@@ -225,7 +225,7 @@ class TetaHttpRequest {
         final dynamic docs = jsonDecode(json);
 
         if (docs is List) {
-          final List<dynamic> listDocs = (docs as List<dynamic>)
+          final List<dynamic> listDocs = (docs)
               .map((final dynamic e) => <String, dynamic>{...e, ...statusCode})
               .toList();
 
@@ -267,15 +267,15 @@ class TetaHttpRequest {
     var firstLoop = true;
     parameters.forEach((key, dynamic value) {
       if (firstLoop) {
-        urlString = urlString + "?${key.toString()}=${value.toString()}";
+        urlString = "$urlString?${key.toString()}=${value.toString()}";
         firstLoop = false;
       } else {
-        urlString = urlString + "&${key.toString()}=${value.toString()}";
+        urlString = "$urlString&${key.toString()}=${value.toString()}";
       }
     });
     final uri = Uri.parse(urlString);
 
-    var headersNew = {
+    final headersNew = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Credentials': 'true',
       'Access-Control-Allow-Headers':
@@ -297,9 +297,9 @@ class TetaHttpRequest {
     if (test == false) {
       if (res.statusCode != int.parse(expectedStatusCode)) {
         final json = res.body;
-        dynamic docs = jsonDecode(json);
+        final dynamic docs = jsonDecode(json);
         if (docs is List) {
-          final List<dynamic> listDocs = (docs as List<dynamic>)
+          final List<dynamic> listDocs = (docs)
               .map((final dynamic e) => <String, dynamic>{...e, ...statusCode})
               .toList();
           return TetaResponse<List<dynamic>?, List<dynamic>>(
@@ -319,9 +319,9 @@ class TetaHttpRequest {
     }
 
     final json = res.body;
-    dynamic docs = jsonDecode(json);
+    final dynamic docs = jsonDecode(json);
     if (docs is List) {
-      final List<dynamic> listDocs = (docs as List<dynamic>)
+      final List<dynamic> listDocs = (docs)
           .map((final dynamic e) => <String, dynamic>{...e, ...statusCode})
           .toList();
       return TetaResponse<List<dynamic>, List<dynamic>?>(
