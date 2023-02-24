@@ -1,7 +1,9 @@
+import 'package:equatable/equatable.dart';
+
 /// Product model
-class TetaProduct {
+class TetaProduct extends Equatable {
   /// Product model
-  TetaProduct({
+  const TetaProduct({
     required this.id,
     required this.name,
     required this.prjId,
@@ -50,12 +52,11 @@ class TetaProduct {
         isPublic: json['isPublic'] as bool? ?? false,
         description: json['description'] as String? ?? '',
         image: json['image'] as String? ?? '',
-        metadata: <String, dynamic>{},
+        metadata: const <String, dynamic>{},
       );
 
   /// Generate a json from the model
   Map<String, dynamic> toJson() => <String, dynamic>{
-        '_id': id,
         'name': name,
         'description': description,
         'price': price,
@@ -64,4 +65,17 @@ class TetaProduct {
         'image': image,
         'metadata': metadata,
       };
+
+  @override
+  List<Object?> get props => [
+        id,
+        name,
+        prjId,
+        price,
+        count,
+        isPublic,
+        description,
+        image,
+        metadata,
+      ];
 }

@@ -1,5 +1,7 @@
-class UserAddress {
-  UserAddress({
+import 'package:equatable/equatable.dart';
+
+class UserAddress extends Equatable {
+  const UserAddress({
     required this.email,
     required this.phone,
     required this.city,
@@ -36,4 +38,15 @@ class UserAddress {
         'postalCode': postalCode,
         'country': country,
       };
+
+  @override
+  List<Object?> get props => [
+        email,
+        phone,
+        city,
+        state,
+        line,
+        postalCode,
+        country,
+      ];
 }

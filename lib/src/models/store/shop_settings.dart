@@ -1,5 +1,7 @@
-class ShopSettings {
-  ShopSettings({
+import 'package:equatable/equatable.dart';
+
+class ShopSettings extends Equatable {
+  const ShopSettings({
     required this.currency,
     required this.livemode,
     required this.merchantCountryCode,
@@ -22,4 +24,12 @@ class ShopSettings {
         merchantCountryCode: json['merchantCountryCode'] as String,
         merchantDisplayName: json['merchantDisplayName'] as String,
       );
+
+  @override
+  List<Object?> get props => [
+        currency,
+        livemode,
+        merchantCountryCode,
+        merchantDisplayName,
+      ];
 }

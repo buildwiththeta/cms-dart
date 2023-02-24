@@ -1,5 +1,7 @@
-class ShopCredentials {
-  ShopCredentials({
+import 'package:equatable/equatable.dart';
+
+class ShopCredentials extends Equatable {
+  const ShopCredentials({
     required this.accessToken,
     required this.livemode,
     required this.refreshToken,
@@ -18,8 +20,7 @@ class ShopCredentials {
   final String scope;
 
   /// Generate a json from the model
-  Map<String, dynamic> toJson() =>
-      <String, dynamic>{
+  Map<String, dynamic> toJson() => <String, dynamic>{
         'access_token': accessToken,
         'livemode': livemode,
         'refresh_token': refreshToken,
@@ -29,7 +30,7 @@ class ShopCredentials {
         'scope': scope,
       };
 
-  static ShopCredentials fromSchema(Map<String, dynamic> json) =>
+  static ShopCredentials fromSchema(final Map<String, dynamic> json) =>
       ShopCredentials(
         accessToken: json['access_token'] as String? ?? '',
         livemode: json['livemode'] as bool? ?? false,
@@ -39,4 +40,15 @@ class ShopCredentials {
         stripeUserId: json['stripe_user_id'] as String? ?? '',
         scope: json['scope'] as String? ?? '',
       );
+
+  @override
+  List<Object?> get props => [
+        accessToken,
+        livemode,
+        refreshToken,
+        tokenType,
+        stripePublishableKey,
+        stripeUserId,
+        scope,
+      ];
 }

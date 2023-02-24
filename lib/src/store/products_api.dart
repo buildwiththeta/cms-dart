@@ -30,7 +30,7 @@ class TetaStoreProductsApi {
 
   /// Gets all the products.
   /// The products are taken by the project's shop.
-  Future<TetaProductsResponse> all() async {
+  Future<TetaProductsResponse> getAll() async {
     try {
       final res = await _dio.get<String>(
         '${Constants.shopBaseUrl}/product/list',
@@ -66,7 +66,7 @@ class TetaStoreProductsApi {
 
   /// Gets a single product by id.
   /// The product is selected in the project's shop
-  Future<TetaProductResponse> get(final String prodId) async {
+  Future<TetaProductResponse> getSingle(final String prodId) async {
     final uri = Uri.parse(
       '${Constants.shopBaseUrl}/product/$prodId',
     );

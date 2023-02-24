@@ -1,5 +1,7 @@
-class Shipping {
-  Shipping({
+import 'package:equatable/equatable.dart';
+
+class Shipping extends Equatable {
+  const Shipping({
     required this.id,
     required this.name,
     required this.cost,
@@ -26,4 +28,12 @@ class Shipping {
       'description': description,
     };
   }
+
+  @override
+  List<Object?> get props => [
+        id,
+        name,
+        cost,
+        description,
+      ];
 }
