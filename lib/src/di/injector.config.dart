@@ -10,7 +10,7 @@ import 'package:get_it/get_it.dart' as _i1;
 import 'package:injectable/injectable.dart' as _i2;
 import 'package:teta_cms/src/analytics.dart' as _i9;
 import 'package:teta_cms/src/auth.dart' as _i19;
-import 'package:teta_cms/src/client.dart' as _i20;
+import 'package:teta_cms/src/database.dart' as _i20;
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart'
     as _i6;
 import 'package:teta_cms/src/db/backups.dart' as _i10;
@@ -83,7 +83,7 @@ _i1.GetIt $initGetIt(
         get<_i6.ServerRequestMetadataStore>(),
         get<_i18.GetServerRequestHeaders>(),
       ));
-  gh.lazySingleton<_i20.TetaClient>(() => _i20.TetaClient(
+  gh.lazySingleton<_i20.TetaDatabase>(() => _i20.TetaDatabase(
         get<_i10.TetaBackups>(),
         get<_i13.TetaPolicies>(),
         get<_i6.ServerRequestMetadataStore>(),
