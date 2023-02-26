@@ -100,7 +100,7 @@ TetaCMS.I.db.from('posts').on(
 Document changes
 
 ```dart
-TetaCMS.I.db.from('users').doc(docId).on(
+TetaCMS.I.db.from('users').row(docId).on(
   callback: (final e) {},
 );
 ```

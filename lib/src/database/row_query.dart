@@ -1,26 +1,26 @@
 import 'dart:async';
 
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
-import 'package:teta_cms/src/database/document_actions.dart';
+import 'package:teta_cms/src/database/row_actions.dart';
 import 'package:teta_cms/src/models/stream_actions.dart';
 import 'package:teta_cms/teta_cms.dart';
 
 /// Query builder for documents actions
-class TetaDocumentQuery {
+class TetaRowQuery {
   /// Query builder for documents actions
-  TetaDocumentQuery(
-    final String documentId,
+  TetaRowQuery(
+    final String rowId,
     final ServerRequestMetadataStore _serverRequestMetadata, {
     final String? collectionId,
     final String? collectionName,
-  })  : _documentId = documentId,
+  })  : _rowId = rowId,
         _collectionId = collectionId,
         _collectionName = collectionName,
-        _doc = TetaDocumentActions(documentId, _serverRequestMetadata),
+        _doc = TetaDocumentActions(rowId, _serverRequestMetadata),
         _realtime = TetaRealtime(_serverRequestMetadata);
 
   /// Document id
-  final String _documentId;
+  final String _rowId;
 
   /// Current collection id
   final String? _collectionId;
@@ -63,14 +63,14 @@ class TetaDocumentQuery {
       return _realtime.on(
         action: action,
         collectionName: _collectionName,
-        documentId: _documentId,
+        documentId: _rowId,
         callback: callback,
       );
     } else {
       return _realtime.on(
         action: action,
         collectionId: _collectionId,
-        documentId: _documentId,
+        documentId: _rowId,
         callback: callback,
       );
     }

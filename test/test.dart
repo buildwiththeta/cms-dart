@@ -11,7 +11,7 @@ Future<void> insert(final List<String> args) async {
 }
 
 Future<void> update(final List<String> args) async {
-  await TetaCMS.I.db.fromId('').doc('id').update(
+  await TetaCMS.I.db.fromId('').row('id').update(
     <String, dynamic>{'name': 'Alessia', 'city': 'Milano'},
   );
 }
@@ -19,12 +19,12 @@ Future<void> update(final List<String> args) async {
 Future<void> delete(final List<String> args) async {
   const collectionName = '0';
   const documentId = '0';
-  await TetaCMS.I.db.from(collectionName).doc(documentId).delete();
+  await TetaCMS.I.db.from(collectionName).row(documentId).delete();
 }
 
 Future<void> createCollectionByName(final List<String> args) async {
   const collectionName = '0';
-  await TetaCMS.I.db.createCollection(
+  await TetaCMS.I.db.create(
     collectionName,
   );
 }
@@ -66,7 +66,7 @@ Future<void> getCollectionChanges(final List<String> args) async {
 
 Future<void> getDocumentChanges(final List<String> args) async {
   const docId = '0';
-  await TetaCMS.I.db.from('posts').doc(docId).on(
+  await TetaCMS.I.db.from('posts').row(docId).on(
         action: StreamAction.updateDoc,
         callback: (final e) {},
       );

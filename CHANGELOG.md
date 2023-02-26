@@ -40,7 +40,7 @@ TetaCMS.instance.client.updateDocument(
 
 New:
 ```dart
-TetaCMS.I.db.fromId(collectionId).doc(documentId).update(
+TetaCMS.I.db.fromId(collectionId).row(documentId).update(
     <String, dynamic>{'name': 'Alessia', 'city': 'Milano'},
 );
 ```

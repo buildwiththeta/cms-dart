@@ -76,7 +76,7 @@ final res = await TetaCMS.I.db.from('contacts').insert(
 Update
 
 ```dart
-final res = await TetaCMS.I.db.fromId(collectionId).doc(documentId).update(
+final res = await TetaCMS.I.db.fromId(collectionId).row(documentId).update(
   <String, dynamic>{'name': 'Alessia', 'city': 'Milano'},
 );
 ```
@@ -84,7 +84,7 @@ final res = await TetaCMS.I.db.fromId(collectionId).doc(documentId).update(
 Delete
 
 ```dart
-final res = await TetaCMS.I.db.from('users').doc(documentId).delete();
+final res = await TetaCMS.I.db.from('users').row(documentId).delete();
 ```
 
 ### Collections
@@ -92,7 +92,7 @@ final res = await TetaCMS.I.db.from('users').doc(documentId).delete();
 Create
 
 ```dart
-final res = await TetaCMS.I.db.createCollection(collectionName);
+final res = await TetaCMS.I.db.create(collectionName);
 ```
 
 Update
@@ -124,7 +124,7 @@ TetaCMS.I.db.from('posts').on(
 Document changes
 
 ```dart
-TetaCMS.I.db.from('users').doc(docId).on(
+TetaCMS.I.db.from('users').row(docId).on(
   callback: (final e) {},
 );
 ```

@@ -125,8 +125,7 @@ class TetaDatabase {
   /// Throws an exception on request error ( statusCode != 200 )
   ///
   /// Returns the created collection as `Map<String,dynamic`
-  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>>
-      createCollection(
+  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>> create(
     final String collectionName,
   ) async {
     final uri = Uri.parse(

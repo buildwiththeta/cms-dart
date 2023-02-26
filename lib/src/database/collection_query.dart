@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/src/database/collection_actions.dart';
-import 'package:teta_cms/src/database/document_query.dart';
+import 'package:teta_cms/src/database/row_query.dart';
 import 'package:teta_cms/src/models/stream_actions.dart';
 import 'package:teta_cms/teta_cms.dart';
 
@@ -28,13 +28,13 @@ class TetaCollectionQuery {
   ///This stores the token and project id headers.
   final ServerRequestMetadataStore _serverRequestMetadata;
 
-  /// Select a specific document inside the current collection
-  TetaDocumentQuery doc(final String id) {
+  /// Select a specific row inside the current collection
+  TetaRowQuery row(final String id) {
     assert(
       name != null && this.id == null || name == null && this.id != null,
-      'Only oe between name and id must be not null',
+      'Only one between name and id must be not null',
     );
-    return TetaDocumentQuery(
+    return TetaRowQuery(
       id,
       _serverRequestMetadata,
       collectionId: this.id,
