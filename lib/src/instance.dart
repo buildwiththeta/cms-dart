@@ -9,13 +9,12 @@ import 'package:path_provider_android/path_provider_android.dart';
 import 'package:path_provider_ios/path_provider_ios.dart';
 import 'package:teta_cms/src/analytics.dart';
 import 'package:teta_cms/src/auth.dart';
-import 'package:teta_cms/src/client.dart';
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
+import 'package:teta_cms/src/database.dart';
 import 'package:teta_cms/src/di/injector.dart';
 import 'package:teta_cms/src/httpRequest.dart';
 import 'package:teta_cms/src/shop.dart';
 import 'package:teta_cms/src/utils.dart';
-import 'package:teta_cms/teta_cms.dart';
 import 'package:universal_platform/universal_platform.dart';
 
 /// TetaCMS instance.
@@ -29,7 +28,7 @@ import 'package:universal_platform/universal_platform.dart';
 /// Use it:
 ///
 /// ```dart
-/// final instance = TetaCMS.instance;
+/// final instance = TetaCMS.I;
 /// ```
 ///
 class TetaCMS {
@@ -40,6 +39,15 @@ class TetaCMS {
   /// An [AssertionError] is thrown if supabase isn't initialized yet.
   /// Call [TetaCMS.initialize] to initialize it.
   static TetaCMS get instance {
+    assert(
+      _instance._initialized,
+      'You must initialize the Teta CMS instance before calling TetaCMS.instance',
+    );
+    return _instance;
+  }
+
+  /// Shortcut to get the current TetaCMS instance.
+  static TetaCMS get I {
     assert(
       _instance._initialized,
       'You must initialize the Teta CMS instance before calling TetaCMS.instance',
@@ -78,10 +86,7 @@ class TetaCMS {
   /// The TetaCMS client for this instance
   ///
   /// Throws an error if [TetaCMS.initialize] was not called.
-  late TetaClient client;
-
-  /// The TetaRealtime instance
-  late TetaRealtime realtime;
+  late TetaDatabase db;
 
   /// The TetaAuth instance
   late TetaAuth auth;
@@ -107,7 +112,6 @@ class TetaCMS {
     final String token,
     final int prjId,
   ) async {
-    //https://github.com/flutter/flutter/issues/99155#issuecomment-1052023743
     try {
       WidgetsFlutterBinding.ensureInitialized();
       DartPluginRegistrant.ensureInitialized();
@@ -131,9 +135,8 @@ class TetaCMS {
     getIt
         .get<ServerRequestMetadataStore>()
         .updateMetadata(token: token, prjId: prjId);
-    realtime = getIt.get<TetaRealtime>();
     auth = getIt.get<TetaAuth>();
-    client = getIt.get<TetaClient>();
+    db = getIt.get<TetaDatabase>();
     store = getIt.get<TetaShop>();
     utils = getIt.get<TetaCMSUtils>();
     httpRequest = getIt.get<TetaHttpRequest>();

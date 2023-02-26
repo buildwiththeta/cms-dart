@@ -221,7 +221,7 @@ class TetaRealtime {
       <String, dynamic>{},
       isUserIdPreferableIfExists: true,
     );
-    TetaCMS.instance.client.getCollections().then(
+    TetaCMS.I.db.getCollections().then(
       (final e) {
         if (e.error == null) {
           streamController.add(e.data!);
@@ -231,7 +231,7 @@ class TetaRealtime {
     on(
       callback: (final e) async {
         TetaCMS.log('on stream collections event. $e');
-        final resp = await TetaCMS.instance.client.getCollections();
+        final resp = await TetaCMS.I.db.getCollections();
         TetaCMS.log('on resp get collections: $resp');
         if (resp.error == null) {
           streamController.add(resp.data!);
@@ -270,14 +270,14 @@ class TetaRealtime {
         'Error inserting a new event in Teta Analytics, error: $e',
       );
     }
-    TetaCMS.instance.client
-        .getCollection(
-      collectionId,
-      filters: filters,
-      limit: limit,
-      page: page,
-      showDrafts: showDrafts,
-    )
+    TetaCMS.I.db
+        .from(id: collectionId)
+        .get(
+          filters: filters,
+          limit: limit,
+          page: page,
+          showDrafts: showDrafts,
+        )
         .then(
       (final e) {
         TetaCMS.printWarning('${e.error}, ${e.data}');
@@ -303,13 +303,12 @@ class TetaRealtime {
             'Error inserting a new event in Teta Analytics, error: $e',
           );
         }
-        final resp = await TetaCMS.instance.client.getCollection(
-          collectionId,
-          filters: filters,
-          limit: limit,
-          page: page,
-          showDrafts: showDrafts,
-        );
+        final resp = await TetaCMS.I.db.from(id: collectionId).get(
+              filters: filters,
+              limit: limit,
+              page: page,
+              showDrafts: showDrafts,
+            );
         if (resp.error == null) {
           streamController.add(resp.data!);
         }
@@ -341,14 +340,14 @@ class TetaRealtime {
       <String, dynamic>{},
       isUserIdPreferableIfExists: true,
     );
-    TetaCMS.instance.client
-        .getCollectionByName(
-      collectionName,
-      filters: filters,
-      limit: limit,
-      page: page,
-      showDrafts: showDrafts,
-    )
+    TetaCMS.I.db
+        .from(name: collectionName)
+        .get(
+          filters: filters,
+          limit: limit,
+          page: page,
+          showDrafts: showDrafts,
+        )
         .then(
       (final e) {
         TetaCMS.printWarning('${e.error}, ${e.data}');
@@ -370,13 +369,12 @@ class TetaRealtime {
             ),
           );
         } catch (_) {}
-        final resp = await TetaCMS.instance.client.getCollectionByName(
-          collectionName,
-          filters: filters,
-          limit: limit,
-          page: page,
-          showDrafts: showDrafts,
-        );
+        final resp = await TetaCMS.I.db.from(name: collectionName).get(
+              filters: filters,
+              limit: limit,
+              page: page,
+              showDrafts: showDrafts,
+            );
         if (resp.error == null) {
           streamController.add(resp.data!);
         }

@@ -1,29 +1,19 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:injectable/injectable.dart';
 import 'package:teta_cms/src/constants.dart';
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
-import 'package:teta_cms/src/db/backups.dart';
-import 'package:teta_cms/src/db/policy.dart';
 import 'package:teta_cms/teta_cms.dart';
 
-/// The CMS client to interact with the db
-@lazySingleton
-class TetaClient {
-  /// Client to interact with the Teta CMS's db
-  TetaClient(
-    this.backups,
-    this.policies,
-    this._serverRequestMetadata,
-  );
+class TetaCollectionActions {
+  TetaCollectionActions(
+    this._serverRequestMetadata, {
+    this.id,
+    this.name,
+  });
 
-  /// Backups area
-  final TetaBackups backups;
-
-  /// Policies area
-  final TetaPolicies policies;
+  String? id;
+  String? name;
 
   ///This stores the token and project id headers.
   final ServerRequestMetadataStore _serverRequestMetadata;
@@ -71,59 +61,17 @@ class TetaClient {
     final bool useUserId = false,
   }) {
     try {
-      unawaited(
-        TetaCMS.instance.analytics.insertEvent(
-          event,
-          description,
-          props,
-          isUserIdPreferableIfExists: useUserId,
-        ),
+      TetaCMS.instance.analytics.insertEvent(
+        event,
+        description,
+        props,
+        isUserIdPreferableIfExists: useUserId,
       );
     } catch (e) {
       TetaCMS.printError(
         'Error inserting a new event in Teta Analytics, error: $e',
       );
     }
-  }
-
-  /// Creates a new collection with name [collectionName] and prj_id [prjId].
-  ///
-  /// Throws an exception on request error ( statusCode != 200 )
-  ///
-  /// Returns the created collection as `Map<String,dynamic`
-  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>>
-      createCollection(
-    final String collectionName,
-  ) async {
-    final uri = Uri.parse(
-      '${Constants.tetaUrl}collection',
-    );
-    final res = await http.post(
-      uri,
-      headers: _getDefaultHeaders,
-      body: json.encode(
-        <String, dynamic>{'name': collectionName},
-      ),
-    );
-    if (res.statusCode != 200) {
-      TetaCMS.printError(
-        'createCollection returned status ${res.statusCode}, error: ${res.body}',
-      );
-      return TetaResponse(
-        data: null,
-        error: TetaErrorResponse(
-          code: res.statusCode,
-          message:
-              'createCollection returned status ${res.statusCode}, error: ${res.body}',
-        ),
-      );
-    }
-    final data = json.decode(res.body) as Map<String, dynamic>;
-    _registerEvent(
-      event: TetaAnalyticsType.createCollection,
-      description: 'Teta CMS: create collection request',
-    );
-    return TetaResponse(data: data, error: null);
   }
 
   /// Deletes the collection with id [collectionId] if prj_id is [prjId].
@@ -192,168 +140,6 @@ class TetaClient {
     _registerEvent(
       event: TetaAnalyticsType.deleteCollection,
       description: 'Teta CMS: delete collection request',
-    );
-    return TetaResponse(data: data, error: null);
-  }
-
-  /// Inserts the document [document] on [collectionId] if prj_id is [prjId].
-  ///
-  /// Throws an exception on request error ( statusCode != 200 )
-  ///
-  /// Returns `true` on success
-  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>>
-      insertDocument(
-    final String collectionId,
-    final Map<String, dynamic> document,
-  ) async {
-    final uri = Uri.parse(
-      '${Constants.tetaUrl}document/$collectionId',
-    );
-    final res = await http.post(
-      uri,
-      headers: {..._getDefaultHeaders},
-      body: json.encode(document),
-    );
-    if (res.statusCode != 200) {
-      TetaCMS.printError(
-        'insertDocument returned status ${res.statusCode}, error: ${res.body}',
-      );
-      return TetaResponse(
-        data: null,
-        error: TetaErrorResponse(
-          code: res.statusCode,
-          message:
-              'insertDocument returned status ${res.statusCode}, error: ${res.body}',
-        ),
-      );
-    }
-    final data = json.decode(res.body) as Map<String, dynamic>;
-    _registerEvent(
-      event: TetaAnalyticsType.insertDocument,
-      description: 'Teta CMS: insert document request',
-      props: <String, dynamic>{
-        'weight': utf8.encode(json.encode(document)).length
-      },
-      useUserId: true,
-    );
-    return TetaResponse(data: data, error: null);
-  }
-
-  /// Inserts the document [document] on [collectionName] if prj_id is [prjId].
-  ///
-  /// Throws an exception on request error ( statusCode != 200 )
-  ///
-  /// Returns `true` on success
-  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>>
-      insertDocumentByCollName(
-    final String collectionName,
-    final Map<String, dynamic> document,
-  ) async {
-    final uri = Uri.parse(
-      '${Constants.tetaUrl}document/$collectionName',
-    );
-    final res = await http.post(
-      uri,
-      headers: {..._getDefaultHeadersForNameEndpoints},
-      body: json.encode(document),
-    );
-    if (res.statusCode != 200) {
-      TetaCMS.printError(
-        'insertDocumentByName returned status ${res.statusCode}, error: ${res.body}',
-      );
-      return TetaResponse(
-        data: null,
-        error: TetaErrorResponse(
-          code: res.statusCode,
-          message:
-              'insertDocumentByName returned status ${res.statusCode}, error: ${res.body}',
-        ),
-      );
-    }
-    final data = json.decode(res.body) as Map<String, dynamic>;
-    _registerEvent(
-      event: TetaAnalyticsType.insertDocument,
-      description: 'Teta CMS: insert document request',
-      props: <String, dynamic>{
-        'weight': utf8.encode(json.encode(document)).length
-      },
-      useUserId: true,
-    );
-    return TetaResponse(data: data, error: null);
-  }
-
-  /// Deletes the document with id [documentId] on [collectionId] if prj_id is [prjId].
-  ///
-  /// Throws an exception on request error ( statusCode != 200 )
-  ///
-  /// Returns `true` on success
-  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>>
-      deleteDocument(
-    final String collectionId,
-    final String documentId,
-  ) async {
-    final uri =
-        Uri.parse('${Constants.tetaUrl}document/$collectionId/$documentId');
-    final res = await http.delete(
-      uri,
-      headers: _getDefaultHeaders,
-    );
-    if (res.statusCode != 200) {
-      TetaCMS.printError(
-        'deleteDocument returned status ${res.statusCode}, error: ${res.body}',
-      );
-      return TetaResponse(
-        data: null,
-        error: TetaErrorResponse(
-          code: res.statusCode,
-          message:
-              'deleteDocument returned status ${res.statusCode}, error: ${res.body}',
-        ),
-      );
-    }
-    final data = json.decode(res.body) as Map<String, dynamic>;
-    _registerEvent(
-      event: TetaAnalyticsType.deleteDocument,
-      description: 'Teta CMS: delete document request',
-      useUserId: true,
-    );
-    return TetaResponse(data: data, error: null);
-  }
-
-  /// Deletes the document with id [documentId] on [collectionName] if prj_id is [prjId].
-  ///
-  /// Throws an exception on request error ( statusCode != 200 )
-  ///
-  /// Returns `true` on success
-  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>>
-      deleteDocumentByCollName(
-    final String collectionName,
-    final String documentId,
-  ) async {
-    final uri =
-        Uri.parse('${Constants.tetaUrl}document/$collectionName/$documentId');
-    final res = await http.delete(
-      uri,
-      headers: _getDefaultHeadersForNameEndpoints,
-    );
-    if (res.statusCode != 200) {
-      TetaCMS.printError(
-        'deleteDocumentByName returned status ${res.statusCode}, error: ${res.body}',
-      );
-      return TetaResponse(
-        data: null,
-        error: TetaErrorResponse(
-          code: res.statusCode,
-          message:
-              'deleteDocumentByName returned status ${res.statusCode}, error: ${res.body}',
-        ),
-      );
-    }
-    final data = json.decode(res.body) as Map<String, dynamic>;
-    _registerEvent(
-      event: TetaAnalyticsType.deleteDocument,
-      description: 'Teta CMS: delete document request',
-      useUserId: true,
     );
     return TetaResponse(data: data, error: null);
   }
@@ -508,16 +294,12 @@ class TetaClient {
 
     final count = data['count'] as int? ?? 0;
 
-    try {
-      unawaited(
-        TetaCMS.instance.analytics.insertEvent(
-          TetaAnalyticsType.getCollectionCount,
-          'Teta CMS: count request',
-          <String, dynamic>{},
-          isUserIdPreferableIfExists: true,
-        ),
-      );
-    } catch (_) {}
+    _registerEvent(
+      event: TetaAnalyticsType.getCollectionCount,
+      description: 'Teta CMS: count request',
+      props: <String, dynamic>{},
+      useUserId: true,
+    );
 
     return count;
   }
@@ -565,57 +347,14 @@ class TetaClient {
 
     final count = data['count'] as int? ?? 0;
 
-    try {
-      unawaited(
-        TetaCMS.instance.analytics.insertEvent(
-          TetaAnalyticsType.getCollectionCount,
-          'Teta CMS: count request',
-          <String, dynamic>{},
-          isUserIdPreferableIfExists: true,
-        ),
-      );
-    } catch (_) {}
+    _registerEvent(
+      event: TetaAnalyticsType.getCollectionCount,
+      description: 'Teta CMS: count request',
+      props: <String, dynamic>{},
+      useUserId: true,
+    );
 
     return count;
-  }
-
-  /// Gets all collection where prj_id is [prjId].
-  ///
-  /// Throws an exception on request error ( statusCode != 200 )
-  ///
-  /// Returns the collections as `List<Map<String,dynamic>>` without `docs`
-  Future<TetaResponse<List<CollectionObject>?, TetaErrorResponse?>>
-      getCollections() async {
-    final uri = Uri.parse('${Constants.tetaUrl}collection/list');
-    final res = await http.get(
-      uri,
-      headers: _getDefaultHeaders,
-    );
-    if (res.statusCode != 200) {
-      TetaCMS.printError(
-        'getCollections returned status ${res.statusCode}, error: ${res.body}',
-      );
-      return TetaResponse(
-        data: null,
-        error: TetaErrorResponse(
-          code: res.statusCode,
-          message:
-              'getCollections returned status ${res.statusCode}, error: ${res.body}',
-        ),
-      );
-    }
-    final data = json.decode(res.body) as List<dynamic>;
-    final collections = data
-        .map(
-          (final dynamic e) =>
-              CollectionObject.fromJson(json: e as Map<String, dynamic>),
-        )
-        .toList();
-    _registerEvent(
-      event: TetaAnalyticsType.getCollections,
-      description: 'Teta CMS: get collections request',
-    );
-    return TetaResponse(data: collections, error: null);
   }
 
   /// Updates the collection [collectionId] with [name] if prj_id is [prjId].
@@ -712,161 +451,89 @@ class TetaClient {
     return TetaResponse(data: data, error: null);
   }
 
-  /// Updates the document with id [documentId] on [collectionId] with [content] if prj_id is [prjId].
+  /// Inserts the document [document] on [collectionId] if prj_id is [prjId].
   ///
   /// Throws an exception on request error ( statusCode != 200 )
   ///
   /// Returns `true` on success
   Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>>
-      updateDocument(
+      insertDocument(
     final String collectionId,
-    final String documentId,
-    final Map<String, dynamic> content,
+    final Map<String, dynamic> document,
   ) async {
     final uri = Uri.parse(
-      '${Constants.tetaUrl}document/$collectionId/$documentId',
+      '${Constants.tetaUrl}document/$collectionId',
     );
-
-    final res = await http.put(
-      uri,
-      headers: _getDefaultHeaders,
-      body: json.encode(content),
-    );
-    if (res.statusCode != 200) {
-      return TetaResponse(
-        data: null,
-        error: TetaErrorResponse(
-          code: res.statusCode,
-          message:
-              'updateDocument returned status ${res.statusCode}, error: ${res.body}',
-        ),
-      );
-    }
-    final data = json.decode(res.body) as Map<String, dynamic>;
-    _registerEvent(
-      event: TetaAnalyticsType.updateDocument,
-      description: 'Teta CMS: update document request',
-      props: <String, dynamic>{
-        'weight': res.bodyBytes.lengthInBytes,
-      },
-      useUserId: true,
-    );
-    return TetaResponse(data: data, error: null);
-  }
-
-  /// Updates the document with id [documentId] on [collectionName] with [content] if prj_id is [prjId].
-  ///
-  /// Throws an exception on request error ( statusCode != 200 )
-  ///
-  /// Returns `true` on success
-  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>>
-      updateDocumentByCollName(
-    final String collectionName,
-    final String documentId,
-    final Map<String, dynamic> content,
-  ) async {
-    final uri = Uri.parse(
-      '${Constants.tetaUrl}document/$collectionName/$documentId',
-    );
-
-    final res = await http.put(
-      uri,
-      headers: _getDefaultHeadersForNameEndpoints,
-      body: json.encode(content),
-    );
-    if (res.statusCode != 200) {
-      return TetaResponse(
-        data: null,
-        error: TetaErrorResponse(
-          code: res.statusCode,
-          message:
-              'updateDocumentByName returned status ${res.statusCode}, error: ${res.body}',
-        ),
-      );
-    }
-    final data = json.decode(res.body) as Map<String, dynamic>;
-    _registerEvent(
-      event: TetaAnalyticsType.updateDocument,
-      description: 'Teta CMS: update document request',
-      props: <String, dynamic>{
-        'weight': res.bodyBytes.lengthInBytes,
-      },
-      useUserId: true,
-    );
-    return TetaResponse(data: data, error: null);
-  }
-
-  /// Performs a custom Ayaya query
-  Future<TetaResponse<List<dynamic>?, TetaErrorResponse?>> query(
-    final String query,
-  ) async {
-    final uri = Uri.parse('${Constants.tetaUrl}cms/aya');
-
     final res = await http.post(
       uri,
-      headers: {
-        'authorization': 'Bearer $token',
-      },
-      body: '''
-      ON prj_id* $prjId;
-      $query
-      ''',
+      headers: {..._getDefaultHeaders},
+      body: json.encode(document),
     );
-
-    TetaCMS.log('custom query: ${res.body}');
-
     if (res.statusCode != 200) {
-      return TetaResponse<List<dynamic>?, TetaErrorResponse>(
+      TetaCMS.printError(
+        'insertDocument returned status ${res.statusCode}, error: ${res.body}',
+      );
+      return TetaResponse(
         data: null,
         error: TetaErrorResponse(
           code: res.statusCode,
-          message: res.body,
+          message:
+              'insertDocument returned status ${res.statusCode}, error: ${res.body}',
         ),
       );
     }
-
-    try {
-      unawaited(
-        TetaCMS.instance.analytics.insertEvent(
-          TetaAnalyticsType.customQuery,
-          'Teta CMS: custom queries request',
-          <String, dynamic>{
-            'weight': res.bodyBytes.lengthInBytes + utf8.encode(query).length,
-          },
-          isUserIdPreferableIfExists: false,
-        ),
-      );
-    } catch (_) {}
-
-    final docs = json.decode(res.body) as List<dynamic>;
-
-    return TetaResponse<List<dynamic>, TetaErrorResponse?>(
-      data: docs,
-      error: null,
+    final data = json.decode(res.body) as Map<String, dynamic>;
+    _registerEvent(
+      event: TetaAnalyticsType.insertDocument,
+      description: 'Teta CMS: insert document request',
+      props: <String, dynamic>{
+        'weight': utf8.encode(json.encode(document)).length
+      },
+      useUserId: true,
     );
+    return TetaResponse(data: data, error: null);
   }
 
-  ///This is used to proxy calls to Google Api for Desktop and Web.
-  Future<String> proxy(
-    final String url,
-    final Map<String, String> headers,
+  /// Inserts the document [document] on [collectionName] if prj_id is [prjId].
+  ///
+  /// Throws an exception on request error ( statusCode != 200 )
+  ///
+  /// Returns `true` on success
+  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>>
+      insertDocumentByCollName(
+    final String collectionName,
+    final Map<String, dynamic> document,
   ) async {
-    final serverMetadata = _serverRequestMetadata.getMetadata();
-
-    final enc = Uri.encodeComponent(url);
-    final uri = Uri.parse('${Constants.reverseProxyUrl}/$enc');
-    final res = await http.get(
-      uri,
-      headers: {
-        'authorization': 'Bearer ${serverMetadata.token}',
-        ...headers,
-      },
+    final uri = Uri.parse(
+      '${Constants.tetaUrl}document/$collectionName',
     );
-
-    if (res.statusCode == 200) {
-      return res.body;
-    } else {
-      throw Exception('Request failed.: ${res.body}');
+    final res = await http.post(
+      uri,
+      headers: {..._getDefaultHeadersForNameEndpoints},
+      body: json.encode(document),
+    );
+    if (res.statusCode != 200) {
+      TetaCMS.printError(
+        'insertDocumentByName returned status ${res.statusCode}, error: ${res.body}',
+      );
+      return TetaResponse(
+        data: null,
+        error: TetaErrorResponse(
+          code: res.statusCode,
+          message:
+              'insertDocumentByName returned status ${res.statusCode}, error: ${res.body}',
+        ),
+      );
     }
+    final data = json.decode(res.body) as Map<String, dynamic>;
+    _registerEvent(
+      event: TetaAnalyticsType.insertDocument,
+      description: 'Teta CMS: insert document request',
+      props: <String, dynamic>{
+        'weight': utf8.encode(json.encode(document)).length
+      },
+      useUserId: true,
+    );
+    return TetaResponse(data: data, error: null);
   }
 }
