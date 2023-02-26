@@ -361,7 +361,8 @@ class TetaShop {
 
   /// Gets all the store's transactions for a user
   Future<TetaReceiptResponse> getReceiptLink(
-      final String paymentIntentId) async {
+    final String paymentIntentId,
+  ) async {
     final token = (await getShopCredentials()).data!.accessToken;
 
     final uri = Uri.parse(
@@ -396,14 +397,17 @@ class TetaShop {
 
   /// Sets shop settings
   Future<TetaShopSettingsResponse> setSettings(
-      final ShopSettings shopSettings) async {
+    final ShopSettings shopSettings,
+  ) async {
     final uri = Uri.parse(
       '${Constants.shopBaseUrl}/shop/settings',
     );
 
-    final res = await http.put(uri,
-        headers: _getServerRequestHeaders.execute(),
-        body: jsonEncode(shopSettings));
+    final res = await http.put(
+      uri,
+      headers: _getServerRequestHeaders.execute(),
+      body: jsonEncode(shopSettings),
+    );
 
     if (res.statusCode != 200) {
       return TetaShopSettingsResponse(
@@ -447,7 +451,9 @@ class TetaShop {
 
   /// Sets a new status for the transaction
   Future<TetaResponse> setTransactionStatus(
-      final String status, final String paymentIntentId) async {
+    final String status,
+    final String paymentIntentId,
+  ) async {
     final uri = Uri.parse(
       '${Constants.shopBaseUrl}/shop/transactions/$paymentIntentId/status/$status',
     );
