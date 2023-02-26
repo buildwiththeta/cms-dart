@@ -90,12 +90,15 @@ class TetaDatabase {
     }
   }
 
-  TetaCollectionQuery from({final String? name, final String? id}) {
-    assert(
-      name != null && id == null || name == null && id != null,
-      'Only oe between name and id must be not null',
+  TetaCollectionQuery from(final String name) {
+    return TetaCollectionQuery(_serverRequestMetadata, name: name);
+  }
+
+  TetaCollectionQuery fromId(final String id) {
+    return TetaCollectionQuery(
+      _serverRequestMetadata,
+      id: id,
     );
-    return TetaCollectionQuery(_serverRequestMetadata, id: id, name: name);
   }
 
   StreamController<List<CollectionObject>> streamCollections() {

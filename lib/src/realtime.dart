@@ -271,7 +271,7 @@ class TetaRealtime {
       );
     }
     TetaCMS.I.db
-        .from(id: collectionId)
+        .fromId(collectionId)
         .get(
           filters: filters,
           limit: limit,
@@ -303,7 +303,7 @@ class TetaRealtime {
             'Error inserting a new event in Teta Analytics, error: $e',
           );
         }
-        final resp = await TetaCMS.I.db.from(id: collectionId).get(
+        final resp = await TetaCMS.I.db.fromId(collectionId).get(
               filters: filters,
               limit: limit,
               page: page,
@@ -341,7 +341,7 @@ class TetaRealtime {
       isUserIdPreferableIfExists: true,
     );
     TetaCMS.I.db
-        .from(name: collectionName)
+        .from(collectionName)
         .get(
           filters: filters,
           limit: limit,
@@ -369,7 +369,7 @@ class TetaRealtime {
             ),
           );
         } catch (_) {}
-        final resp = await TetaCMS.I.db.from(name: collectionName).get(
+        final resp = await TetaCMS.I.db.from(collectionName).get(
               filters: filters,
               limit: limit,
               page: page,
