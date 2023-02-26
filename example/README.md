@@ -68,7 +68,7 @@ class _MyAppState extends State<MyApp> {
 Insert
 
 ```dart
-final res = await TetaCMS.I.db.from(name: 'contacts').insert(
+final res = await TetaCMS.I.db.from('contacts').insert(
   <String, dynamic>{'name': 'Giulia', 'city': 'Roma'},
 );
 ```
@@ -76,7 +76,7 @@ final res = await TetaCMS.I.db.from(name: 'contacts').insert(
 Update
 
 ```dart
-final res = await TetaCMS.I.db.from(id: collectionId).doc(documentId).update(
+final res = await TetaCMS.I.db.fromId(collectionId).doc(documentId).update(
   <String, dynamic>{'name': 'Alessia', 'city': 'Milano'},
 );
 ```
@@ -84,7 +84,7 @@ final res = await TetaCMS.I.db.from(id: collectionId).doc(documentId).update(
 Delete
 
 ```dart
-final res = await TetaCMS.I.db.from(name: 'users').doc(documentId).delete();
+final res = await TetaCMS.I.db.from('users').doc(documentId).delete();
 ```
 
 ### Collections
@@ -98,7 +98,7 @@ final res = await TetaCMS.I.db.createCollection(collectionName);
 Update
 
 ```dart
-final res = await TetaCMS.I.db.from(id: collectionId).update(
+final res = await TetaCMS.I.db.fromId(collectionId).update(
   newName,
   <String, dynamic>{'key': 'value', 'key': 'value'},
 );
@@ -107,7 +107,7 @@ final res = await TetaCMS.I.db.from(id: collectionId).update(
 Delete
 
 ```dart
-final res = await TetaCMS.I.db.from(name: 'posts').delete();
+final res = await TetaCMS.I.db.from('posts').delete();
 ```
 
 ### Realtime
@@ -115,7 +115,7 @@ final res = await TetaCMS.I.db.from(name: 'posts').delete();
 Collection changes
 
 ```dart
-TetaCMS.I.db.from(name: 'posts').on(
+TetaCMS.I.db.from('posts').on(
   // action: StreamAction.all,
   callback: (final e) {},
 );
@@ -124,7 +124,7 @@ TetaCMS.I.db.from(name: 'posts').on(
 Document changes
 
 ```dart
-TetaCMS.I.db.from(name: 'users').doc(docId).on(
+TetaCMS.I.db.from('users').doc(docId).on(
   callback: (final e) {},
 );
 ```

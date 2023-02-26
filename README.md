@@ -42,7 +42,7 @@ Future<void> main() {
 
 ```dart
 // Fetch all docs
-final res = await TetaCMS.I.db.from(name: 'users').get();
+final res = await TetaCMS.I.db.from('users').get();
 if (res.error != null) {
   Logger.printError('Error fetching users, code: ${res.error?.code}, error: ${res.error?.message}');
 } else {
@@ -55,7 +55,7 @@ if (res.error != null) {
 
 ```dart
 // Fetch all docs, ordering and filtering
-TetaCMS.I.db.from(name: 'users').get(
+TetaCMS.I.db.from('users').get(
   limit: 10,
   page: 0,
   showDrafts: false,
@@ -74,7 +74,7 @@ It manages the cache by preventing unwanted calls.
 
 ```dart
 TetaFutureBuilder(
-  future: TetaCMS.I.db.from(name: 'posts').get(), 
+  future: TetaCMS.I.db.from('posts').get(), 
   builder: (final context, final snap) {
     // build your widgets with snap.data as TetaResponse<T, TetaErrorResponse?>
   },
@@ -91,7 +91,7 @@ TetaFutureBuilder supports any future. You can also use it to run an [Ayaya](htt
 Collection changes
 
 ```dart
-TetaCMS.I.db.from(name: 'posts').on(
+TetaCMS.I.db.from('posts').on(
   // action: StreamAction.all,
   callback: (final e) {},
 );
@@ -100,7 +100,7 @@ TetaCMS.I.db.from(name: 'posts').on(
 Document changes
 
 ```dart
-TetaCMS.I.db.from(name: 'users').doc(docId).on(
+TetaCMS.I.db.from('users').doc(docId).on(
   callback: (final e) {},
 );
 ```
@@ -109,7 +109,7 @@ Stream changes
 
 ```dart
 // Stream all docs, ordering and filtering
-final sub = TetaCMS.I.db.from(name: 'chats').stream(
+final sub = TetaCMS.I.db.from('chats').stream(
   limit: 10,
   page: 0,
   showDrafts: false,
@@ -131,7 +131,7 @@ It manages the cache by preventing unwanted calls and closes the stream controll
 
 ```dart
 TetaStreamBuilder(
-  stream: TetaCMS.I.db.from(name: 'feed').stream(), 
+  stream: TetaCMS.I.db.from('feed').stream(), 
   builder: (final context, final snap) {
     // build your widgets with snap.data as TetaResponse<T, TetaErrorResponse?>
   },
