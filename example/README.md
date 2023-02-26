@@ -1,14 +1,14 @@
-### Retrieve docs from 2 collections, filtering and sorting by `_name` field and limiting to 10
+### Retrieve docs from 2 collections, filtering and sorting by `email` field and limiting to 10
 
 ```dart
 import 'package:flutter/material.dart';
 import 'package:teta_cms/teta_cms.dart';
 
-void main() {
+Future<void> main() {
   const prjToken = '';
   const prjId = 0;
 
-  TetaCMS.initialize(
+  await TetaCMS.initialize(
     token: prjToken,
     prjId: prjId,
   );
@@ -30,12 +30,12 @@ class _MyAppState extends State<MyApp> {
       home: Scaffold(
         body:
             TetaFutureBuilder<TetaResponse<List<dynamic>?, TetaErrorResponse?>>(
-          future: TetaCMS.instance.client.query(
+          future: TetaCMS.I.db.query(
             '''
               MATCHOR name EQ Collection1 name EQ Collection2;
               IN docs;
-              MATCHOR _name EQ 'value' _name LIKE /value2/;
-              SORT _name 1;
+              MATCHOR email EQ 'value' email LIKE /value2/;
+              SORT email 1;
               LIMIT 10;
             ''',
           ),
@@ -48,7 +48,7 @@ class _MyAppState extends State<MyApp> {
                 itemCount: snap.data?.data?.length ?? 0,
                 itemBuilder: (final c, final i) {
                   // ignore: avoid_dynamic_calls
-                  return Text('${snap.data?.data?[i]['_name']}');
+                  return Text('${snap.data?.data?[i]['email']}');
                 },
               );
             }
@@ -68,8 +68,7 @@ class _MyAppState extends State<MyApp> {
 Insert
 
 ```dart
-final res = await TetaCMS.instance.client.insertDocument(
-  collectionId,
+final res = await TetaCMS.I.db.from(name: 'contacts').insert(
   <String, dynamic>{'name': 'Giulia', 'city': 'Roma'},
 );
 ```
@@ -77,9 +76,7 @@ final res = await TetaCMS.instance.client.insertDocument(
 Update
 
 ```dart
-final res = await TetaCMS.instance.client.updateDocument(
-  collectionId,
-  documentId,
+final res = await TetaCMS.I.db.from(id: collectionId).doc(documentId).update(
   <String, dynamic>{'name': 'Alessia', 'city': 'Milano'},
 );
 ```
@@ -87,10 +84,7 @@ final res = await TetaCMS.instance.client.updateDocument(
 Delete
 
 ```dart
-final res = await TetaCMS.instance.client.deleteDocument(
-  collectionId,
-  documentId,
-);
+final res = await TetaCMS.I.db.from(name: 'users').doc(documentId).delete();
 ```
 
 ### Collections
@@ -98,16 +92,13 @@ final res = await TetaCMS.instance.client.deleteDocument(
 Create
 
 ```dart
-final res = await TetaCMS.instance.client.createCollection(
-  collectionName,
-);
+final res = await TetaCMS.I.db.createCollection(collectionName);
 ```
 
 Update
 
 ```dart
-final res = await TetaCMS.instance.client.updateCollection(
-  collectionId,
+final res = await TetaCMS.I.db.from(id: collectionId).update(
   newName,
   <String, dynamic>{'key': 'value', 'key': 'value'},
 );
@@ -116,8 +107,25 @@ final res = await TetaCMS.instance.client.updateCollection(
 Delete
 
 ```dart
-final res = await TetaCMS.instance.client.deleteCollection(
-  collectionId,
+final res = await TetaCMS.I.db.from(name: 'posts').delete();
+```
+
+### Realtime
+
+Collection changes
+
+```dart
+TetaCMS.I.db.from(name: 'posts').on(
+  // action: StreamAction.all,
+  callback: (final e) {},
+);
+```
+
+Document changes
+
+```dart
+TetaCMS.I.db.from(name: 'users').doc(docId).on(
+  callback: (final e) {},
 );
 ```
 

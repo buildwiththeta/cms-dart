@@ -6,7 +6,9 @@ import 'package:teta_cms/src/database/document_query.dart';
 import 'package:teta_cms/src/models/stream_actions.dart';
 import 'package:teta_cms/teta_cms.dart';
 
+/// Query builder for collections actions
 class TetaCollectionQuery {
+  /// Query builder for collections actions
   TetaCollectionQuery(
     this._serverRequestMetadata, {
     this.id,
@@ -14,7 +16,10 @@ class TetaCollectionQuery {
   })  : _coll = TetaCollectionActions(_serverRequestMetadata),
         _realtime = TetaRealtime(_serverRequestMetadata);
 
+  /// Collection id
   final String? id;
+
+  /// Collection name
   final String? name;
 
   final TetaCollectionActions _coll;
@@ -23,6 +28,7 @@ class TetaCollectionQuery {
   ///This stores the token and project id headers.
   final ServerRequestMetadataStore _serverRequestMetadata;
 
+  /// Select a specific document inside the current collection
   TetaDocumentQuery doc(final String id) {
     assert(
       name != null && this.id == null || name == null && this.id != null,
@@ -36,6 +42,7 @@ class TetaCollectionQuery {
     );
   }
 
+  /// Delete the current collection
   Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>>
       delete() async {
     if (name == null && id == null) {
@@ -53,6 +60,7 @@ class TetaCollectionQuery {
     }
   }
 
+  /// Get all documents inside the current collection
   Future<TetaResponse<List<dynamic>?, TetaErrorResponse?>> get({
     final List<Filter> filters = const [],
     final int page = 0,
@@ -74,6 +82,7 @@ class TetaCollectionQuery {
     }
   }
 
+  /// Stream all documents inside the current collection
   StreamController<List<dynamic>> stream({
     final StreamAction action = StreamAction.all,
     final List<Filter> filters = const [],
@@ -106,6 +115,7 @@ class TetaCollectionQuery {
     }
   }
 
+  /// Get any realtime changes inside the current collection
   Future<RealtimeHandler> on({
     final StreamAction action = StreamAction.all,
     final dynamic Function(SocketChangeEvent)? callback,
@@ -129,6 +139,7 @@ class TetaCollectionQuery {
     }
   }
 
+  /// Get the documents count inside the current collection
   Future<int> count({
     final List<Filter> filters = const [],
     final int page = 0,
@@ -147,11 +158,7 @@ class TetaCollectionQuery {
     }
   }
 
-  /// Updates the collection [collectionId] with [name] if prj_id is [prjId].
-  ///
-  /// Throws an exception on request error ( statusCode != 200 )
-  ///
-  /// Returns the updated collection as `Map<String,dynamic>`
+  /// Updates the current collection
   Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>> update(
     final String name,
     final Map<String, dynamic>? attributes,
@@ -171,11 +178,7 @@ class TetaCollectionQuery {
     }
   }
 
-  /// Inserts the document [document] on [collectionName] if prj_id is [prjId].
-  ///
-  /// Throws an exception on request error ( statusCode != 200 )
-  ///
-  /// Returns `true` on success
+  /// Insert a new document
   Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>> insert(
     final Map<String, dynamic> document,
   ) async {

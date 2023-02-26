@@ -3,7 +3,7 @@
 
 ## What's Teta CMS?
 
-Teta CMS is a low-code back-end service. We provide:
+Teta CMS is a low-code back-end service made by [Teta](https://teta.so). We provide:
 
 - Scalable NoSQL database
 - Real-time subscriptions with sockets
@@ -15,23 +15,10 @@ Teta CMS is a low-code back-end service. We provide:
 
 To use Teta CMS you have to create first a project on [Teta.so](https://teta.so?utm_source=pub.dev&utm_medium=ClickToWebsite)
 
-### Compatibility
-
-|          |  Auth              | Database | Ayaya  | Realtime   | Analytics |
-| -------- | :--------------:   | :------: | :------:  | :-------: | :-------: |
-| Android  |      ✅            |     ✅    |    ✅     |    ✅     |     ✅     |
-| iOS      |      ✅            |     ✅    |    ✅     |    ✅     |     ✅     |
-| Web      |      ✅            |     ✅    |    ✅     |    ✅     |     ✅     |
-| macOS    |     Coming soon    |     ✅    |    ✅     |    ✅     |     ✅     |
-| Windows  |     Coming soon    |     ✅    |    ✅     |    ✅     |     ✅     |
-| Linux    |     Coming soon    |     ✅    |    ✅     |    ✅     |     ✅     |
-
-## Database
-
 ### Initialize
 To get the credentials, go to [Teta](https://teta.so?utm_source=pub.dev&utm_medium=ClickToWebsite) > project dashboard > Getting Started
 
-Since you call the .initialize method, you are able to use Teta.instance anywhere in your application
+Since you call the .initialize method, you are able to use **TetaCMS.instance** or **TetaCMS.I** anywhere in your application
 ```dart
 import 'package:teta_cms/teta_cms.dart';
 
@@ -46,13 +33,118 @@ Future<void> main() {
   );
 }
 ```
-### Database with custom query
+
+---
+
+## Database
+
+### Fetch docs from collections
+
+```dart
+// Fetch all docs
+final res = await TetaCMS.I.db.from(name: 'users').get();
+if (res.error != null) {
+  Logger.printError('Error fetching users, code: ${res.error?.code}, error: ${res.error?.message}');
+} else {
+  // Safe to use res.data 🎉
+  return res.data;
+}
+```
+
+### Filtering
+
+```dart
+// Fetch all docs, ordering and filtering
+TetaCMS.I.db.from(name: 'users').get(
+  limit: 10,
+  page: 0,
+  showDrafts: false,
+  filters: [
+    Filter(
+      'Key',
+      'Value',
+      type: FilterType.like,
+    ),
+  ],
+);
+```
+
+Or you can use our **TetaFutureBuilder**.
+It manages the cache by preventing unwanted calls.
+
+```dart
+TetaFutureBuilder(
+  future: TetaCMS.I.db.from(name: 'posts').get(), 
+  builder: (final context, final snap) {
+    // build your widgets with snap.data as TetaResponse<T, TetaErrorResponse?>
+  },
+);
+```
+
+TetaFutureBuilder supports any future. You can also use it to run an [Ayaya](https://teta.so/ayaya-language/) query.
+
+**[See other examples](https://pub.dev/packages/teta_cms/example).** 
+
+
+### Realtime
+
+Collection changes
+
+```dart
+TetaCMS.I.db.from(name: 'posts').on(
+  // action: StreamAction.all,
+  callback: (final e) {},
+);
+```
+
+Document changes
+
+```dart
+TetaCMS.I.db.from(name: 'users').doc(docId).on(
+  callback: (final e) {},
+);
+```
+
+Stream changes
+
+```dart
+// Stream all docs, ordering and filtering
+final sub = TetaCMS.I.db.from(name: 'chats').stream(
+  limit: 10,
+  page: 0,
+  showDrafts: false,
+  filters: [
+    Filter(
+      'Key',
+      'Value',
+      type: FilterType.like,
+    ),
+  ],
+);
+
+// Remember to close it when you're done
+sub.close();
+```
+
+Or you can use our **TetaStreamBuilder**.
+It manages the cache by preventing unwanted calls and closes the stream controller at the dispose event.
+
+```dart
+TetaStreamBuilder(
+  stream: TetaCMS.I.db.from(name: 'feed').stream(), 
+  builder: (final context, final snap) {
+    // build your widgets with snap.data as TetaResponse<T, TetaErrorResponse?>
+  },
+);
+```
+
+### Custom query
 
 Making a query with the [Ayaya](https://teta.so/ayaya-language/) language
 
 ```dart
 // Fetch all docs in `users` created less than a week, ordering by `created_at`
-final res = await TetaCMS.instance.client.query(
+final res = await TetaCMS.I.db.query(
   r'''
     MATCH name EQ users;
     IN docs;
@@ -75,93 +167,10 @@ With Ayaya, you can join two or more collections:
 
 ```dart
 // Fetch all docs in `users` and `posts`
-final response = await TetaCMS.instance.client.query(
+final response = await TetaCMS.I.db.query(
   '''
     MATCHOR name EQ users name EQ posts;
   ''', 
-);
-```
-
-### Fetch docs
-
-```dart
-// Fetch all docs
-final res = await TetaCMS.instance.client.getCollectionByName('users');
-if (res.error != null) {
-  Logger.printError('Error fetching users, code: ${res.error?.code}, error: ${res.error?.message}');
-} else {
-  // Safe to use res.data 🎉
-  return res.data;
-}
-```
-
-### Filtering
-
-```dart
-// Fetch all docs, ordering and filtering
-TetaCMS.instance.client.getCollectionByName(
-  'users',
-  limit: 10,
-  page: 0,
-  showDrafts: false,
-  filters: [
-    Filter(
-      'Key',
-      'Value',
-      type: FilterType.like,
-    ),
-  ],
-);
-```
-
-Or you can use our **TetaFutureBuilder**.
-It manages the cache by preventing unwanted calls.
-
-```dart
-TetaFutureBuilder(
-  future: TetaCMS.instance.client.getCollectionByName('posts'), 
-  builder: (final context, final snap) {
-    // build your widgets with snap.data as TetaResponse<T, TetaErrorResponse?>
-  },
-);
-```
-
-TetaFutureBuilder supports any future. You can also use it to run an [Ayaya](https://teta.so/ayaya-language/) query.
-
-**[See other examples](https://pub.dev/packages/teta_cms/example).** 
-
-
-### Realtime
-
-```dart
-// Stream all docs, ordering and filtering
-final sub = TetaCMS.instance.realtime.streamCollectionByName(
-  'chats', // You can retrieve this from your project dashboard
-  limit: 10,
-  page: 0,
-  showDrafts: false,
-  filters: [
-    Filter(
-      'Key',
-      'Value',
-      type: FilterType.like,
-    ),
-  ],
-);
-
-// Remember to close it when you're done
-sub.close();
-```
-
-Or you can use our **TetaStreamBuilder**.
-It manages the cache by preventing unwanted calls and closes the stream controller at the dispose event.
-
-```dart
-TetaStreamBuilder(
-  stream: TetaCMS.instance.realtime.streamCollectionByName('feed'), 
-  builder: (final context, final snap) {
-    // build your widgets with snap.data as TetaResponse<T, TetaErrorResponse?>
-  },
 );
 ```
 
@@ -172,13 +181,16 @@ Each policy is linked to a specific collection, and each policy is executed ever
 Essentially, they are additional conditions for each query that will be made to the collection.
 - [Secure your database with Teta CMS policies](https://teta.so/policies/)
 
+
+---
+
 ## Authentication
 
 ### Social authentication
 
 ```dart
 // Sign up user with Apple OAuth provider
-TetaCMS.instance.auth.signIn(
+TetaCMS.I.auth.signIn(
   provider: TetaProvider.apple,
   onSuccess: (final isFirstTime) async {
     // Success 🎉
@@ -192,7 +204,7 @@ The `isFirstTime` flag tells us whether the user is a first-time login, which is
 
 ```dart
 // Get the current user
-final TetaUser user = await TetaCMS.instance.auth.user.get;
+final TetaUser user = await TetaCMS.I.auth.user.get;
 if (user.isLogged) {
   // The user is logged 🎉
 } else {
@@ -203,8 +215,10 @@ if (user.isLogged) {
 ### Sign Out
 
 ```dart
-await TetaCMS.instance.auth.signOut();
+await TetaCMS.I.auth.signOut();
 ```
+
+---
 
 ## Teta Auth configuration
 Authentication with Teta CMS works by opening a browser to allow people to log in using different providers.
@@ -295,6 +309,17 @@ Authentication for desktop platforms is coming soon.
 
 ---
 
+### Compatibility
+
+|          |  Auth              | Database | Ayaya  | Realtime   | Analytics |
+| -------- | :--------------:   | :------: | :------:  | :-------: | :-------: |
+| Android  |      ✅            |     ✅    |    ✅     |    ✅     |     ✅     |
+| iOS      |      ✅            |     ✅    |    ✅     |    ✅     |     ✅     |
+| Web      |      ✅            |     ✅    |    ✅     |    ✅     |     ✅     |
+| macOS    |     Coming soon    |     ✅    |    ✅     |    ✅     |     ✅     |
+| Windows  |     Coming soon    |     ✅    |    ✅     |    ✅     |     ✅     |
+| Linux    |     Coming soon    |     ✅    |    ✅     |    ✅     |     ✅     |
+
 ## Tutorials
 This section will be updated whenever a new tutorial is released
 
@@ -303,6 +328,8 @@ This section will be updated whenever a new tutorial is released
 
 ## Docs
 See our Flutter docs on [teta.so/flutter-docs](https://teta.so/flutter-docs)
+
+---
 
 ## Teta CMS is still in open alpha
 

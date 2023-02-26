@@ -5,16 +5,16 @@ import 'package:teta_cms/src/constants.dart';
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/teta_cms.dart';
 
+/// Set of methods to edit documents
 class TetaDocumentActions {
+  /// Set of methods to edit documents
   TetaDocumentActions(this.documentId, this._serverRequestMetadata);
 
+  /// Document Id
   final String documentId;
 
   ///This stores the token and project id headers.
   final ServerRequestMetadataStore _serverRequestMetadata;
-
-  /// Http header for count
-  Map<String, String> get _countHeader => {'cms-count-only': '1'};
 
   ///Get token
   String get token => _serverRequestMetadata.getMetadata().token;

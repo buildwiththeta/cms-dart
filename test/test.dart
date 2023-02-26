@@ -1,3 +1,6 @@
+// ignore_for_file: avoid_redundant_argument_values
+
+import 'package:teta_cms/src/models/stream_actions.dart';
 import 'package:teta_cms/teta_cms.dart';
 
 Future<void> insert(final List<String> args) async {
@@ -52,4 +55,19 @@ Future<void> streamCollection(final List<String> args) async {
 
 Future<void> getCollectionCount(final List<String> args) async {
   await TetaCMS.I.db.from(name: 'posts').count();
+}
+
+Future<void> getCollectionChanges(final List<String> args) async {
+  await TetaCMS.I.db.from(name: 'posts').on(
+        action: StreamAction.all,
+        callback: (final e) {},
+      );
+}
+
+Future<void> getDocumentChanges(final List<String> args) async {
+  const docId = '0';
+  await TetaCMS.I.db.from(name: 'posts').doc(docId).on(
+        action: StreamAction.updateDoc,
+        callback: (final e) {},
+      );
 }

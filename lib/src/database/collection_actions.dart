@@ -5,15 +5,12 @@ import 'package:teta_cms/src/constants.dart';
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/teta_cms.dart';
 
+/// Set of methods to edit collections
 class TetaCollectionActions {
+  /// Set of methods to edit collections
   TetaCollectionActions(
-    this._serverRequestMetadata, {
-    this.id,
-    this.name,
-  });
-
-  String? id;
-  String? name;
+    this._serverRequestMetadata,
+  );
 
   ///This stores the token and project id headers.
   final ServerRequestMetadataStore _serverRequestMetadata;
@@ -109,7 +106,7 @@ class TetaCollectionActions {
     return TetaResponse(data: data, error: null);
   }
 
-  /// Deletes the collection with id [collectionId] if prj_id is [prjId].
+  /// Deletes the collection with id [collectionName] if prj_id is [prjId].
   ///
   /// Throws an exception on request error ( statusCode != 200 )
   ///

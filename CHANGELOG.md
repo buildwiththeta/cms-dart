@@ -1,3 +1,62 @@
+# 0.3.5
+Breaking changes!
+* You can now call the instance using the shortcut TetaCMS.I
+* The client is now called db. You can call it using TetaCMS.I.db
+* The TetaDatabase class has now a .from() method to select a specific collection. You can use both .from(name: 'users') or .from(id: _id)
+* To select a specific document, you can now use .doc(id)
+### Examples
+Old api:
+```dart
+TetaCMS.instance.client.getCollectionByName('users');
+```
+
+New:
+```dart
+TetaCMS.I.db.from(name: 'users').get();
+```
+
+---
+
+Old api:
+```dart
+TetaCMS.instance.realtime.streamCollectionByName('posts', ...);
+```
+
+New:
+```dart
+TetaCMS.I.db.from(name: 'posts').stream(...);
+```
+
+---
+
+Old api:
+```dart
+TetaCMS.instance.client.updateDocument(
+    collectionId,
+    documentId,
+    <String, dynamic>{'name': 'Alessia', 'city': 'Milano'},
+);
+```
+
+New:
+```dart
+TetaCMS.I.db.from(id: collectionId).doc(documentId).update(
+    <String, dynamic>{'name': 'Alessia', 'city': 'Milano'},
+);
+```
+
+---
+
+Old api:
+```dart
+TetaCMS.instance.client.getCollections();
+```
+---
+New:
+```dart
+TetaCMS.I.db.getCollections();
+```
+
 # 0.3.0
 * Collections can now by called by names
 * Documents can be retrived by collections names

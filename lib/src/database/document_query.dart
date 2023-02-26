@@ -5,29 +5,37 @@ import 'package:teta_cms/src/database/document_actions.dart';
 import 'package:teta_cms/src/models/stream_actions.dart';
 import 'package:teta_cms/teta_cms.dart';
 
+/// Query builder for documents actions
 class TetaDocumentQuery {
+  /// Query builder for documents actions
   TetaDocumentQuery(
-    this.documentId,
-    this._serverRequestMetadata, {
-    this.collectionId,
-    this.collectionName,
-  })  : _doc = TetaDocumentActions(documentId, _serverRequestMetadata),
+    final String documentId,
+    final ServerRequestMetadataStore _serverRequestMetadata, {
+    final String? collectionId,
+    final String? collectionName,
+  })  : _documentId = documentId,
+        _collectionId = collectionId,
+        _collectionName = collectionName,
+        _doc = TetaDocumentActions(documentId, _serverRequestMetadata),
         _realtime = TetaRealtime(_serverRequestMetadata);
 
-  final String documentId;
-  final String? collectionId;
-  final String? collectionName;
+  /// Document id
+  final String _documentId;
+
+  /// Current collection id
+  final String? _collectionId;
+
+  /// Current collection name
+  final String? _collectionName;
 
   final TetaDocumentActions _doc;
 
   final TetaRealtime _realtime;
 
-  ///This stores the token and project id headers.
-  final ServerRequestMetadataStore _serverRequestMetadata;
-
+  /// Delete the current document
   Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>>
       delete() async {
-    if (collectionName == null && collectionId == null) {
+    if (_collectionName == null && _collectionId == null) {
       return TetaResponse(
         data: null,
         error: TetaErrorResponse(
@@ -35,47 +43,44 @@ class TetaDocumentQuery {
               'Call .select() choosing one between id and name before this.',
         ),
       );
-    } else if (collectionName != null) {
-      return _doc.deleteDocumentByCollName(collectionName!);
+    } else if (_collectionName != null) {
+      return _doc.deleteDocumentByCollName(_collectionName!);
     } else {
-      return _doc.deleteDocument(collectionId!);
+      return _doc.deleteDocument(_collectionId!);
     }
   }
 
+  /// Detect realtime changes on the current document
   Future<RealtimeHandler> on({
     final StreamAction action = StreamAction.all,
     final dynamic Function(SocketChangeEvent)? callback,
   }) {
-    if (collectionName == null && collectionId == null) {
+    if (_collectionName == null && _collectionId == null) {
       throw Exception(
         'Call .select() choosing one between id and name before this.',
       );
-    } else if (collectionName != null) {
+    } else if (_collectionName != null) {
       return _realtime.on(
         action: action,
-        collectionName: collectionName,
-        documentId: documentId,
+        collectionName: _collectionName,
+        documentId: _documentId,
         callback: callback,
       );
     } else {
       return _realtime.on(
         action: action,
-        collectionId: collectionId,
-        documentId: documentId,
+        collectionId: _collectionId,
+        documentId: _documentId,
         callback: callback,
       );
     }
   }
 
-  /// Updates the document with id [documentId] on [collectionName] with [content] if prj_id is [prjId].
-  ///
-  /// Throws an exception on request error ( statusCode != 200 )
-  ///
-  /// Returns `true` on success
+  /// Update the document
   Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>> update(
     final Map<String, dynamic> content,
   ) async {
-    if (collectionName == null && collectionId == null) {
+    if (_collectionName == null && _collectionId == null) {
       return TetaResponse(
         data: null,
         error: TetaErrorResponse(
@@ -83,10 +88,10 @@ class TetaDocumentQuery {
               'Call .select() choosing one between id and name before this.',
         ),
       );
-    } else if (collectionName != null) {
-      return _doc.updateDocumentByCollName(collectionName!, content);
+    } else if (_collectionName != null) {
+      return _doc.updateDocumentByCollName(_collectionName!, content);
     } else {
-      return _doc.updateDocument(collectionId!, content);
+      return _doc.updateDocument(_collectionId!, content);
     }
   }
 }
