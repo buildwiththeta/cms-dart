@@ -56,7 +56,7 @@ class TetaCMS {
   }
 
   /// Returns if the instance is initialized or not
-  bool get isInitialized => _instance._initialized;
+  static bool get isInitialized => _instance._initialized;
 
   /// Initialize the current TetaCMS instance
   ///
