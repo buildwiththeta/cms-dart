@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/src/database/collection_actions.dart';
-import 'package:teta_cms/src/database/collection_cache.dart';
 import 'package:teta_cms/src/database/row_query.dart';
 import 'package:teta_cms/src/models/stream_actions.dart';
 import 'package:teta_cms/teta_cms.dart';
@@ -28,8 +27,6 @@ class TetaCollectionQuery {
 
   ///This stores the token and project id headers.
   final ServerRequestMetadataStore _serverRequestMetadata;
-
-  final CachedCollectionRepository cache = const CachedCollectionRepository();
 
   /// Select a specific row inside the current collection
   TetaRowQuery row(final String id) {
@@ -78,28 +75,10 @@ class TetaCollectionQuery {
               'Call .select() choosing one between id and name before this.',
         ),
       );
+    } else if (name != null) {
+      return _coll.getCollectionByName(name!);
     } else {
-      final cacheRes = await cache.getCollection(
-        name ?? id,
-        filters: filters,
-        page: page,
-        showDrafts: showDrafts,
-      );
-      if (cacheRes.error == null) {
-        TetaCMS.printWarning('TetaCMS - getCollection cached correctly');
-        return cacheRes;
-      }
-      late TetaResponse<List<dynamic>?, TetaErrorResponse?> res;
-      if (name != null) {
-        res = await _coll.getCollectionByName(name!);
-      } else {
-        res = await _coll.getCollection(id!);
-      }
-      if (res.error == null) {
-        await cache.cacheList(res.data, name ?? id);
-        TetaCMS.printWarning('TetaCMS - getCollection cache saved correctly');
-      }
-      return res;
+      return _coll.getCollection(id!);
     }
   }
 
