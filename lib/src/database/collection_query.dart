@@ -76,9 +76,21 @@ class TetaCollectionQuery {
         ),
       );
     } else if (name != null) {
-      return _coll.getCollectionByName(name!);
+      return _coll.getCollectionByName(
+        name!,
+        filters: filters,
+        page: page,
+        limit: limit,
+        showDrafts: showDrafts,
+      );
     } else {
-      return _coll.getCollection(id!);
+      return _coll.getCollection(
+        id!,
+        filters: filters,
+        page: page,
+        limit: limit,
+        showDrafts: showDrafts,
+      );
     }
   }
 
