@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:injectable/injectable.dart';
 import 'package:teta_cms/src/models/response.dart';
+import 'package:teta_cms/teta_cms.dart';
 
 @lazySingleton
 class TetaHttpRequest {
@@ -31,13 +32,8 @@ class TetaHttpRequest {
 
     final uri = Uri.parse(urlString);
 
-    final headersNew = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Credentials': 'true',
-      'Access-Control-Allow-Headers':
-          'Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS'
-    };
+    final headersNew = <String, String>{};
+
     headers.forEach((key, dynamic value) {
       headersNew[key] = value.toString();
     });
@@ -117,13 +113,8 @@ class TetaHttpRequest {
 
     final uri = Uri.parse(urlString);
 
-    final headersNew = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Credentials': 'true',
-      'Access-Control-Allow-Headers':
-          'Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS'
-    };
+    final headersNew = <String, String>{};
+
     headers.forEach((key, dynamic value) {
       headersNew[key] = value.toString();
     });
@@ -205,13 +196,8 @@ class TetaHttpRequest {
       }
     });
 
-    final headersNew = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Credentials': 'true',
-      'Access-Control-Allow-Headers':
-          'Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS'
-    };
+    final headersNew = <String, String>{};
+
     headers.forEach((key, dynamic value) {
       headersNew[key] = value.toString();
     });
@@ -275,13 +261,8 @@ class TetaHttpRequest {
     });
     final uri = Uri.parse(urlString);
 
-    final headersNew = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Credentials': 'true',
-      'Access-Control-Allow-Headers':
-          'Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS'
-    };
+    final headersNew = <String, String>{};
+
     headers.forEach((key, dynamic value) {
       headersNew[key] = value.toString();
     });
