@@ -21,7 +21,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  http: ^0.13.4
+  http: ^0.13.5
   equatable: ^2.0.3
   socket_io_client: ^2.0.0
   hive: ^2.2.2
@@ -41,7 +41,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  build_runner: ^2.2.1
+  build_runner:
   injectable_generator: ^1.5.4
   flutter_lints: ^2.0.1
 
