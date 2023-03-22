@@ -32,6 +32,8 @@ import 'package:teta_cms/src/users/settings.dart' as _i14;
 import 'package:teta_cms/src/users/user.dart' as _i16;
 import 'package:teta_cms/src/utils.dart' as _i11;
 import 'package:teta_cms/src/httpRequest.dart' as _i25;
+import 'package:teta_cms/src/storage.dart' as _i26;
+
 // ignore_for_file: unnecessary_lambdas
 
 // ignore_for_file: lines_longer_than_80_chars
@@ -62,6 +64,8 @@ _i1.GetIt $initGetIt(
       () => _i10.TetaBackups(get<_i6.ServerRequestMetadataStore>()));
   gh.lazySingleton<_i11.TetaCMSUtils>(
       () => _i11.TetaCMSUtils(get<_i6.ServerRequestMetadataStore>()));
+  gh.lazySingleton<_i26.TetaStorage>(
+      () => _i26.TetaStorage(get<_i6.ServerRequestMetadataStore>()));
   gh.lazySingleton<_i12.TetaEmail>(
       () => _i12.TetaEmail(get<_i6.ServerRequestMetadataStore>()));
   gh.lazySingleton<_i13.TetaPolicies>(

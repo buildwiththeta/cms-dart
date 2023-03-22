@@ -14,6 +14,7 @@ import 'package:teta_cms/src/database.dart';
 import 'package:teta_cms/src/di/injector.dart';
 import 'package:teta_cms/src/httpRequest.dart';
 import 'package:teta_cms/src/shop.dart';
+import 'package:teta_cms/src/storage.dart';
 import 'package:teta_cms/src/utils.dart';
 import 'package:universal_platform/universal_platform.dart';
 
@@ -94,6 +95,9 @@ class TetaCMS {
   /// The TetaStore instance
   late TetaShop store;
 
+  /// The TetaStorage instance
+  late TetaStorage storage;
+
   /// The TetaStore instance
   late TetaAnalytics analytics;
 
@@ -137,6 +141,7 @@ class TetaCMS {
         .updateMetadata(token: token, prjId: prjId);
     auth = getIt.get<TetaAuth>();
     db = getIt.get<TetaDatabase>();
+    storage = getIt.get<TetaStorage>();
     store = getIt.get<TetaShop>();
     utils = getIt.get<TetaCMSUtils>();
     httpRequest = getIt.get<TetaHttpRequest>();
