@@ -1,10 +1,6 @@
 library teta_cms;
 
-export 'src/flutter/future_builder.dart';
-export 'src/flutter/fututer_builder_http.dart';
-export 'src/flutter/stream_builder.dart';
 export 'src/index.dart';
-export 'src/instance.dart';
 export 'src/models/collection.dart';
 export 'src/models/credentials.dart';
 export 'src/models/email_info.dart';

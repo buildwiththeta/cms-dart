@@ -1,24 +1,24 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:clear_response/clear_response.dart';
 import 'package:http/http.dart' as http;
-import 'package:injectable/injectable.dart';
+import 'package:light_logger/light_logger.dart';
 import 'package:teta_cms/src/constants.dart';
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/teta_cms.dart';
 
 /// Project settings
-@lazySingleton
-class TetaProjectSettings {
+class ProjectSettings {
   /// Project settings
-  TetaProjectSettings(
+  ProjectSettings(
     this._serverRequestMetadata,
   );
 
   ///This stores the token and project id headers.
   final ServerRequestMetadataStore _serverRequestMetadata;
 
-  Future<TetaResponse<List<dynamic>, TetaErrorResponse?>> invoices() async {
+  Future<ClearResponse<List<dynamic>, ClearErrorResponse?>> invoices() async {
     final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
@@ -33,9 +33,9 @@ class TetaProjectSettings {
     );
 
     if (res.statusCode != 200) {
-      return TetaResponse(
+      return ClearResponse(
         data: <dynamic>[],
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message: res.body,
         ),
@@ -46,13 +46,13 @@ class TetaProjectSettings {
             as List<dynamic>? ??
         <dynamic>[];
 
-    return TetaResponse(
+    return ClearResponse(
       data: invoices,
       error: null,
     );
   }
 
-  Future<TetaResponse<double, TetaErrorResponse?>> retrieveSpaceUsed() async {
+  Future<ClearResponse<double, ClearErrorResponse?>> retrieveSpaceUsed() async {
     final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
@@ -67,9 +67,9 @@ class TetaProjectSettings {
     );
 
     if (res.statusCode != 200) {
-      return TetaResponse(
+      return ClearResponse(
         data: 0,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message: res.body,
         ),
@@ -80,13 +80,13 @@ class TetaProjectSettings {
         (json.decode(res.body) as Map<String, dynamic>)['spaceUsed'] as double;
     final mb = spaceUsed / 1000 / 1000;
 
-    return TetaResponse(
+    return ClearResponse(
       data: mb,
       error: null,
     );
   }
 
-  Future<TetaResponse<TetaPlanResponse?, TetaErrorResponse?>>
+  Future<ClearResponse<PlanResponse?, ClearErrorResponse?>>
       retrievePlanInfo() async {
     final serverMetadata = _serverRequestMetadata.getMetadata();
 
@@ -102,9 +102,9 @@ class TetaProjectSettings {
     );
 
     if (res.statusCode != 200) {
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message: res.body,
         ),
@@ -113,11 +113,11 @@ class TetaProjectSettings {
 
     print(res.body);
 
-    final data = TetaPlanResponse.fromJson(
+    final data = PlanResponse.fromJson(
       json.decode(res.body) as Map<String, dynamic>,
     );
 
-    return TetaResponse(
+    return ClearResponse(
       data: data,
       error: null,
     );
@@ -125,7 +125,7 @@ class TetaProjectSettings {
 
   /// Save OAuth providers credentials
   Future<void> saveCredentials({
-    required final TetaAuthCredentials credentials,
+    required final AuthCredentials credentials,
   }) async {
     final serverMetadata = _serverRequestMetadata.getMetadata();
 
@@ -144,26 +144,15 @@ class TetaProjectSettings {
       ),
     );
 
-    TetaCMS.log('saveCredentials body: ${res.body}');
+    Logger.printMessage('saveCredentials body: ${res.body}');
 
     if (res.statusCode != 200) {
       throw Exception('saveCredentials resulted in ${res.statusCode}');
     }
-
-    unawaited(
-      TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.tetaAuthSaveCredentials,
-        'Teta Auth: save credentials request',
-        <String, dynamic>{
-          'weight': res.bodyBytes.lengthInBytes,
-        },
-        isUserIdPreferableIfExists: false,
-      ),
-    );
   }
 
   /// Retrieve project credentials
-  Future<TetaAuthCredentials> retrieveCredentials() async {
+  Future<AuthCredentials> retrieveCredentials() async {
     final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
@@ -177,24 +166,13 @@ class TetaProjectSettings {
       },
     );
 
-    TetaCMS.printWarning('retrieveCredentials body: ${res.body}');
+    Logger.printWarning('retrieveCredentials body: ${res.body}');
 
     if (res.statusCode != 200) {
       throw Exception('retrieveCredentials resulted in ${res.statusCode}');
     }
 
-    unawaited(
-      TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.tetaAuthRetrieveCredentials,
-        'Teta Auth: retrieve credentials request',
-        <String, dynamic>{
-          'weight': res.bodyBytes.lengthInBytes,
-        },
-        isUserIdPreferableIfExists: false,
-      ),
-    );
-
     final map = json.decode(res.body) as Map<String, dynamic>;
-    return TetaAuthCredentials.fromJson(map);
+    return AuthCredentials.fromJson(map);
   }
 }

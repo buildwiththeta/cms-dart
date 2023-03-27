@@ -1,9 +1,9 @@
 import 'package:equatable/equatable.dart';
 
 /// Product model
-class TetaProduct extends Equatable {
+class Product extends Equatable {
   /// Product model
-  const TetaProduct({
+  const Product({
     required this.id,
     required this.name,
     required this.prjId,
@@ -43,7 +43,7 @@ class TetaProduct extends Equatable {
   final Map<String, dynamic>? metadata;
 
   /// Generate a model from a json schema
-  static TetaProduct fromSchema(final Map<String, dynamic> json) => TetaProduct(
+  static Product fromSchema(final Map<String, dynamic> json) => Product(
         id: json['_id'] as String? ?? '',
         prjId: json['prj_id'] as int? ?? 0,
         name: json['name'] as String? ?? '',

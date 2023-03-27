@@ -1,4 +1,4 @@
-enum TetaPolicyScope {
+enum PolicyScope {
   read,
   delete,
   update,

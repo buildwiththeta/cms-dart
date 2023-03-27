@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:clear_response/clear_response.dart';
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/src/database/collection_actions.dart';
 import 'package:teta_cms/src/database/row_query.dart';
@@ -13,8 +14,8 @@ class TetaCollectionQuery {
     this._serverRequestMetadata, {
     this.id,
     this.name,
-  })  : _coll = TetaCollectionActions(_serverRequestMetadata),
-        _realtime = TetaRealtime(_serverRequestMetadata);
+  })  : _coll = CollectionActions(_serverRequestMetadata),
+        _realtime = Realtime(_serverRequestMetadata);
 
   /// Collection id
   final String? id;
@@ -22,8 +23,8 @@ class TetaCollectionQuery {
   /// Collection name
   final String? name;
 
-  final TetaCollectionActions _coll;
-  final TetaRealtime _realtime;
+  final CollectionActions _coll;
+  final Realtime _realtime;
 
   ///This stores the token and project id headers.
   final ServerRequestMetadataStore _serverRequestMetadata;
@@ -43,12 +44,12 @@ class TetaCollectionQuery {
   }
 
   /// Delete the current collection
-  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>>
+  Future<ClearResponse<Map<String, dynamic>?, ClearErrorResponse?>>
       delete() async {
     if (name == null && id == null) {
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           message:
               'Call .select() choosing one between id and name before this.',
         ),
@@ -61,16 +62,16 @@ class TetaCollectionQuery {
   }
 
   /// Get all documents inside the current collection
-  Future<TetaResponse<List<dynamic>?, TetaErrorResponse?>> get({
+  Future<ClearResponse<List<dynamic>?, ClearErrorResponse?>> get({
     final List<Filter> filters = const [],
     final int page = 0,
     final int limit = 20,
     final bool showDrafts = false,
   }) async {
     if (name == null && id == null) {
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           message:
               'Call .select() choosing one between id and name before this.',
         ),
@@ -171,14 +172,14 @@ class TetaCollectionQuery {
   }
 
   /// Updates the current collection
-  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>> update(
+  Future<ClearResponse<Map<String, dynamic>?, ClearErrorResponse?>> update(
     final String name,
     final Map<String, dynamic>? attributes,
   ) async {
     if (this.name == null && id == null) {
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           message:
               'Call .select() choosing one between id and name before this.',
         ),
@@ -191,13 +192,13 @@ class TetaCollectionQuery {
   }
 
   /// Insert a new document
-  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>> insert(
+  Future<ClearResponse<Map<String, dynamic>?, ClearErrorResponse?>> insert(
     final Map<String, dynamic> document,
   ) async {
     if (name == null && id == null) {
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           message:
               'Call .select() choosing one between id and name before this.',
         ),

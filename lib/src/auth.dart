@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:clear_response/clear_response.dart';
 import 'package:enum_to_string/enum_to_string.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
-import 'package:injectable/injectable.dart';
+import 'package:light_logger/light_logger.dart';
 import 'package:teta_cms/src/constants.dart';
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/src/platform/index.dart';
 import 'package:teta_cms/src/use_cases/get_server_request_headers/get_server_request_headers.dart';
-import 'package:teta_cms/src/users/email.dart';
 import 'package:teta_cms/src/users/settings.dart';
 import 'package:teta_cms/src/users/user.dart';
 import 'package:teta_cms/teta_cms.dart';
@@ -18,25 +18,21 @@ import 'package:universal_platform/universal_platform.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Teta Auth - Control all the methods about authentication
-@lazySingleton
-class TetaAuth {
+
+class Authentication {
   /// Teta Auth - Control all the methods about authentication
-  TetaAuth(
+  Authentication(
     this.project,
     this.user,
-    this.email,
     this._serverRequestMetadata,
     this._getServerRequestHeaders,
   );
 
   /// Project settings
-  final TetaProjectSettings project;
+  final ProjectSettings project;
 
   /// User utils
-  final TetaUserUtils user;
-
-  /// Teta email
-  final TetaEmail email;
+  final UserUtils user;
 
   ///This stores the token and project id headers.
   final ServerRequestMetadataStore _serverRequestMetadata;
@@ -65,14 +61,6 @@ class TetaAuth {
     }
     if (res.body != '{"warn":"User already registered"}') {
       try {
-        unawaited(
-          TetaCMS.instance.analytics.insertEvent(
-            TetaAnalyticsType.tetaAuthSignUp,
-            'Teta Auth: signup request',
-            <String, dynamic>{},
-            isUserIdPreferableIfExists: false,
-          ),
-        );
         return false;
       } catch (_) {}
     }
@@ -101,35 +89,22 @@ class TetaAuth {
       },
     );
 
-    TetaCMS.printWarning('retrieveUsers body: ${res.body}');
+    Logger.printWarning('retrieveUsers body: ${res.body}');
 
     if (res.statusCode != 200) {
       throw Exception('retrieveUsers resulted in ${res.statusCode}');
     }
 
     final list = json.decode(res.body) as List<dynamic>;
-    TetaCMS.log('retrieveUsers list: $list');
+    Logger.printMessage('retrieveUsers list: $list');
     final users =
         (list.first as Map<String, dynamic>)['users'] as List<dynamic>;
-    TetaCMS.log('retrieveUsers users: $users');
-
-    try {
-      unawaited(
-        TetaCMS.instance.analytics.insertEvent(
-          TetaAnalyticsType.tetaAuthRetrieveUsers,
-          'Teta Auth: retrieve users request',
-          <String, dynamic>{
-            'weight': res.bodyBytes.lengthInBytes,
-          },
-          isUserIdPreferableIfExists: false,
-        ),
-      );
-    } catch (_) {}
+    Logger.printMessage('retrieveUsers users: $users');
 
     return users;
   }
 
-  Future<TetaResponse<void, TetaErrorResponse?>> removeUser({
+  Future<ClearResponse<void, ClearErrorResponse?>> removeUser({
     required final String email,
   }) async {
     final requestMetadata = _serverRequestMetadata.getMetadata();
@@ -143,9 +118,9 @@ class TetaAuth {
       },
     );
     if (res.statusCode != 200) {
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message:
               'removeUser error, code: ${res.statusCode}, error: ${res.body}',
@@ -153,26 +128,13 @@ class TetaAuth {
       );
     }
 
-    try {
-      unawaited(
-        TetaCMS.instance.analytics.insertEvent(
-          TetaAnalyticsType.tetaAuthRetrieveUsers,
-          'Teta Auth: remove user request',
-          <String, dynamic>{
-            'weight': res.bodyBytes.lengthInBytes,
-          },
-          isUserIdPreferableIfExists: false,
-        ),
-      );
-    } catch (_) {}
-
-    return TetaResponse(data: null, error: null);
+    return ClearResponse(data: null, error: null);
   }
 
   /// Returns auth url from specific provider
   Future<String> _signIn({
     required final int prjId,
-    required final TetaProvider provider,
+    required final AuthProvider provider,
     final bool fromEditor = false,
   }) async {
     final requestMetadata = _serverRequestMetadata.getMetadata();
@@ -190,7 +152,7 @@ class TetaAuth {
       },
     );
 
-    TetaCMS.log(res.body);
+    Logger.printMessage(res.body);
 
     if (res.statusCode != 200) {
       throw Exception('signIn resulted in ${res.statusCode}');
@@ -205,7 +167,7 @@ class TetaAuth {
     required final Function(bool) onSuccess,
 
     /// The external provider
-    final TetaProvider provider = TetaProvider.google,
+    final AuthProvider provider = AuthProvider.google,
     final bool? fromEditor,
   }) async {
     final requestMetadata = _serverRequestMetadata.getMetadata();
@@ -223,21 +185,11 @@ class TetaAuth {
               if (uri.queryParameters['access_token'] != null &&
                   uri.queryParameters['access_token'] is String) {
                 await closeInAppWebView();
-                final isFirstTime = await TetaCMS.instance.auth.insertUser(
+                final isFirstTime = await insertUser(
                   // ignore: cast_nullable_to_non_nullable
                   uri.queryParameters['access_token'] as String,
                 );
-                unawaited(
-                  TetaCMS.instance.analytics.insertEvent(
-                    TetaAnalyticsType.tetaAuthSignIn,
-                    'Teta Auth: signIn request',
-                    <String, dynamic>{
-                      'device': 'mobile',
-                      'provider': EnumToString.convertToString(provider),
-                    },
-                    isUserIdPreferableIfExists: false,
-                  ),
-                );
+
                 onSuccess(isFirstTime);
               }
             }
@@ -247,19 +199,9 @@ class TetaAuth {
           },
         );
       } else {
-        TetaCMS.log('Callback on web');
+        Logger.printMessage('Callback on web');
         final isFirstTime = await insertUser(userToken);
-        unawaited(
-          TetaCMS.instance.analytics.insertEvent(
-            TetaAnalyticsType.tetaAuthSignIn,
-            'Teta Auth: signIn request',
-            <String, dynamic>{
-              'device': 'web',
-              'provider': EnumToString.convertToString(provider),
-            },
-            isUserIdPreferableIfExists: false,
-          ),
-        );
+
         onSuccess(isFirstTime);
       }
     });
@@ -278,7 +220,7 @@ class TetaAuth {
   }
 
   /// Make a query with Ayaya
-  Future<TetaResponse<dynamic, TetaErrorResponse?>> get(
+  Future<ClearResponse<dynamic, ClearErrorResponse?>> get(
     final String ayayaQuery,
   ) async {
     final requestMetadata = _serverRequestMetadata.getMetadata();
@@ -300,28 +242,16 @@ class TetaAuth {
     );
 
     if (res.statusCode != 200) {
-      return TetaResponse<List<dynamic>, TetaErrorResponse>(
+      return ClearResponse<List<dynamic>, ClearErrorResponse>(
         data: <dynamic>[],
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message: res.body,
         ),
       );
     }
 
-    unawaited(
-      TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.tetaAuthQueryAyaya,
-        'Teta Auth: custom Query with Ayaya',
-        <String, dynamic>{
-          'weight':
-              res.bodyBytes.lengthInBytes + utf8.encode(ayayaQuery).length,
-        },
-        isUserIdPreferableIfExists: false,
-      ),
-    );
-
-    TetaCMS.printWarning(
+    Logger.printWarning(
       "${((json.decode(res.body) as List<dynamic>?)?.first as Map<String, dynamic>?)?['count']}",
     );
 
@@ -329,7 +259,7 @@ class TetaAuth {
             as Map<String, dynamic>?)?['count'] !=
         null;
 
-    return TetaResponse<dynamic, TetaErrorResponse?>(
+    return ClearResponse<dynamic, ClearErrorResponse?>(
       data: !isCount
           ? (((json.decode(res.body) as List<dynamic>?)?.first
                   as Map<String, dynamic>?)?['data'] as List<dynamic>? ??

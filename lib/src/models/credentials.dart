@@ -1,9 +1,9 @@
 // ignore_for_file: non_constant_identifier_names
 
 /// Model to save a project oauth providers credentials
-class TetaAuthCredentials {
+class AuthCredentials {
   /// Model to save a project oauth providers credentials
-  TetaAuthCredentials({
+  AuthCredentials({
     this.g_client_id,
     this.g_client_secret,
     this.gh_client_id,
@@ -27,7 +27,7 @@ class TetaAuthCredentials {
   });
 
   /// Generate a TetaAuthCredentials from a json
-  TetaAuthCredentials.fromJson(final Map<String, dynamic> json)
+  AuthCredentials.fromJson(final Map<String, dynamic> json)
       : g_client_id = json['g_client_id'] as String?,
         g_client_secret = json['g_client_secret'] as String?,
         gh_client_id = json['gh_client_id'] as String?,

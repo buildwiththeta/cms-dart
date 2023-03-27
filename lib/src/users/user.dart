@@ -3,15 +3,14 @@ import 'dart:convert';
 
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
-import 'package:injectable/injectable.dart';
+import 'package:light_logger/light_logger.dart';
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/teta_cms.dart';
 
 /// User utils
-@lazySingleton
-class TetaUserUtils {
+class UserUtils {
   /// User utils
-  TetaUserUtils(
+  UserUtils(
     this._serverRequestMetadata,
   );
 
@@ -19,7 +18,7 @@ class TetaUserUtils {
   final ServerRequestMetadataStore _serverRequestMetadata;
 
   /// Check if users is logged in
-  Future<TetaUser> get get async {
+  Future<User> get get async {
     final serverMetadata = _serverRequestMetadata.getMetadata();
 
     final box = await Hive.openBox<dynamic>('Teta Auth');
@@ -36,13 +35,13 @@ class TetaUserUtils {
         },
       );
 
-      TetaCMS.printWarning('insertUser body: ${res.body}');
+      Logger.printWarning('insertUser body: ${res.body}');
 
       if (res.statusCode != 200) {
-        TetaCMS.printWarning(
+        Logger.printWarning(
           'insertUser resulted in ${res.statusCode} ${res.body}',
         );
-        return TetaUser(
+        return User(
           uid: null,
           name: null,
           email: null,
@@ -51,26 +50,12 @@ class TetaUserUtils {
         );
       }
 
-      unawaited(
-        TetaCMS.instance.analytics.insertEvent(
-          TetaAnalyticsType.tetaAuthGetCurrentUser,
-          'Teta Auth: get current user request',
-          <String, dynamic>{
-            'weight': res.bodyBytes.lengthInBytes,
-          },
-          isUserIdPreferableIfExists: false,
-        ),
-      );
-
-      final user = TetaUser.fromJson(
+      final user = User.fromJson(
         json.decode(res.body) as Map<String, dynamic>? ?? <String, dynamic>{},
-      );
-      unawaited(
-        TetaCMS.instance.analytics.init(userId: user.uid),
       );
       return user;
     }
-    return TetaUser(
+    return User(
       uid: null,
       name: null,
       email: null,

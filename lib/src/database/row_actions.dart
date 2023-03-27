@@ -1,14 +1,15 @@
 import 'dart:convert';
 
+import 'package:clear_response/clear_response.dart';
 import 'package:http/http.dart' as http;
+import 'package:light_logger/light_logger.dart';
 import 'package:teta_cms/src/constants.dart';
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
-import 'package:teta_cms/teta_cms.dart';
 
 /// Set of methods to edit documents
-class TetaDocumentActions {
+class DocumentActions {
   /// Set of methods to edit documents
-  TetaDocumentActions(this.documentId, this._serverRequestMetadata);
+  DocumentActions(this.documentId, this._serverRequestMetadata);
 
   /// Document Id
   final String documentId;
@@ -49,32 +50,12 @@ class TetaDocumentActions {
     };
   }
 
-  void _registerEvent({
-    required final TetaAnalyticsType event,
-    required final String description,
-    final Map<String, dynamic> props = const <String, dynamic>{},
-    final bool useUserId = false,
-  }) {
-    try {
-      TetaCMS.instance.analytics.insertEvent(
-        event,
-        description,
-        props,
-        isUserIdPreferableIfExists: useUserId,
-      );
-    } catch (e) {
-      TetaCMS.printError(
-        'Error inserting a new event in Teta Analytics, error: $e',
-      );
-    }
-  }
-
   /// Deletes the document with id [documentId] on [collectionId] if prj_id is [prjId].
   ///
   /// Throws an exception on request error ( statusCode != 200 )
   ///
   /// Returns `true` on success
-  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>>
+  Future<ClearResponse<Map<String, dynamic>?, ClearErrorResponse?>>
       deleteDocument(
     final String collectionId,
   ) async {
@@ -85,12 +66,12 @@ class TetaDocumentActions {
       headers: _getDefaultHeaders,
     );
     if (res.statusCode != 200) {
-      TetaCMS.printError(
+      Logger.printError(
         'deleteDocument returned status ${res.statusCode}, error: ${res.body}',
       );
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message:
               'deleteDocument returned status ${res.statusCode}, error: ${res.body}',
@@ -98,12 +79,7 @@ class TetaDocumentActions {
       );
     }
     final data = json.decode(res.body) as Map<String, dynamic>;
-    _registerEvent(
-      event: TetaAnalyticsType.deleteDocument,
-      description: 'Teta CMS: delete document request',
-      useUserId: true,
-    );
-    return TetaResponse(data: data, error: null);
+    return ClearResponse(data: data, error: null);
   }
 
   /// Deletes the document with id [documentId] on [collectionName] if prj_id is [prjId].
@@ -111,7 +87,7 @@ class TetaDocumentActions {
   /// Throws an exception on request error ( statusCode != 200 )
   ///
   /// Returns `true` on success
-  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>>
+  Future<ClearResponse<Map<String, dynamic>?, ClearErrorResponse?>>
       deleteDocumentByCollName(
     final String collectionName,
   ) async {
@@ -122,12 +98,12 @@ class TetaDocumentActions {
       headers: _getDefaultHeadersForNameEndpoints,
     );
     if (res.statusCode != 200) {
-      TetaCMS.printError(
+      Logger.printError(
         'deleteDocumentByName returned status ${res.statusCode}, error: ${res.body}',
       );
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message:
               'deleteDocumentByName returned status ${res.statusCode}, error: ${res.body}',
@@ -135,12 +111,7 @@ class TetaDocumentActions {
       );
     }
     final data = json.decode(res.body) as Map<String, dynamic>;
-    _registerEvent(
-      event: TetaAnalyticsType.deleteDocument,
-      description: 'Teta CMS: delete document request',
-      useUserId: true,
-    );
-    return TetaResponse(data: data, error: null);
+    return ClearResponse(data: data, error: null);
   }
 
   /// Updates the document with id [documentId] on [collectionId] with [content] if prj_id is [prjId].
@@ -148,7 +119,7 @@ class TetaDocumentActions {
   /// Throws an exception on request error ( statusCode != 200 )
   ///
   /// Returns `true` on success
-  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>>
+  Future<ClearResponse<Map<String, dynamic>?, ClearErrorResponse?>>
       updateDocument(
     final String collectionId,
     final Map<String, dynamic> content,
@@ -163,9 +134,9 @@ class TetaDocumentActions {
       body: json.encode(content),
     );
     if (res.statusCode != 200) {
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message:
               'updateDocument returned status ${res.statusCode}, error: ${res.body}',
@@ -173,15 +144,7 @@ class TetaDocumentActions {
       );
     }
     final data = json.decode(res.body) as Map<String, dynamic>;
-    _registerEvent(
-      event: TetaAnalyticsType.updateDocument,
-      description: 'Teta CMS: update document request',
-      props: <String, dynamic>{
-        'weight': res.bodyBytes.lengthInBytes,
-      },
-      useUserId: true,
-    );
-    return TetaResponse(data: data, error: null);
+    return ClearResponse(data: data, error: null);
   }
 
   /// Updates the document with id [documentId] on [collectionName] with [content] if prj_id is [prjId].
@@ -189,7 +152,7 @@ class TetaDocumentActions {
   /// Throws an exception on request error ( statusCode != 200 )
   ///
   /// Returns `true` on success
-  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>>
+  Future<ClearResponse<Map<String, dynamic>?, ClearErrorResponse?>>
       updateDocumentByCollName(
     final String collectionName,
     final Map<String, dynamic> content,
@@ -204,9 +167,9 @@ class TetaDocumentActions {
       body: json.encode(content),
     );
     if (res.statusCode != 200) {
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message:
               'updateDocumentByName returned status ${res.statusCode}, error: ${res.body}',
@@ -214,14 +177,6 @@ class TetaDocumentActions {
       );
     }
     final data = json.decode(res.body) as Map<String, dynamic>;
-    _registerEvent(
-      event: TetaAnalyticsType.updateDocument,
-      description: 'Teta CMS: update document request',
-      props: <String, dynamic>{
-        'weight': res.bodyBytes.lengthInBytes,
-      },
-      useUserId: true,
-    );
-    return TetaResponse(data: data, error: null);
+    return ClearResponse(data: data, error: null);
   }
 }

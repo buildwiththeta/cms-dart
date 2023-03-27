@@ -1,5 +1,5 @@
-class TetaStorageFile {
-  const TetaStorageFile({
+class StorageFile {
+  const StorageFile({
     required this.id,
     required this.name,
     required this.prjId,
@@ -21,8 +21,8 @@ class TetaStorageFile {
   final String sha;
   final String? slug;
 
-  factory TetaStorageFile.fromJson(Map<String, dynamic> json) {
-    return TetaStorageFile(
+  factory StorageFile.fromJson(Map<String, dynamic> json) {
+    return StorageFile(
       id: json['id'],
       name: json['name'],
       prjId: json['prjId'],

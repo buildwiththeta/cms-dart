@@ -2,7 +2,7 @@
 
 import 'dart:async';
 
-import 'package:teta_cms/teta_cms.dart';
+import 'package:light_logger/light_logger.dart';
 import 'package:universal_html/js.dart';
 
 /// Use login with providers on different devices
@@ -15,10 +15,10 @@ class CMSPlatform {
     late final JsObject child;
     final completer = Completer<String>();
     Future onParentWindowMessage(final dynamic message) async {
-      TetaCMS.log('message');
+      Logger.printMessage('message');
       if (message == null) return;
       if ((message.origin as String).startsWith('https://auth.teta.so')) {
-        TetaCMS.log(message.data.toString());
+        Logger.printMessage(message.data.toString());
         final token = message.data.toString();
         await callback(token);
         child.callMethod('close');

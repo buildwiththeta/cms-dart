@@ -1,5 +1,5 @@
-class TetaUser {
-  TetaUser({
+class User {
+  User({
     required this.uid,
     required this.name,
     required this.email,
@@ -8,7 +8,7 @@ class TetaUser {
     this.isLogged = false,
   });
 
-  TetaUser.fromJson(final Map<String, dynamic>? json)
+  User.fromJson(final Map<String, dynamic>? json)
       : uid = json?['uid'] as String?,
         name = json?['name'] as String?,
         email = json?['email'] as String?,

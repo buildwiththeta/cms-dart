@@ -2,24 +2,24 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:clear_response/clear_response.dart';
 import 'package:enum_to_string/enum_to_string.dart';
 import 'package:http/http.dart' as http;
-import 'package:injectable/injectable.dart';
+import 'package:light_logger/light_logger.dart';
 import 'package:teta_cms/src/constants.dart';
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/teta_cms.dart';
 
 /// Control all the policies in a project
-@lazySingleton
-class TetaPolicies {
+class Policies {
   /// Control all the policies in a project
-  TetaPolicies(this._serverRequestMetadata);
+  Policies(this._serverRequestMetadata);
 
   ///This stores the token and project id headers.
   final ServerRequestMetadataStore _serverRequestMetadata;
 
   /// Get all policies
-  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>> all(
+  Future<ClearResponse<Map<String, dynamic>?, ClearErrorResponse?>> all(
     final String collId,
   ) async {
     final serverMetadata = _serverRequestMetadata.getMetadata();
@@ -35,30 +35,17 @@ class TetaPolicies {
       },
     );
 
-    TetaCMS.log('get backups: ${res.body}');
+    Logger.printMessage('get backups: ${res.body}');
 
     if (res.statusCode != 200) {
-      return TetaResponse<Map<String, dynamic>?, TetaErrorResponse>(
+      return ClearResponse<Map<String, dynamic>?, ClearErrorResponse>(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message: res.body,
         ),
       );
     }
-
-    try {
-      unawaited(
-        TetaCMS.instance.analytics.insertEvent(
-          TetaAnalyticsType.getPolicies,
-          'Teta CMS: get policies',
-          <String, dynamic>{
-            'weight': res.bodyBytes.lengthInBytes,
-          },
-          isUserIdPreferableIfExists: false,
-        ),
-      );
-    } catch (_) {}
 
     final map = json.decode(res.body) as Map<String, dynamic>;
     final backups = <String, dynamic>{};
@@ -73,18 +60,18 @@ class TetaPolicies {
       backups['delete'] = (map['policy'] as Map<String, dynamic>?)?['delete'];
     }
 
-    return TetaResponse<Map<String, dynamic>, TetaErrorResponse?>(
+    return ClearResponse<Map<String, dynamic>, ClearErrorResponse?>(
       data: backups,
       error: null,
     );
   }
 
   /// Insert a new policy
-  Future<TetaResponse<Uint8List, TetaErrorResponse?>> insert(
+  Future<ClearResponse<Uint8List, ClearErrorResponse?>> insert(
     final String collId,
     final String key,
     final String value,
-    final TetaPolicyScope scope,
+    final PolicyScope scope,
   ) async {
     final serverMetadata = _serverRequestMetadata.getMetadata();
 
@@ -100,39 +87,28 @@ class TetaPolicies {
       },
     );
 
-    TetaCMS.log('get backup: ${res.body}');
+    Logger.printMessage('get backup: ${res.body}');
 
     if (res.statusCode != 200) {
-      return TetaResponse<Uint8List, TetaErrorResponse>(
+      return ClearResponse<Uint8List, ClearErrorResponse>(
         data: Uint8List.fromList([]),
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message: res.body,
         ),
       );
     }
 
-    try {
-      unawaited(
-        TetaCMS.instance.analytics.insertEvent(
-          TetaAnalyticsType.insertPolicy,
-          'Teta CMS: insert new policy',
-          <String, dynamic>{},
-          isUserIdPreferableIfExists: false,
-        ),
-      );
-    } catch (_) {}
-
-    return TetaResponse<Uint8List, TetaErrorResponse?>(
+    return ClearResponse<Uint8List, ClearErrorResponse?>(
       data: res.bodyBytes,
       error: null,
     );
   }
 
   /// Deletes a new policy
-  Future<TetaResponse<void, TetaErrorResponse?>> delete(
+  Future<ClearResponse<void, ClearErrorResponse?>> delete(
     final String collId,
-    final TetaPolicyScope scope,
+    final PolicyScope scope,
   ) async {
     final serverMetadata = _serverRequestMetadata.getMetadata();
 
@@ -149,27 +125,16 @@ class TetaPolicies {
     );
 
     if (res.statusCode != 200) {
-      return TetaResponse<void, TetaErrorResponse>(
+      return ClearResponse<void, ClearErrorResponse>(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message: res.body,
         ),
       );
     }
 
-    try {
-      unawaited(
-        TetaCMS.instance.analytics.insertEvent(
-          TetaAnalyticsType.deletePolicy,
-          'Teta CMS: delete policy',
-          <String, dynamic>{},
-          isUserIdPreferableIfExists: false,
-        ),
-      );
-    } catch (_) {}
-
-    return TetaResponse<void, TetaErrorResponse?>(
+    return ClearResponse<void, ClearErrorResponse?>(
       data: null,
       error: null,
     );

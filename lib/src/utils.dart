@@ -2,19 +2,21 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:injectable/injectable.dart';
+import 'package:teta_cms/src/analytics.dart';
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
-import 'package:teta_cms/teta_cms.dart';
+import 'package:clear_response/clear_response.dart';
+import 'package:light_logger/light_logger.dart';
 
-@lazySingleton
-class TetaCMSUtils {
+class Utils {
   ///Constructor
-  TetaCMSUtils(this._serverRequestMetadata);
+  Utils(this._serverRequestMetadata)
+      : _analytics = Analytics(_serverRequestMetadata);
 
   ///This stores the token and project id headers.
   final ServerRequestMetadataStore _serverRequestMetadata;
+  final Analytics _analytics;
 
-  Future<TetaResponse<bool, TetaErrorResponse?>> braintreePay(
+  Future<ClearResponse<bool, ClearErrorResponse?>> braintreePay(
     final dynamic nounce,
     final dynamic deviceData,
     final dynamic amount,
@@ -31,39 +33,28 @@ class TetaCMSUtils {
       headers: {'authorization': 'Bearer ${serverMetadata.token}'},
     );
 
-    TetaCMS.log('custom query: ${res.body}');
+    Logger.printMessage('custom query: ${res.body}');
 
     if (res.statusCode != 200) {
-      return TetaResponse<bool, TetaErrorResponse?>(
+      return ClearResponse<bool, ClearErrorResponse?>(
         data: false,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message: res.body,
         ),
       );
     }
 
-    try {
-      unawaited(
-        TetaCMS.instance.analytics.insertEvent(
-          TetaAnalyticsType.customQuery,
-          'Braintree: purchase',
-          <String, dynamic>{},
-          isUserIdPreferableIfExists: false,
-        ),
-      );
-    } catch (_) {}
-
     final data = json.decode(res.body) as Map<String, dynamic>;
     if (data['result'] == 'success') {
-      return TetaResponse<bool, TetaErrorResponse?>(
+      return ClearResponse<bool, ClearErrorResponse?>(
         data: true,
         error: null,
       );
     } else {
-      return TetaResponse<bool, TetaErrorResponse?>(
+      return ClearResponse<bool, ClearErrorResponse?>(
         data: false,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message: res.body,
         ),

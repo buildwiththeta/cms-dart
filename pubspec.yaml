@@ -14,12 +14,11 @@ platforms:
   windows:
 
 environment:
-  sdk: ">=2.16.1 <3.0.0"
-  flutter: ">=1.17.0"
+  sdk: ">=2.17.0 <3.0.0"
 
 dependencies:
-  flutter:
-    sdk: flutter
+  clear_response:
+  light_logger:
 
   http: ^0.13.5
   equatable: ^2.0.3
@@ -28,22 +27,11 @@ dependencies:
   universal_platform: ^1.0.0+1
   url_launcher: ^6.1.4
   uni_links: ^0.5.1
-  path_provider: ^2.0.11
   enum_to_string: ^2.0.1
-  get_it: ^7.2.0
-  injectable: ^1.5.3
-  dio: ^4.0.6
   uuid: ^3.0.6
-  path_provider_android: ^2.0.15
-  path_provider_ios: ^2.0.10
   universal_html: ^2.0.8
   cross_file:
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
   build_runner:
-  injectable_generator: ^1.5.4
   flutter_lints: ^2.0.1
-
-flutter:

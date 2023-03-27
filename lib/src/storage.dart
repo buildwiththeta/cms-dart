@@ -1,19 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:clear_response/clear_response.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:http/http.dart' as http;
-import 'package:injectable/injectable.dart';
 import 'package:teta_cms/src/constants.dart';
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/src/models/file.dart';
-import 'package:teta_cms/teta_cms.dart';
 
 /// The CMS client to interact with the db
-@lazySingleton
-class TetaStorage {
+class Storage {
   /// Client to interact with the Teta CMS's db
-  TetaStorage(
+  Storage(
     this._serverRequestMetadata,
   );
 
@@ -38,29 +36,7 @@ class TetaStorage {
     };
   }
 
-  void _registerEvent({
-    required final TetaAnalyticsType event,
-    required final String description,
-    final Map<String, dynamic> props = const <String, dynamic>{},
-    final bool useUserId = false,
-  }) {
-    try {
-      unawaited(
-        TetaCMS.instance.analytics.insertEvent(
-          event,
-          description,
-          props,
-          isUserIdPreferableIfExists: useUserId,
-        ),
-      );
-    } catch (e) {
-      TetaCMS.printError(
-        'Error inserting a new event in Teta Analytics, error: $e',
-      );
-    }
-  }
-
-  Future<TetaResponse<List<TetaStorageFile>?, TetaErrorResponse?>> upload(
+  Future<ClearResponse<List<StorageFile>?, ClearErrorResponse?>> upload(
       List<XFile> files) async {
     assert(files.length <= 5, 'Files length must be less or equal to 5');
     final url = '/$prjId';
@@ -75,22 +51,22 @@ class TetaStorage {
     var body = jsonDecode(resBody);
     if (response.statusCode == 200) {
       final list = (body as List<dynamic>)
-          .map((e) => TetaStorageFile.fromJson(
+          .map((e) => StorageFile.fromJson(
                 e as Map<String, dynamic>,
               ))
           .toList();
-      return TetaResponse(data: list, error: null);
+      return ClearResponse(data: list, error: null);
     } else {
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
             code: response.statusCode,
             message: 'Error uploading files, error: $body'),
       );
     }
   }
 
-  Future<TetaResponse<List<TetaStorageFile>?, TetaErrorResponse?>> getFiles(
+  Future<ClearResponse<List<StorageFile>?, ClearErrorResponse?>> getFiles(
       List<int> fileIds) async {
     final uri = Uri.parse('${Constants.tetaUrl}/$prjId/list');
     final res = await http.get(
@@ -99,15 +75,15 @@ class TetaStorage {
     );
     if (res.statusCode == 200) {
       final list = (res.body as List<dynamic>)
-          .map((e) => TetaStorageFile.fromJson(
+          .map((e) => StorageFile.fromJson(
                 e as Map<String, dynamic>,
               ))
           .toList();
-      return TetaResponse(data: list, error: null);
+      return ClearResponse(data: list, error: null);
     } else {
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message: 'Error reading files info, error: ${res.body}',
         ),
@@ -115,7 +91,7 @@ class TetaStorage {
     }
   }
 
-  Future<TetaResponse<List<TetaStorageFile>?, TetaErrorResponse?>> getFilesInfo(
+  Future<ClearResponse<List<StorageFile>?, ClearErrorResponse?>> getFilesInfo(
       List<int> fileIds) async {
     final uri = Uri.parse('${Constants.tetaUrl}/$prjId/files/info');
     final res = await http.post(
@@ -127,15 +103,15 @@ class TetaStorage {
     );
     if (res.statusCode == 200) {
       final list = (res.body as List<dynamic>)
-          .map((e) => TetaStorageFile.fromJson(
+          .map((e) => StorageFile.fromJson(
                 e as Map<String, dynamic>,
               ))
           .toList();
-      return TetaResponse(data: list, error: null);
+      return ClearResponse(data: list, error: null);
     } else {
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message: 'Error reading files info, error: ${res.body}',
         ),
@@ -143,7 +119,7 @@ class TetaStorage {
     }
   }
 
-  Future<TetaResponse<List<TetaStorageFile>?, TetaErrorResponse?>> setSlug(
+  Future<ClearResponse<List<StorageFile>?, ClearErrorResponse?>> setSlug(
     int fileId,
     String slug,
   ) async {
@@ -154,15 +130,15 @@ class TetaStorage {
     );
     if (res.statusCode == 200) {
       final list = (res.body as List<dynamic>)
-          .map((e) => TetaStorageFile.fromJson(
+          .map((e) => StorageFile.fromJson(
                 e as Map<String, dynamic>,
               ))
           .toList();
-      return TetaResponse(data: list, error: null);
+      return ClearResponse(data: list, error: null);
     } else {
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message: 'Error reading files info, error: ${res.body}',
         ),
@@ -170,7 +146,7 @@ class TetaStorage {
     }
   }
 
-  Future<TetaResponse<bool, TetaErrorResponse?>> setPassword(
+  Future<ClearResponse<bool, ClearErrorResponse?>> setPassword(
     int fileId,
     String password,
   ) async {
@@ -181,11 +157,11 @@ class TetaStorage {
     );
     if (res.statusCode == 200) {
       final value = res.body as bool? ?? false;
-      return TetaResponse(data: value, error: null);
+      return ClearResponse(data: value, error: null);
     } else {
-      return TetaResponse(
+      return ClearResponse(
         data: false,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message: 'Error reading files info, error: ${res.body}',
         ),
@@ -193,7 +169,7 @@ class TetaStorage {
     }
   }
 
-  Future<TetaResponse<TetaStorageFile?, TetaErrorResponse?>> getFileById(
+  Future<ClearResponse<StorageFile?, ClearErrorResponse?>> getFileById(
     int fileId,
   ) async {
     final uri = Uri.parse('${Constants.tetaUrl}/$prjId/file/$fileId/');
@@ -202,14 +178,14 @@ class TetaStorage {
       headers: _getDefaultHeaders,
     );
     if (res.statusCode == 200) {
-      return TetaResponse(
-        data: TetaStorageFile.fromJson(res.body as Map<String, dynamic>),
+      return ClearResponse(
+        data: StorageFile.fromJson(res.body as Map<String, dynamic>),
         error: null,
       );
     } else {
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message: 'Error reading files info, error: ${res.body}',
         ),
@@ -217,7 +193,7 @@ class TetaStorage {
     }
   }
 
-  Future<TetaResponse<TetaStorageFile?, TetaErrorResponse?>> getFileBySlug(
+  Future<ClearResponse<StorageFile?, ClearErrorResponse?>> getFileBySlug(
     int fileSlug,
   ) async {
     final uri = Uri.parse('${Constants.tetaUrl}/$fileSlug');
@@ -225,14 +201,14 @@ class TetaStorage {
       uri,
     );
     if (res.statusCode == 200) {
-      return TetaResponse(
-        data: TetaStorageFile.fromJson(res.body as Map<String, dynamic>),
+      return ClearResponse(
+        data: StorageFile.fromJson(res.body as Map<String, dynamic>),
         error: null,
       );
     } else {
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message: 'Error reading files info, error: ${res.body}',
         ),
@@ -240,7 +216,7 @@ class TetaStorage {
     }
   }
 
-  Future<TetaResponse<void, TetaErrorResponse?>> deleteFilesById(
+  Future<ClearResponse<void, ClearErrorResponse?>> deleteFilesById(
     List<int> fileIds,
   ) async {
     final uri = Uri.parse('${Constants.tetaUrl}/$prjId');
@@ -250,14 +226,14 @@ class TetaStorage {
       body: jsonEncode(fileIds),
     );
     if (res.statusCode == 200) {
-      return TetaResponse(
+      return ClearResponse(
         data: null,
         error: null,
       );
     } else {
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message: 'Error reading files info, error: ${res.body}',
         ),

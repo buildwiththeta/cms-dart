@@ -1,17 +1,15 @@
+
 // ignore_for_file: prefer_final_parameters
 
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:clear_response/clear_response.dart';
 import 'package:http/http.dart' as http;
-import 'package:injectable/injectable.dart';
-import 'package:teta_cms/src/models/response.dart';
-import 'package:teta_cms/teta_cms.dart';
 
-@lazySingleton
-class TetaHttpRequest {
+class ThetaHttpRequest {
   //Get Request
-  Future<TetaResponse<List<dynamic>?, List<dynamic>?>> get(
+  Future<ClearResponse<List<dynamic>?, List<dynamic>?>> get(
     final String url,
     final String expectedStatusCode,
     final Map<String, dynamic> parameters,
@@ -53,7 +51,7 @@ class TetaHttpRequest {
               .map((final dynamic e) => <String, dynamic>{...e, ...statusCode})
               .toList();
 
-          return TetaResponse<List<dynamic>?, List<dynamic>>(
+          return ClearResponse<List<dynamic>?, List<dynamic>>(
             data: null,
             error: listDocs,
           );
@@ -62,7 +60,7 @@ class TetaHttpRequest {
             <String, dynamic>{...docs, ...statusCode}
           ];
 
-          return TetaResponse<List<dynamic>?, List<dynamic>>(
+          return ClearResponse<List<dynamic>?, List<dynamic>>(
             data: null,
             error: listDocs,
           );
@@ -76,7 +74,7 @@ class TetaHttpRequest {
       final listDocs = (docs)
           .map((final dynamic e) => <String, dynamic>{...e, ...statusCode})
           .toList();
-      return TetaResponse<List<dynamic>, List<dynamic>?>(
+      return ClearResponse<List<dynamic>, List<dynamic>?>(
         data: listDocs,
         error: null,
       );
@@ -84,7 +82,7 @@ class TetaHttpRequest {
       final listDocs = <dynamic>[
         <String, dynamic>{...docs, ...statusCode}
       ];
-      return TetaResponse<List<dynamic>, List<dynamic>?>(
+      return ClearResponse<List<dynamic>, List<dynamic>?>(
         data: listDocs,
         error: null,
       );
@@ -92,7 +90,7 @@ class TetaHttpRequest {
   }
 
   /// Post Request
-  Future<TetaResponse<List<dynamic>?, List<dynamic>?>> post(
+  Future<ClearResponse<List<dynamic>?, List<dynamic>?>> post(
     final String url,
     final String expectedStatusCode,
     final Map<String, dynamic> parameters,
@@ -137,7 +135,7 @@ class TetaHttpRequest {
               .map((final dynamic e) => <String, dynamic>{...e, ...statusCode})
               .toList();
 
-          return TetaResponse<List<dynamic>?, List<dynamic>>(
+          return ClearResponse<List<dynamic>?, List<dynamic>>(
             data: null,
             error: listDocs,
           );
@@ -146,7 +144,7 @@ class TetaHttpRequest {
             <String, dynamic>{...docs, ...statusCode}
           ];
 
-          return TetaResponse<List<dynamic>?, List<dynamic>>(
+          return ClearResponse<List<dynamic>?, List<dynamic>>(
             data: null,
             error: listDocs,
           );
@@ -161,7 +159,7 @@ class TetaHttpRequest {
       final List<dynamic> listDocs = (docs)
           .map((final dynamic e) => <String, dynamic>{...e, ...statusCode})
           .toList();
-      return TetaResponse<List<dynamic>, List<dynamic>?>(
+      return ClearResponse<List<dynamic>, List<dynamic>?>(
         data: listDocs,
         error: null,
       );
@@ -169,7 +167,7 @@ class TetaHttpRequest {
       final listDocs = <dynamic>[
         <String, dynamic>{...docs, ...statusCode}
       ];
-      return TetaResponse<List<dynamic>, List<dynamic>?>(
+      return ClearResponse<List<dynamic>, List<dynamic>?>(
         data: listDocs,
         error: null,
       );
@@ -177,7 +175,7 @@ class TetaHttpRequest {
   }
 
   /// Delete Request
-  Future<TetaResponse<List<dynamic>?, List<dynamic>?>> delete(
+  Future<ClearResponse<List<dynamic>?, List<dynamic>?>> delete(
     final String url,
     final String expectedStatusCode,
     final Map<String, dynamic> parameters,
@@ -215,7 +213,7 @@ class TetaHttpRequest {
               .map((final dynamic e) => <String, dynamic>{...e, ...statusCode})
               .toList();
 
-          return TetaResponse<List<dynamic>?, List<dynamic>>(
+          return ClearResponse<List<dynamic>?, List<dynamic>>(
             data: null,
             error: listDocs,
           );
@@ -224,7 +222,7 @@ class TetaHttpRequest {
             <String, dynamic>{...docs, ...statusCode}
           ];
 
-          return TetaResponse<List<dynamic>?, List<dynamic>>(
+          return ClearResponse<List<dynamic>?, List<dynamic>>(
             data: null,
             error: listDocs,
           );
@@ -232,7 +230,7 @@ class TetaHttpRequest {
       }
     }
 
-    return TetaResponse<List<dynamic>?, List<dynamic>?>(
+    return ClearResponse<List<dynamic>?, List<dynamic>?>(
       data: <dynamic>[
         <String, dynamic>{...statusCode}
       ],
@@ -241,7 +239,7 @@ class TetaHttpRequest {
   }
 
   /// Update Request
-  Future<TetaResponse<List<dynamic>?, List<dynamic>?>> update(
+  Future<ClearResponse<List<dynamic>?, List<dynamic>?>> update(
     final String url,
     final String expectedStatusCode,
     final Map<String, dynamic> parameters,
@@ -283,7 +281,7 @@ class TetaHttpRequest {
           final List<dynamic> listDocs = (docs)
               .map((final dynamic e) => <String, dynamic>{...e, ...statusCode})
               .toList();
-          return TetaResponse<List<dynamic>?, List<dynamic>>(
+          return ClearResponse<List<dynamic>?, List<dynamic>>(
             data: null,
             error: listDocs,
           );
@@ -291,7 +289,7 @@ class TetaHttpRequest {
           final listDocs = <dynamic>[
             <String, dynamic>{...docs, ...statusCode}
           ];
-          return TetaResponse<List<dynamic>?, List<dynamic>>(
+          return ClearResponse<List<dynamic>?, List<dynamic>>(
             data: null,
             error: listDocs,
           );
@@ -305,7 +303,7 @@ class TetaHttpRequest {
       final List<dynamic> listDocs = (docs)
           .map((final dynamic e) => <String, dynamic>{...e, ...statusCode})
           .toList();
-      return TetaResponse<List<dynamic>, List<dynamic>?>(
+      return ClearResponse<List<dynamic>, List<dynamic>?>(
         data: listDocs,
         error: null,
       );
@@ -313,7 +311,7 @@ class TetaHttpRequest {
       final listDocs = <dynamic>[
         <String, dynamic>{...docs, ...statusCode}
       ];
-      return TetaResponse<List<dynamic>, List<dynamic>?>(
+      return ClearResponse<List<dynamic>, List<dynamic>?>(
         data: listDocs,
         error: null,
       );

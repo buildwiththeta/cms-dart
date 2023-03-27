@@ -1,10 +1,6 @@
-import 'dart:convert';
-
-import 'package:injectable/injectable.dart';
 import 'package:teta_cms/src/mappers/product_mapper.dart';
 import 'package:teta_cms/src/models/response.dart';
 
-@lazySingleton
 class TransactionsMapper {
   TransactionsMapper(this._productMapper);
 
@@ -17,7 +13,7 @@ class TransactionsMapper {
           );
 
   TransactionModel mapTransaction(Map<String, dynamic> json) {
-    final decodedList = (json['items']  as List<dynamic>)
+    final decodedList = (json['items'] as List<dynamic>)
         .map((final dynamic e) => e as Map<String, dynamic>)
         .toList(growable: false);
 

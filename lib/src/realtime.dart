@@ -69,18 +69,19 @@ bool _matchAction(
   return false;
 }
 
-/// Teta Realtime
-@lazySingleton
-class TetaRealtime {
+class Realtime {
   ///Constructor
-  TetaRealtime(
+  Realtime(
     this._serverRequestMetadata,
-  );
+  ) : _db = Database(Backups(_serverRequestMetadata),
+            Policies(_serverRequestMetadata), _serverRequestMetadata);
 
   socket_io.Socket? _socket;
 
   ///This stores the token and project id headers.
   final ServerRequestMetadataStore _serverRequestMetadata;
+
+  final Database _db;
 
   /// List of all the streams
   List<RealtimeHandler> handlers = [];
@@ -102,12 +103,12 @@ class TetaRealtime {
     _socket = socket_io.io(Constants.tetaUrl, opts);
 
     _socket?.onConnect((final dynamic _) {
-      TetaCMS.printWarning('Socket Connected');
+      Logger.printWarning('Socket Connected');
       completer.complete();
     });
 
     _socket?.on('event', (final dynamic data) {
-      TetaCMS.printError('Socket Event: $data');
+      Logger.printError('Socket Event: $data');
       final event = SocketChangeEvent.fromJson(data as Map<String, dynamic>);
 
       for (final handler in handlers) {
@@ -133,6 +134,7 @@ class TetaRealtime {
     return completer.future;
   }
 
+  // ignore: no_leading_underscores_for_local_identifiers
   void _off(final RealtimeHandler _handler) {
     final handler = handlers.firstWhere((final h) => h == _handler);
     handlers.remove(handler);
@@ -160,7 +162,7 @@ class TetaRealtime {
 
     if (_socket == null) await _openSocket();
 
-    TetaCMS.printWarning('Socket Id: ${_socket!.id}');
+    Logger.printWarning('Socket Id: ${_socket!.id}');
 
     final collId = collectionName ?? collectionId ?? '*';
     final docId = action.targetDocument ? documentId : '*';
@@ -215,13 +217,8 @@ class TetaRealtime {
         }
       },
     );
-    TetaCMS.instance.analytics.insertEvent(
-      TetaAnalyticsType.streamCollection,
-      'Teta CMS: realtime request',
-      <String, dynamic>{},
-      isUserIdPreferableIfExists: true,
-    );
-    TetaCMS.I.db.getCollections().then(
+
+    _db.getCollections().then(
       (final e) {
         if (e.error == null) {
           streamController.add(e.data!);
@@ -230,9 +227,9 @@ class TetaRealtime {
     );
     on(
       callback: (final e) async {
-        TetaCMS.log('on stream collections event. $e');
-        final resp = await TetaCMS.I.db.getCollections();
-        TetaCMS.log('on resp get collections: $resp');
+        Logger.printMessage('on stream collections event. $e');
+        final resp = await _db.getCollections();
+        Logger.printMessage('on resp get collections: $resp');
         if (resp.error == null) {
           streamController.add(resp.data!);
         }
@@ -258,19 +255,7 @@ class TetaRealtime {
         }
       },
     );
-    try {
-      TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.streamCollection,
-        'Teta CMS: realtime request',
-        <String, dynamic>{},
-        isUserIdPreferableIfExists: true,
-      );
-    } catch (e) {
-      TetaCMS.printError(
-        'Error inserting a new event in Teta Analytics, error: $e',
-      );
-    }
-    TetaCMS.I.db
+    _db
         .fromId(collectionId)
         .get(
           filters: filters,
@@ -280,7 +265,7 @@ class TetaRealtime {
         )
         .then(
       (final e) {
-        TetaCMS.printWarning('${e.error}, ${e.data}');
+        Logger.printWarning('${e.error}, ${e.data}');
         if (e.error == null) {
           streamController.add(e.data!);
         }
@@ -289,21 +274,7 @@ class TetaRealtime {
     on(
       collectionId: collectionId,
       callback: (final e) async {
-        try {
-          unawaited(
-            TetaCMS.instance.analytics.insertEvent(
-              TetaAnalyticsType.streamCollection,
-              'Teta CMS: realtime request',
-              <String, dynamic>{},
-              isUserIdPreferableIfExists: true,
-            ),
-          );
-        } catch (e) {
-          TetaCMS.printError(
-            'Error inserting a new event in Teta Analytics, error: $e',
-          );
-        }
-        final resp = await TetaCMS.I.db.fromId(collectionId).get(
+        final resp = await _db.fromId(collectionId).get(
               filters: filters,
               limit: limit,
               page: page,
@@ -334,13 +305,7 @@ class TetaRealtime {
         }
       },
     );
-    TetaCMS.instance.analytics.insertEvent(
-      TetaAnalyticsType.streamCollection,
-      'Teta CMS: realtime request',
-      <String, dynamic>{},
-      isUserIdPreferableIfExists: true,
-    );
-    TetaCMS.I.db
+    _db
         .from(collectionName)
         .get(
           filters: filters,
@@ -350,7 +315,7 @@ class TetaRealtime {
         )
         .then(
       (final e) {
-        TetaCMS.printWarning('${e.error}, ${e.data}');
+        Logger.printWarning('${e.error}, ${e.data}');
         if (e.error == null) {
           streamController.add(e.data!);
         }
@@ -359,17 +324,7 @@ class TetaRealtime {
     on(
       collectionName: collectionName,
       callback: (final e) async {
-        try {
-          unawaited(
-            TetaCMS.instance.analytics.insertEvent(
-              TetaAnalyticsType.streamCollection,
-              'Teta CMS: realtime request',
-              <String, dynamic>{},
-              isUserIdPreferableIfExists: true,
-            ),
-          );
-        } catch (_) {}
-        final resp = await TetaCMS.I.db.from(collectionName).get(
+        final resp = await _db.from(collectionName).get(
               filters: filters,
               limit: limit,
               page: page,

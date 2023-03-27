@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:clear_response/clear_response.dart';
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/src/database/row_actions.dart';
 import 'package:teta_cms/src/models/stream_actions.dart';
@@ -16,8 +17,8 @@ class TetaRowQuery {
   })  : _rowId = rowId,
         _collectionId = collectionId,
         _collectionName = collectionName,
-        _doc = TetaDocumentActions(rowId, _serverRequestMetadata),
-        _realtime = TetaRealtime(_serverRequestMetadata);
+        _doc = DocumentActions(rowId, _serverRequestMetadata),
+        _realtime = Realtime(_serverRequestMetadata);
 
   /// Document id
   final String _rowId;
@@ -28,17 +29,17 @@ class TetaRowQuery {
   /// Current collection name
   final String? _collectionName;
 
-  final TetaDocumentActions _doc;
+  final DocumentActions _doc;
 
-  final TetaRealtime _realtime;
+  final Realtime _realtime;
 
   /// Delete the current document
-  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>>
+  Future<ClearResponse<Map<String, dynamic>?, ClearErrorResponse?>>
       delete() async {
     if (_collectionName == null && _collectionId == null) {
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           message:
               'Call .select() choosing one between id and name before this.',
         ),
@@ -77,13 +78,13 @@ class TetaRowQuery {
   }
 
   /// Update the document
-  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>> update(
+  Future<ClearResponse<Map<String, dynamic>?, ClearErrorResponse?>> update(
     final Map<String, dynamic> content,
   ) async {
     if (_collectionName == null && _collectionId == null) {
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           message:
               'Call .select() choosing one between id and name before this.',
         ),

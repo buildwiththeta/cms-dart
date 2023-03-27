@@ -5,14 +5,14 @@ enum TetaPlan {
   ultra,
 }
 
-class TetaPlanResponse {
-  const TetaPlanResponse({
+class PlanResponse {
+  const PlanResponse({
     required this.isPremium,
     required this.plan,
     this.downgradedStillActive,
   });
 
-  static TetaPlanResponse fromJson(final Map<String, dynamic> json) {
+  static PlanResponse fromJson(final Map<String, dynamic> json) {
     final isPremium = json['isPremium'] as bool? ?? false;
     final plan = (json['premiumPlan'] as int?) == 1 ||
             (json['premiumPlan'] as int?) == 99
@@ -25,7 +25,7 @@ class TetaPlanResponse {
                 ? TetaPlan.basic
                 : TetaPlan.free;
     final downgradedStillActive = !isPremium && plan != TetaPlan.free;
-    return TetaPlanResponse(
+    return PlanResponse(
       isPremium: isPremium,
       plan: plan,
       downgradedStillActive: downgradedStillActive,

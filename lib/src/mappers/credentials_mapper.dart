@@ -1,7 +1,5 @@
-import 'package:injectable/injectable.dart';
 import 'package:teta_cms/src/models/store/credentials.dart';
 
-@lazySingleton
 class CredentialsMapper {
   ShopCredentials mapCredentials(Map<String, dynamic> json) {
     return ShopCredentials(

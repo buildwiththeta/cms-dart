@@ -1,19 +1,16 @@
 import 'dart:convert';
 
+import 'package:clear_response/clear_response.dart';
 import 'package:enum_to_string/enum_to_string.dart';
 import 'package:http/http.dart' as http;
-import 'package:injectable/injectable.dart';
 import 'package:teta_cms/src/constants.dart';
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/teta_cms.dart';
 
 /// Teta Analytics is our service to track events in an OLAP DB
-@lazySingleton
-class TetaAnalytics {
+class Analytics {
   ///
-  TetaAnalytics(this._serverRequestMetadata) {
-    init();
-  }
+  Analytics(this._serverRequestMetadata);
 
   ///This stores the token and project id headers.
   final ServerRequestMetadataStore _serverRequestMetadata;
@@ -41,17 +38,9 @@ class TetaAnalytics {
     };
   }
 
-  /// Detected id of the logged user
-  String? _currentUserId;
-
-  /// Initialize the logged user id
-  Future init({final String? userId}) async {
-    _currentUserId = userId ?? (await TetaCMS.instance.auth.user.get).uid;
-  }
-
   /// Creates a new event
-  Future<TetaResponse<dynamic, TetaErrorResponse?>> insertEvent(
-    final TetaAnalyticsType type,
+  Future<ClearResponse<dynamic, ClearErrorResponse?>> insertEvent(
+    final AnalyticsTypeEnum type,
     final String description,
     final Map<String, dynamic> properties, {
     required final bool isUserIdPreferableIfExists,
@@ -67,28 +56,26 @@ class TetaAnalytics {
       body: json.encode(<String, dynamic>{
         'description': description,
         'prj_id': {serverMetadata.prjId},
-        if (isUserIdPreferableIfExists && _currentUserId != null)
-          'user_id': _currentUserId,
         ...properties,
       }),
     );
     if (res.statusCode != 200) {
-      return TetaResponse<dynamic, TetaErrorResponse>(
+      return ClearResponse<dynamic, ClearErrorResponse>(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message: res.body,
         ),
       );
     }
-    return TetaResponse<dynamic, TetaErrorResponse?>(
+    return ClearResponse<dynamic, ClearErrorResponse?>(
       data: res.body,
       error: null,
     );
   }
 
   /// Creates a new event
-  Future<TetaResponse<dynamic, TetaErrorResponse?>> get(
+  Future<ClearResponse<dynamic, ClearErrorResponse?>> get(
     final String ayayaQuery,
   ) async {
     final uri = Uri.parse(
@@ -104,9 +91,9 @@ class TetaAnalytics {
       body: ayayaQuery,
     );
     if (res.statusCode != 200) {
-      return TetaResponse<dynamic, TetaErrorResponse>(
+      return ClearResponse<dynamic, ClearErrorResponse>(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message: res.body,
         ),
@@ -115,7 +102,7 @@ class TetaAnalytics {
     final isCount = ((json.decode(res.body) as List<dynamic>?)?.first
             as Map<String, dynamic>?)?['count'] !=
         null;
-    return TetaResponse<dynamic, TetaErrorResponse?>(
+    return ClearResponse<dynamic, ClearErrorResponse?>(
       data: !isCount
           ? (((json.decode(res.body) as List<dynamic>?)?.first
                   as Map<String, dynamic>?)?['data'] as List<dynamic>? ??

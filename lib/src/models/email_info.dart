@@ -1,5 +1,5 @@
-class TetaEmailSettings {
-  TetaEmailSettings({
+class EmailSettings {
+  EmailSettings({
     required this.username,
     required this.password,
     required this.host,
@@ -7,7 +7,7 @@ class TetaEmailSettings {
     required this.secure,
   });
 
-  TetaEmailSettings.fromJson(final Map<String, dynamic> json)
+  EmailSettings.fromJson(final Map<String, dynamic> json)
       : username = json['username'] as String?,
         password = json['password'] as String?,
         host = json['host'] as String?,

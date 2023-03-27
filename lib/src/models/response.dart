@@ -1,49 +1,29 @@
+import 'package:clear_response/clear_response.dart';
 import 'package:teta_cms/src/models/store/credentials.dart';
 import 'package:teta_cms/src/models/store/product.dart';
 import 'package:teta_cms/src/models/store/shipping.dart';
 import 'package:teta_cms/src/models/store/shop_settings.dart';
 
-class TetaResponse<DATA, ERROR> {
-  TetaResponse({
-    required this.data,
-    required this.error,
-  });
-
-  final DATA data;
-  final ERROR error;
-}
-
-class TetaErrorResponse {
-  TetaErrorResponse({
-    this.message,
-    this.code,
-  });
-
-  final String? message;
-  final int? code;
-}
-
-class TetaProductResponse
-    extends TetaResponse<TetaProduct?, TetaErrorResponse?> {
-  TetaProductResponse({
-    final TetaProduct? data,
-    final TetaErrorResponse? error,
+class ProductResponse extends ClearResponse<Product?, ClearErrorResponse?> {
+  ProductResponse({
+    final Product? data,
+    final ClearErrorResponse? error,
   }) : super(data: data, error: error);
 }
 
-class TetaProductsResponse
-    extends TetaResponse<List<TetaProduct>?, TetaErrorResponse?> {
-  TetaProductsResponse({
-    final List<TetaProduct>? data,
-    final TetaErrorResponse? error,
+class ProductsResponse
+    extends ClearResponse<List<Product>?, ClearErrorResponse?> {
+  ProductsResponse({
+    final List<Product>? data,
+    final ClearErrorResponse? error,
   }) : super(data: data, error: error);
 }
 
-class TetaPaymentIntentResponse
-    extends TetaResponse<PaymentIntentData?, TetaErrorResponse?> {
-  TetaPaymentIntentResponse({
+class PaymentIntentResponse
+    extends ClearResponse<PaymentIntentData?, ClearErrorResponse?> {
+  PaymentIntentResponse({
     final PaymentIntentData? data,
-    final TetaErrorResponse? error,
+    final ClearErrorResponse? error,
   }) : super(data: data, error: error);
 }
 
@@ -61,42 +41,42 @@ class PaymentIntentData {
   final String merchantIdentifier;
 }
 
-class TetaCredentialsResponse
-    extends TetaResponse<ShopCredentials?, TetaErrorResponse?> {
-  TetaCredentialsResponse({
+class CredentialsResponse
+    extends ClearResponse<ShopCredentials?, ClearErrorResponse?> {
+  CredentialsResponse({
     final ShopCredentials? data,
-    final TetaErrorResponse? error,
+    final ClearErrorResponse? error,
   }) : super(data: data, error: error);
 }
 
-class TetaReceiptResponse extends TetaResponse<String?, TetaErrorResponse?> {
-  TetaReceiptResponse({
+class ReceiptResponse extends ClearResponse<String?, ClearErrorResponse?> {
+  ReceiptResponse({
     final String? data,
-    final TetaErrorResponse? error,
+    final ClearErrorResponse? error,
   }) : super(data: data, error: error);
 }
 
-class TetaTransactionsResponse
-    extends TetaResponse<List<TransactionModel>?, TetaErrorResponse?> {
-  TetaTransactionsResponse({
+class TransactionsResponse
+    extends ClearResponse<List<TransactionModel>?, ClearErrorResponse?> {
+  TransactionsResponse({
     final List<TransactionModel>? data,
-    final TetaErrorResponse? error,
+    final ClearErrorResponse? error,
   }) : super(data: data, error: error);
 }
 
-class TetaShippingResponse
-    extends TetaResponse<List<Shipping>?, TetaErrorResponse?> {
-  TetaShippingResponse({
+class ShippingResponse
+    extends ClearResponse<List<Shipping>?, ClearErrorResponse?> {
+  ShippingResponse({
     final List<Shipping>? data,
-    final TetaErrorResponse? error,
+    final ClearErrorResponse? error,
   }) : super(data: data, error: error);
 }
 
-class TetaShopSettingsResponse
-    extends TetaResponse<ShopSettings?, TetaErrorResponse?> {
-  TetaShopSettingsResponse({
+class ShopSettingsResponse
+    extends ClearResponse<ShopSettings?, ClearErrorResponse?> {
+  ShopSettingsResponse({
     final ShopSettings? data,
-    final TetaErrorResponse? error,
+    final ClearErrorResponse? error,
   }) : super(data: data, error: error);
 }
 
@@ -115,13 +95,13 @@ class TransactionModel {
   final String paymentIntentId;
   final String state;
   final String ammount;
-  final List<TetaProduct> items;
+  final List<Product> items;
 
-  Map<String, dynamic> toJson() => <String, dynamic> {
-    'user_id': userId,
-    'prj_id': prjId,
-    'paymentIntentId': paymentIntentId,
-    'state': state,
-    'amount': ammount,
-  };
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'user_id': userId,
+        'prj_id': prjId,
+        'paymentIntentId': paymentIntentId,
+        'state': state,
+        'amount': ammount,
+      };
 }

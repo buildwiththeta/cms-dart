@@ -1,8 +1,6 @@
-import 'package:injectable/injectable.dart';
 import 'package:teta_cms/src/models/server_request_metadata.dart';
 
 /// Request the store metadata
-@lazySingleton
 class ServerRequestMetadataStore {
   ServerRequestMetadata _localMetadata = ServerRequestMetadata(
     token: 'default',

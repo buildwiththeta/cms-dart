@@ -1,5 +1,5 @@
-class TetaEmailTemplate {
-  TetaEmailTemplate({
+class EmailTemplate {
+  EmailTemplate({
     required this.id,
     required this.name,
     required this.subject,
@@ -7,7 +7,7 @@ class TetaEmailTemplate {
     required this.text,
   });
 
-  TetaEmailTemplate.fromJson(final Map<String, dynamic> json)
+  EmailTemplate.fromJson(final Map<String, dynamic> json)
       : id = json['_id'] as String?,
         name = json['name'] as String?,
         subject = json['subject'] as String?,

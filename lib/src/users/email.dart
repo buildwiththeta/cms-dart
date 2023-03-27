@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:clear_response/clear_response.dart';
 import 'package:http/http.dart' as http;
-import 'package:injectable/injectable.dart';
+import 'package:light_logger/light_logger.dart';
 import 'package:teta_cms/src/constants.dart';
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/teta_cms.dart';
 
 /// Project settings
-@lazySingleton
 class TetaEmail {
   /// Project settings
   TetaEmail(
@@ -19,7 +19,7 @@ class TetaEmail {
   final ServerRequestMetadataStore _serverRequestMetadata;
 
   /// Get email info
-  Future<TetaResponse<TetaEmailResponse?, TetaErrorResponse?>> info() async {
+  Future<ClearResponse<EmailResponse?, ClearErrorResponse?>> info() async {
     final requestMetadata = _serverRequestMetadata.getMetadata();
 
     final uri = Uri.parse(
@@ -33,41 +33,30 @@ class TetaEmail {
       },
     );
 
-    TetaCMS.log('get email info body: ${res.body}');
+    Logger.printMessage('get email info body: ${res.body}');
 
     if (res.statusCode != 200) {
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message: res.body,
         ),
       );
     }
 
-    unawaited(
-      TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.emailInfo,
-        'Teta Auth: get email info',
-        <String, dynamic>{
-          'weight': res.bodyBytes.lengthInBytes,
-        },
-        isUserIdPreferableIfExists: false,
-      ),
-    );
-
     final data = json.decode(res.body) as Map<String, dynamic>?;
     if (data != null) {
-      final result = TetaEmailResponse.fromJson(data);
+      final result = EmailResponse.fromJson(data);
 
-      return TetaResponse(
+      return ClearResponse(
         data: result,
         error: null,
       );
     } else {
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message: 'Impossible to fetch res.body',
         ),
@@ -76,7 +65,7 @@ class TetaEmail {
   }
 
   /// Retrieve project credentials
-  Future<TetaResponse<bool, TetaErrorResponse?>> send({
+  Future<ClearResponse<bool, ClearErrorResponse?>> send({
     required final String templateId,
     required final String fromName,
     required final String fromAddress,
@@ -101,33 +90,24 @@ class TetaEmail {
     );
 
     if (res.statusCode != 200) {
-      return TetaResponse(
+      return ClearResponse(
         data: false,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message: res.body,
         ),
       );
     }
 
-    unawaited(
-      TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.emailSend,
-        'Teta Auth: send email',
-        <String, dynamic>{},
-        isUserIdPreferableIfExists: false,
-      ),
-    );
-
-    return TetaResponse(
+    return ClearResponse(
       data: true,
       error: null,
     );
   }
 
   /// Insert new template
-  Future<TetaResponse<bool, TetaErrorResponse?>> insertTemplate(
-    final TetaEmailTemplate template,
+  Future<ClearResponse<bool, ClearErrorResponse?>> insertTemplate(
+    final EmailTemplate template,
   ) async {
     final requestMetadata = _serverRequestMetadata.getMetadata();
 
@@ -145,32 +125,23 @@ class TetaEmail {
     );
 
     if (res.statusCode != 200) {
-      return TetaResponse(
+      return ClearResponse(
         data: false,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message: res.body,
         ),
       );
     }
 
-    unawaited(
-      TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.emailInsertTemplate,
-        'Teta Auth: insert new template',
-        <String, dynamic>{},
-        isUserIdPreferableIfExists: false,
-      ),
-    );
-
-    return TetaResponse(
+    return ClearResponse(
       data: true,
       error: null,
     );
   }
 
   /// Delete a template
-  Future<TetaResponse<bool, TetaErrorResponse?>> deleteTemplate(
+  Future<ClearResponse<bool, ClearErrorResponse?>> deleteTemplate(
     final String templateId,
   ) async {
     final requestMetadata = _serverRequestMetadata.getMetadata();
@@ -187,35 +158,24 @@ class TetaEmail {
     );
 
     if (res.statusCode != 200) {
-      return TetaResponse(
+      return ClearResponse(
         data: false,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message: res.body,
         ),
       );
     }
 
-    unawaited(
-      TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.tetaAuthRetrieveCredentials,
-        'Teta Auth: retrieve credentials request',
-        <String, dynamic>{
-          'weight': res.bodyBytes.lengthInBytes,
-        },
-        isUserIdPreferableIfExists: false,
-      ),
-    );
-
-    return TetaResponse(
+    return ClearResponse(
       data: true,
       error: null,
     );
   }
 
   /// Update a template
-  Future<TetaResponse<bool, TetaErrorResponse?>> updateTemplate(
-    final TetaEmailTemplate template,
+  Future<ClearResponse<bool, ClearErrorResponse?>> updateTemplate(
+    final EmailTemplate template,
   ) async {
     final requestMetadata = _serverRequestMetadata.getMetadata();
 
@@ -233,25 +193,16 @@ class TetaEmail {
     );
 
     if (res.statusCode != 200) {
-      return TetaResponse(
+      return ClearResponse(
         data: false,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message: res.body,
         ),
       );
     }
 
-    unawaited(
-      TetaCMS.instance.analytics.insertEvent(
-        TetaAnalyticsType.emailInsertTemplate,
-        'Teta Auth: insert new template',
-        <String, dynamic>{},
-        isUserIdPreferableIfExists: false,
-      ),
-    );
-
-    return TetaResponse(
+    return ClearResponse(
       data: true,
       error: null,
     );

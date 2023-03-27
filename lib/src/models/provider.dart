@@ -1,5 +1,5 @@
 /// Supported social OAuth providers
-enum TetaProvider {
+enum AuthProvider {
   google,
   github,
   twitter,

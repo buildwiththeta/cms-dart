@@ -1,17 +1,17 @@
 import 'package:teta_cms/teta_cms.dart';
 
 /// Custom response object
-class TetaEmailResponse {
+class EmailResponse {
   /// Custom response object
-  TetaEmailResponse({
+  EmailResponse({
     required this.settings,
     required this.templates,
   });
 
   /// Get a TetaEmailResponse from json
-  TetaEmailResponse.fromJson(final Map<String, dynamic> json)
+  EmailResponse.fromJson(final Map<String, dynamic> json)
       : settings = json['settings'] != null
-            ? TetaEmailSettings.fromJson(
+            ? EmailSettings.fromJson(
                 json['settings'] as Map<String, dynamic>,
               )
             : null,
@@ -19,14 +19,14 @@ class TetaEmailResponse {
             ? (json['templates'] as List<dynamic>)
                 .map(
                   (final dynamic e) =>
-                      TetaEmailTemplate.fromJson(e as Map<String, dynamic>),
+                      EmailTemplate.fromJson(e as Map<String, dynamic>),
                 )
                 .toList()
             : [];
 
   /// Settings
-  final TetaEmailSettings? settings;
+  final EmailSettings? settings;
 
   /// Templates
-  final List<TetaEmailTemplate> templates;
+  final List<EmailTemplate> templates;
 }

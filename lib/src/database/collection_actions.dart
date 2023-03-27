@@ -1,14 +1,16 @@
 import 'dart:convert';
 
+import 'package:clear_response/clear_response.dart';
 import 'package:http/http.dart' as http;
+import 'package:light_logger/light_logger.dart';
 import 'package:teta_cms/src/constants.dart';
 import 'package:teta_cms/src/data_stores/local/server_request_metadata_store.dart';
 import 'package:teta_cms/teta_cms.dart';
 
 /// Set of methods to edit collections
-class TetaCollectionActions {
+class CollectionActions {
   /// Set of methods to edit collections
-  TetaCollectionActions(
+  CollectionActions(
     this._serverRequestMetadata,
   );
 
@@ -51,32 +53,12 @@ class TetaCollectionActions {
     };
   }
 
-  void _registerEvent({
-    required final TetaAnalyticsType event,
-    required final String description,
-    final Map<String, dynamic> props = const <String, dynamic>{},
-    final bool useUserId = false,
-  }) {
-    try {
-      TetaCMS.instance.analytics.insertEvent(
-        event,
-        description,
-        props,
-        isUserIdPreferableIfExists: useUserId,
-      );
-    } catch (e) {
-      TetaCMS.printError(
-        'Error inserting a new event in Teta Analytics, error: $e',
-      );
-    }
-  }
-
   /// Deletes the collection with id [collectionId] if prj_id is [prjId].
   ///
   /// Throws an exception on request error ( statusCode != 200 )
   ///
   /// Returns `true` on success
-  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>>
+  Future<ClearResponse<Map<String, dynamic>?, ClearErrorResponse?>>
       deleteCollection(
     final String collectionId,
   ) async {
@@ -86,12 +68,12 @@ class TetaCollectionActions {
       headers: _getDefaultHeaders,
     );
     if (res.statusCode != 200) {
-      TetaCMS.printError(
+      Logger.printError(
         'deleteDocument returned status ${res.statusCode}, error: ${res.body}',
       );
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message:
               'deleteDocument returned status ${res.statusCode}, error: ${res.body}',
@@ -99,11 +81,7 @@ class TetaCollectionActions {
       );
     }
     final data = json.decode(res.body) as Map<String, dynamic>;
-    _registerEvent(
-      event: TetaAnalyticsType.deleteCollection,
-      description: 'Teta CMS: delete collection request',
-    );
-    return TetaResponse(data: data, error: null);
+    return ClearResponse(data: data, error: null);
   }
 
   /// Deletes the collection with id [collectionName] if prj_id is [prjId].
@@ -111,7 +89,7 @@ class TetaCollectionActions {
   /// Throws an exception on request error ( statusCode != 200 )
   ///
   /// Returns `true` on success
-  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>>
+  Future<ClearResponse<Map<String, dynamic>?, ClearErrorResponse?>>
       deleteCollectionByName(
     final String collectionName,
   ) async {
@@ -121,12 +99,12 @@ class TetaCollectionActions {
       headers: _getDefaultHeadersForNameEndpoints,
     );
     if (res.statusCode != 200) {
-      TetaCMS.printError(
+      Logger.printError(
         'deleteDocumentByName returned status ${res.statusCode}, error: ${res.body}',
       );
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message:
               'deleteDocumentByName returned status ${res.statusCode}, error: ${res.body}',
@@ -134,11 +112,7 @@ class TetaCollectionActions {
       );
     }
     final data = json.decode(res.body) as Map<String, dynamic>;
-    _registerEvent(
-      event: TetaAnalyticsType.deleteCollection,
-      description: 'Teta CMS: delete collection request',
-    );
-    return TetaResponse(data: data, error: null);
+    return ClearResponse(data: data, error: null);
   }
 
   /// Gets the collection with id [collectionId] if prj_id is [prjId].
@@ -146,7 +120,7 @@ class TetaCollectionActions {
   /// Throws an exception on request error ( statusCode != 200 )
   ///
   /// Returns the collection as `Map<String,dynamic>`
-  Future<TetaResponse<List<dynamic>?, TetaErrorResponse?>> getCollection(
+  Future<ClearResponse<List<dynamic>?, ClearErrorResponse?>> getCollection(
     final String collectionId, {
     final List<Filter> filters = const [],
     final int page = 0,
@@ -171,12 +145,12 @@ class TetaCollectionActions {
       },
     );
     if (res.statusCode != 200) {
-      TetaCMS.printError(
+      Logger.printError(
         'getCollection returned status ${res.statusCode}, error: ${res.body}',
       );
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message:
               'getCollection returned status ${res.statusCode}, error: ${res.body}',
@@ -184,15 +158,7 @@ class TetaCollectionActions {
       );
     }
     final data = json.decode(res.body) as List<dynamic>;
-    _registerEvent(
-      event: TetaAnalyticsType.getCollection,
-      description: 'Teta CMS: cms request',
-      props: <String, dynamic>{
-        'weight': res.bodyBytes.lengthInBytes,
-      },
-      useUserId: true,
-    );
-    return TetaResponse(data: data, error: null);
+    return ClearResponse(data: data, error: null);
   }
 
   /// Gets the collection with id [collectionName] if prj_id is [prjId].
@@ -200,7 +166,8 @@ class TetaCollectionActions {
   /// Throws an exception on request error ( statusCode != 200 )
   ///
   /// Returns the collection as `Map<String,dynamic>`
-  Future<TetaResponse<List<dynamic>?, TetaErrorResponse?>> getCollectionByName(
+  Future<ClearResponse<List<dynamic>?, ClearErrorResponse?>>
+      getCollectionByName(
     final String collectionName, {
     final List<Filter> filters = const [],
     final int page = 0,
@@ -225,12 +192,12 @@ class TetaCollectionActions {
       },
     );
     if (res.statusCode != 200) {
-      TetaCMS.printError(
+      Logger.printError(
         'getCollectionByName returned status ${res.statusCode}, error: ${res.body}',
       );
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message:
               'getCollectionByName returned status ${res.statusCode}, error: ${res.body}',
@@ -238,15 +205,7 @@ class TetaCollectionActions {
       );
     }
     final data = json.decode(res.body) as List<dynamic>;
-    _registerEvent(
-      event: TetaAnalyticsType.getCollection,
-      description: 'Teta CMS: cms request',
-      props: <String, dynamic>{
-        'weight': res.bodyBytes.lengthInBytes,
-      },
-      useUserId: true,
-    );
-    return TetaResponse(data: data, error: null);
+    return ClearResponse(data: data, error: null);
   }
 
   /// Gets the collection with id [collectionId] if prj_id is [prjId].
@@ -290,14 +249,6 @@ class TetaCollectionActions {
     final data = json.decode(res.body) as Map<String, dynamic>;
 
     final count = data['count'] as int? ?? 0;
-
-    _registerEvent(
-      event: TetaAnalyticsType.getCollectionCount,
-      description: 'Teta CMS: count request',
-      props: <String, dynamic>{},
-      useUserId: true,
-    );
-
     return count;
   }
 
@@ -344,13 +295,6 @@ class TetaCollectionActions {
 
     final count = data['count'] as int? ?? 0;
 
-    _registerEvent(
-      event: TetaAnalyticsType.getCollectionCount,
-      description: 'Teta CMS: count request',
-      props: <String, dynamic>{},
-      useUserId: true,
-    );
-
     return count;
   }
 
@@ -359,7 +303,7 @@ class TetaCollectionActions {
   /// Throws an exception on request error ( statusCode != 200 )
   ///
   /// Returns the updated collection as `Map<String,dynamic>`
-  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>>
+  Future<ClearResponse<Map<String, dynamic>?, ClearErrorResponse?>>
       updateCollection(
     final String collectionId,
     final String name,
@@ -377,12 +321,12 @@ class TetaCollectionActions {
       }),
     );
     if (res.statusCode != 200) {
-      TetaCMS.printError(
+      Logger.printError(
         'updateCollection returned status ${res.statusCode}, error: ${res.body}',
       );
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message:
               'updateCollection returned status ${res.statusCode}, error: ${res.body}',
@@ -390,15 +334,7 @@ class TetaCollectionActions {
       );
     }
     final data = json.decode(res.body) as Map<String, dynamic>;
-    _registerEvent(
-      event: TetaAnalyticsType.updateCollection,
-      description: 'Teta CMS: update collection request',
-      props: <String, dynamic>{
-        'weight': res.bodyBytes.lengthInBytes,
-      },
-      useUserId: true,
-    );
-    return TetaResponse(data: data, error: null);
+    return ClearResponse(data: data, error: null);
   }
 
   /// Updates the collection [collectionName] with [name] if prj_id is [prjId].
@@ -406,7 +342,7 @@ class TetaCollectionActions {
   /// Throws an exception on request error ( statusCode != 200 )
   ///
   /// Returns the updated collection as `Map<String,dynamic>`
-  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>>
+  Future<ClearResponse<Map<String, dynamic>?, ClearErrorResponse?>>
       updateCollectionByName(
     final String collectionName,
     final String name,
@@ -424,12 +360,12 @@ class TetaCollectionActions {
       }),
     );
     if (res.statusCode != 200) {
-      TetaCMS.printError(
+      Logger.printError(
         'updateCollectionByName returned status ${res.statusCode}, error: ${res.body}',
       );
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message:
               'updateCollectionByName returned status ${res.statusCode}, error: ${res.body}',
@@ -437,15 +373,7 @@ class TetaCollectionActions {
       );
     }
     final data = json.decode(res.body) as Map<String, dynamic>;
-    _registerEvent(
-      event: TetaAnalyticsType.updateCollection,
-      description: 'Teta CMS: update collection request',
-      props: <String, dynamic>{
-        'weight': res.bodyBytes.lengthInBytes,
-      },
-      useUserId: true,
-    );
-    return TetaResponse(data: data, error: null);
+    return ClearResponse(data: data, error: null);
   }
 
   /// Inserts the document [document] on [collectionId] if prj_id is [prjId].
@@ -453,7 +381,7 @@ class TetaCollectionActions {
   /// Throws an exception on request error ( statusCode != 200 )
   ///
   /// Returns `true` on success
-  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>>
+  Future<ClearResponse<Map<String, dynamic>?, ClearErrorResponse?>>
       insertDocument(
     final String collectionId,
     final Map<String, dynamic> document,
@@ -467,12 +395,12 @@ class TetaCollectionActions {
       body: json.encode(document),
     );
     if (res.statusCode != 200) {
-      TetaCMS.printError(
+      Logger.printError(
         'insertDocument returned status ${res.statusCode}, error: ${res.body}',
       );
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message:
               'insertDocument returned status ${res.statusCode}, error: ${res.body}',
@@ -480,15 +408,7 @@ class TetaCollectionActions {
       );
     }
     final data = json.decode(res.body) as Map<String, dynamic>;
-    _registerEvent(
-      event: TetaAnalyticsType.insertDocument,
-      description: 'Teta CMS: insert document request',
-      props: <String, dynamic>{
-        'weight': utf8.encode(json.encode(document)).length
-      },
-      useUserId: true,
-    );
-    return TetaResponse(data: data, error: null);
+    return ClearResponse(data: data, error: null);
   }
 
   /// Inserts the document [document] on [collectionName] if prj_id is [prjId].
@@ -496,7 +416,7 @@ class TetaCollectionActions {
   /// Throws an exception on request error ( statusCode != 200 )
   ///
   /// Returns `true` on success
-  Future<TetaResponse<Map<String, dynamic>?, TetaErrorResponse?>>
+  Future<ClearResponse<Map<String, dynamic>?, ClearErrorResponse?>>
       insertDocumentByCollName(
     final String collectionName,
     final Map<String, dynamic> document,
@@ -510,12 +430,12 @@ class TetaCollectionActions {
       body: json.encode(document),
     );
     if (res.statusCode != 200) {
-      TetaCMS.printError(
+      Logger.printError(
         'insertDocumentByName returned status ${res.statusCode}, error: ${res.body}',
       );
-      return TetaResponse(
+      return ClearResponse(
         data: null,
-        error: TetaErrorResponse(
+        error: ClearErrorResponse(
           code: res.statusCode,
           message:
               'insertDocumentByName returned status ${res.statusCode}, error: ${res.body}',
@@ -523,14 +443,6 @@ class TetaCollectionActions {
       );
     }
     final data = json.decode(res.body) as Map<String, dynamic>;
-    _registerEvent(
-      event: TetaAnalyticsType.insertDocument,
-      description: 'Teta CMS: insert document request',
-      props: <String, dynamic>{
-        'weight': utf8.encode(json.encode(document)).length
-      },
-      useUserId: true,
-    );
-    return TetaResponse(data: data, error: null);
+    return ClearResponse(data: data, error: null);
   }
 }

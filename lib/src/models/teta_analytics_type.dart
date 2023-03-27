@@ -1,4 +1,4 @@
-enum TetaAnalyticsType {
+enum AnalyticsTypeEnum {
   teta,
   tetaAuthSignUp,
   tetaAuthSignIn,
